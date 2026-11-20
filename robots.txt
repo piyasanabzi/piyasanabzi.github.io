@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://piyasanabzi.github.io/sitemap.xml
+Sitemap: https://piyasanabzi.site/sitemap.xml
