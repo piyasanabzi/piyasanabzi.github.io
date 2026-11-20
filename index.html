@@ -102,6 +102,9 @@
   .linkbtn{border:0;background:none;color:var(--blue);font:inherit;font-weight:700;cursor:pointer;padding:8px 0;width:100%}
   .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
   .toast.on{opacity:1;transform:translateX(-50%)}
+  .guides{display:grid;gap:8px;margin-bottom:6px}@media (min-width:720px){.guides{grid-template-columns:1fr 1fr}}
+  .guides a{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);text-decoration:none;font-weight:700;font-size:14px}
+  .flinks a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom:6px;font-size:13px}
   footer{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;color:var(--muted);font-size:12px;line-height:1.6}
   .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
   .demo{background:#5a3b00;color:#ffe2a6;text-align:center;font-size:12px;font-weight:700;padding:6px}
@@ -154,6 +157,14 @@
   <h2 id="varliklarim">Varlıklarım ve borçlarım</h2>
   <div class="panel" id="pf"></div>
 
+  <h2 id="rehberler">Altın rehberleri</h2>
+  <div class="guides">
+    <a href="/rehber/ceyrek-altin-kac-gram.html">Çeyrek altın kaç gram?</a>
+    <a href="/rehber/gram-altin-nasil-hesaplanir.html">Gram altın fiyatı nasıl hesaplanır?</a>
+    <a href="/rehber/22-ayar-24-ayar-farki.html">22 ayar ve 24 ayar farkı</a>
+    <a href="/rehber/gram-altin-mi-ceyrek-altin-mi.html">Gram altın mı, çeyrek altın mı?</a>
+    <a href="/rehber/altin-alirken-dikkat-edilmesi-gerekenler.html">Altın alırken nelere dikkat edilmeli?</a>
+  </div>
 
   <div class="note">Fiyatlar uluslararası piyasa verilerinden hesaplanan gösterge değerlerdir; banka, döviz bürosu ve kuyumcu alış-satış fiyatları farklıdır. Yatırım tavsiyesi değildir. Çeyrek, yarım, tam ve Cumhuriyet altını değerleri içerdikleri saf altın miktarından hesaplanır, işçilik dahil değildir. Dolar ve euro, Binance'teki USDT/TRY ve EUR/USDT işlemlerinden alınır ve resmî kurdan biraz farklı olabilir.</div>
 </main>
@@ -172,7 +183,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<footer><div class="wrap">Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
+<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a></nav>Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
 
 <script>
 (function(){
