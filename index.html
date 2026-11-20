@@ -255,8 +255,17 @@
   $("qty").addEventListener("input",calc); $("unit").addEventListener("change",calc);
 
   // ---------- data sources ----------
-  const BIN_REST="https://data-api.binance.vision/api/v3";
-  const BIN_WS="wss://data-stream.binance.vision/stream?streams=usdttry@miniTicker/eurusdt@miniTicker/btcusdt@miniTicker";
+  const BIN_HOSTS=["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com","https://api3.binance.com"];
+  const WS_HOSTS=["wss://data-stream.binance.vision","wss://stream.binance.com:9443","wss://stream.binance.com:443"];
+  const WS_PATH="/stream?streams=usdttry@miniTicker/eurusdt@miniTicker/btcusdt@miniTicker";
+  let binHost=0, wsHost=0, binanceOK=false;
+  async function bj(path){
+    for(let i=0;i<BIN_HOSTS.length;i++){
+      const h=(binHost+i)%BIN_HOSTS.length;
+      try{ const d=await j(BIN_HOSTS[h]+"/api/v3"+path,7000); binHost=h; return d; }catch(e){}
+    }
+    throw new Error("binance unreachable");
+  }
   let gotAny=false;
   function setLive(ok,txt){ $("live").classList.toggle("on",ok); $("liveTxt").textContent=txt; }
 
@@ -264,8 +273,9 @@
 
   async function binanceRest(){
     const syms=encodeURIComponent(JSON.stringify(["USDTTRY","EURUSDT","BTCUSDT"]));
-    const d=await j(`${BIN_REST}/ticker/24hr?symbols=${syms}`);
+    const d=await bj(`/ticker/24hr?symbols=${syms}`);
     d.forEach(x=>applyTick(x.symbol, +x.lastPrice, +x.openPrice));
+    binanceOK=true;
   }
   function applyTick(sym,last,open){
     if(sym==="USDTTRY"){ S.usdtry=last; S.usdtry24=open; }
@@ -275,20 +285,30 @@
   }
   let ws=null, wsTry=0;
   function connectWS(){
-    try{ ws=new WebSocket(BIN_WS); }catch(e){ return; }
-    ws.onopen=()=>{ wsTry=0; setLive(true,"Canlı"); };
+    let opened=false;
+    try{ ws=new WebSocket(WS_HOSTS[wsHost]+WS_PATH); }catch(e){ wsHost=(wsHost+1)%WS_HOSTS.length; setTimeout(connectWS,2000); return; }
+    ws.onopen=()=>{ opened=true; wsTry=0; binanceOK=true; setLive(true,"Canlı"); };
     ws.onmessage=e=>{ try{ const m=JSON.parse(e.data).data; applyTick(m.s, +m.c, +m.o); }catch(_){} };
-    ws.onclose=()=>{ if(gotAny) setLive(true,"Güncel"); else setLive(false,"Bağlanıyor…"); const w=Math.min(30000,1000*Math.pow(2,wsTry++)); setTimeout(connectWS,w); };
+    ws.onclose=()=>{ if(!opened) wsHost=(wsHost+1)%WS_HOSTS.length; if(gotAny) setLive(true,"Güncel"); else setLive(false,"Bağlanıyor…"); const w=Math.min(30000,1000*Math.pow(2,Math.floor(wsTry++/WS_HOSTS.length))); setTimeout(connectWS,w); };
     ws.onerror=()=>{ try{ ws.close(); }catch(_){} };
   }
 
   async function gold(){
-    const d=await j("https://xaus.com/api/v1/spot?currency=USD&compact=1");
+    const d=await j("https://xaus.com/api/v1/spot?currency=TRY");
     if(+d.spot_usd_oz>0){ S.goldOz=+d.spot_usd_oz; }
+    if(!binanceOK){
+      const r=d.fx_rates||{}; const rate=k=>{ const v=r[k]; return +(v&&typeof v==="object"?(v.rate||v.value):v); };
+      let tr=rate("TRY"); if(!(tr>0) && +d.fx_rate>0) tr=+d.fx_rate;
+      if(!(tr>0) && d.xau && +d.xau.price>0 && +d.spot_usd_oz>0) tr = d.xau.unit==="gram" ? d.xau.price/(d.spot_usd_oz/OZ) : d.xau.price/d.spot_usd_oz;
+      if(tr>0){ S.usdtry=tr; S.t.fx=new Date(); }
+      const eu=rate("EUR"); if(eu>0) S.eurusd=1/eu;
+      if(+d.btc_usd>0) S.btc=+d.btc_usd;
+      fxFromXaus=true;
+    }
     if(+d.silver_usd_oz>0) S.silverOz=+d.silver_usd_oz;
     S.t.gold=new Date(); gotAny=true; schedule();
   }
-  let goldSeries=null;
+  let goldSeries=null, fxFromXaus=false;
   async function goldIntraday(){
     const d=await j("https://xaus.com/api/v1/intraday?symbol=xau&hours=24");
     const pts=(d.points||d.data||d.series||[]).map(p=>({t:new Date(typeof p.t==="number"&&p.t<1e12?p.t*1000:p.t).getTime(), p:+p.p})).filter(p=>p.p>0&&isFinite(p.t));
@@ -314,7 +334,7 @@
   async function klines(sym){
     if(series[sym]) return series[sym];
     if(sym==="EURTRY"){ const [a,b]=await Promise.all([klines("EURUSDT"),klines("USDTTRY")]); const n=Math.min(a.length,b.length); return series[sym]=a.slice(-n).map((p,i)=>({t:p.t,p:p.p*b.slice(-n)[i].p})); }
-    const d=await j(`${BIN_REST}/klines?symbol=${sym}&interval=1h&limit=168`);
+    const d=await bj(`/klines?symbol=${sym}&interval=1h&limit=168`);
     return series[sym]=d.map(k=>({t:k[0],p:+k[4]}));
   }
   async function drawChart(){
