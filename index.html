@@ -209,7 +209,7 @@
   const S = {
     usdtry:null, usdtry24:null, eurusd:null, eurusd24:null, btc:null, btc24:null,
     goldOz:null, goldOz24:null, silverOz:null, brent:null, brentCh:null, wti:null, wtiCh:null, ng:null, ngCh:null,
-    t:{fx:null, gold:null, oil:null}, x:{}, x24:{}
+    t:{fx:null, gold:null, oil:null}, x:{}, x24:{}, r24:{}
   };
   const eurtry=()=> S.eurusd&&S.usdtry ? S.eurusd*S.usdtry : null;
   const eurtry24=()=> S.eurusd24&&S.usdtry24 ? S.eurusd24*S.usdtry24 : null;
@@ -227,7 +227,7 @@
       {k:"gram", n:"Gram altın", s:"24 ayar", big:true, gold:true, v:()=>gramTL(), v24:()=>gramTL24(), f:v=>fTL(v), t:"gold"},
       ...COINS.map(([n,g],i)=>({k:"coin"+i, n, s:"tahmini", gold:true, v:()=>gramTL()&&gramTL()*g, v24:()=>gramTL24()&&gramTL24()*g, f:v=>fTL(v,0), t:"gold"})),
       {k:"ons", n:"Ons altın", s:"USD", gold:true, v:()=>S.goldOz, v24:()=>S.goldOz24, f:v=>fUSD(v), t:"gold"},
-      {k:"ag", n:"Gram gümüş", s:"TL", v:()=>S.silverOz&&S.usdtry? S.silverOz/OZ*S.usdtry:null, f:v=>fTL(v), t:"gold"}
+      {k:"ag", n:"Gram gümüş", s:"TL", v:()=>S.silverOz&&S.usdtry? S.silverOz/OZ*S.usdtry:null, v24:()=>S.r24&&S.r24.xag>0&&S.usdtry24? (1/S.r24.xag)/OZ*S.usdtry24:null, f:v=>fTL(v), t:"gold"}
     ],
     gFx:[
       {k:"usd", n:"Dolar", s:"USD/TRY", v:()=>S.usdtry, v24:()=>S.usdtry24, f:v=>fN(v,4), t:"fx"},
@@ -254,7 +254,16 @@
   });
   const ALL=Object.values(CARDS).flat();
 
+  // 24s değişim için yedek: Binance/intraday alınamazsa dünkü günlük kurları kullan
+  function fill24(){
+    const r=S.r24||{};
+    if(!(S.usdtry24>0) && r.try>0) S.usdtry24=r.try;
+    if(!(S.eurusd24>0) && r.eur>0) S.eurusd24=1/r.eur;
+    if(!(S.btc24>0) && r.btc>0) S.btc24=1/r.btc;
+    if(!(S.goldOz24>0) && r.xau>0) S.goldOz24=1/r.xau;
+  }
   function render(){
+    fill24();
     ALL.forEach(c=>{
       const v=c.v(), el=EL[c.k];
       if(v==null||!isFinite(v)) return;
@@ -372,14 +381,14 @@
   async function first(urls){ for(const u of urls){ try{ return await j(u,8000); }catch(e){} } throw new Error("fx2"); }
   const FXU=d=>[`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${d}/v1/currencies/usd.min.json`,`https://${d}.currency-api.pages.dev/v1/currencies/usd.min.json`];
   async function fx2(){
-    const c=LS.get("pn-fx2",null);
-    if(c&&Date.now()-c.at<3*3600e3&&c.x&&Object.keys(c.x).length){ S.x=c.x; S.x24=c.x24||{}; schedule(); return; }
-    let x={}, x24={}, date=null;
+    const c=LS.get("pn-fx3",null);
+    if(c&&Date.now()-c.at<3*3600e3&&c.x&&Object.keys(c.x).length){ S.x=c.x; S.x24=c.x24||{}; S.r24=c.r24||{}; schedule(); return; }
+    let x={}, x24={}, r24={}, date=null;
     try{ const d=await first(FXU("latest")); x=pick(d.usd||{}); date=d.date; }catch(e){}
     if(!Object.keys(x).length){ try{ const d=await j("https://open.er-api.com/v6/latest/USD",8000); x=pick(d.rates||{}); }catch(e){} }
     if(!Object.keys(x).length) throw new Error("fx2");
-    if(date){ try{ const y=new Date(date+"T12:00:00Z"); y.setUTCDate(y.getUTCDate()-1); const d=await first(FXU(y.toISOString().slice(0,10))); x24=pick(d.usd||{}); }catch(e){} }
-    S.x=x; S.x24=x24; LS.set("pn-fx2",{at:Date.now(),x,x24}); schedule();
+    if(date){ try{ const y=new Date(date+"T12:00:00Z"); y.setUTCDate(y.getUTCDate()-1); const d=await first(FXU(y.toISOString().slice(0,10))); x24=pick(d.usd||{}); const u=d.usd||{}; r24={}; ["try","eur","btc","xau","xag"].forEach(k=>{ if(+u[k]>0) r24[k]=+u[k]; }); }catch(e){} }
+    S.x=x; S.x24=x24; S.r24=r24; LS.set("pn-fx3",{at:Date.now(),x,x24,r24}); schedule();
   }
 
   // ---------- chart ----------
