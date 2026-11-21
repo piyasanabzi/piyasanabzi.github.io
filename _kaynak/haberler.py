@@ -19,18 +19,19 @@ KAYNAKLAR = [
     ("Dünya", "https://www.dunya.com/rss"),
 ]
 
-# (etiket, anahtar kelimeler) - ilk eşleşen etiket kullanılır
+# (etiket, düzenli ifadeler) - ilk eşleşen etiket kullanılır. Başlık küçük harfe çevrilip aranır.
+_DOLAR = r"(?<!milyar )(?<!milyon )(?<!trilyon )(?<!bin )(?<!\d )\bdolar(?:ın|ı|a|da|dan|daki)?\b"
 ETIKETLER = [
-    ("Altın", ["altın", "ons ", "gümüş", "kuyumcu", "çeyrek"]),
-    ("Faiz", ["faiz", "merkez bankası", "tcmb", "ppk", " fed", "fed'", "fomc", "ecb", "avrupa merkez", "powell", "warsh", "lagarde", "karahan"]),
-    ("Döviz", ["dolar", "euro", "avro", "kur ", "kuru", "döviz", "sterlin", "yen ", "yuan", "parite", "rezerv"]),
-    ("Enflasyon", ["enflasyon", "tüfe", "üfe", "fiyat artış"]),
-    ("Petrol", ["petrol", "brent", "opec", "doğal gaz", "doğalgaz", "akaryakıt"]),
-    ("Kripto", ["bitcoin", "kripto", "ethereum"]),
-    ("Borsa", ["borsa", "bist", "hisse", "nasdaq", "dow jones", "s&p", "tahvil", "cds"]),
-    ("Dünya", ["abd ", "çin", "avrupa", "japonya", "ingiltere", "almanya", "küresel", "trump", "gümrük vergi", "tarife", "resesyon", "büyüme"]),
+    ("Altın", [r"\baltın(?:\b|[ıiae][a-zçğıöşü]{0,5}\b)", r"\bons\b", r"\bgümüş", r"\bkuyumcu", r"\bçeyrek altın"]),
+    ("Faiz", [r"\bfaiz", r"merkez bankası", r"\btcmb\b", r"\bppk\b", r"\bfed\b", r"\bfed'", r"\bfomc\b", r"\becb\b", r"\bpowell\b", r"\bwarsh\b", r"\blagarde\b"]),
+    ("Döviz", [r"dolar\s*/\s*tl", r"euro\s*/\s*tl", r"\bdöviz", r"\bkur(?:u|lar|da|daki)?\b", r"\bavro\b", r"\beuro\b", r"\bsterlin", r"\bparite", r"\brezerv", _DOLAR]),
+    ("Enflasyon", [r"enflasyon", r"\btüfe\b", r"\büfe\b"]),
+    ("Petrol", [r"\bpetrol", r"\bbrent\b", r"\bopec", r"doğal ?gaz", r"akaryakıt", r"\bbenzin", r"\bmotorin"]),
+    ("Kripto", [r"\bbitcoin", r"\bkripto", r"\bethereum"]),
+    ("Borsa", [r"\bborsa", r"\bbist\b", r"\bhisse", r"\bnasdaq\b", r"dow jones", r"s&p", r"\btahvil", r"\bcds\b"]),
+    ("Küresel", [r"küresel (?:piyasa|ekonomi|büyüme)", r"gümrük vergi", r"\btarife", r"resesyon", r"ticaret savaş", r"(?:abd|çin|avrupa|euro bölgesi) ekonomi", r"\bbüyüme (?:verisi|rakam|beklenti)"]),
 ]
-HARIC = ["burç", "maç", "transfer", "magazin", "dizi ", "tarif:", "hava durumu"]
+HARIC = ["burç", " maç", "transfer", "magazin", "hava durumu", "soruşturma", "gözaltı", "tutuklan", "yakalandı"]
 
 
 def getir(url):
@@ -61,11 +62,11 @@ def temizle(t):
 
 
 def etiket(baslik):
-    b = " " + baslik.lower().replace("İ", "i").replace("I", "ı") + " "
+    b = " " + baslik.replace("İ", "i").replace("I", "ı").lower() + " "
     if any(h in b for h in HARIC):
         return None
     for ad, kel in ETIKETLER:
-        if any(k in b for k in kel):
+        if any(re.search(k, b) for k in kel):
             return ad
     return None
 

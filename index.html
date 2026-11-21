@@ -105,6 +105,20 @@
   .guides{display:grid;gap:8px;margin-bottom:6px}@media (min-width:720px){.guides{grid-template-columns:1fr 1fr}}
   .guides a{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);text-decoration:none;font-weight:700;font-size:14px}
   .flinks a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom:6px;font-size:13px}
+  .gd{display:grid;gap:12px}@media (min-width:860px){.gd{grid-template-columns:1fr 1.4fr}}
+  .gd-p{padding:14px 16px}
+  .gd-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px;margin-bottom:8px;font-size:15px}
+  .gd-h a{color:var(--gold);font-size:13px;font-weight:700;text-decoration:none;white-space:nowrap}
+  .gd-s{color:var(--muted);font-size:12px}
+  .gd-list{display:flex;flex-direction:column}
+  .gd-i{display:block;padding:10px 0;border-top:1px solid var(--line);color:var(--ink);text-decoration:none}
+  .gd-i:first-child{border-top:0}
+  .gd-t{font-size:14.5px;font-weight:600;line-height:1.35}
+  .gd-m{color:var(--muted);font-size:12px;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+  .gd-e{font-size:11px;font-weight:800;padding:1px 7px;border-radius:999px;background:color-mix(in srgb,var(--gold) 18%,transparent);color:var(--gold)}
+  .gd-k{font-weight:800;color:var(--gold)}
+  .gd-bos{color:var(--muted);font-size:13px;padding:6px 0}
+  .gd-more{margin-top:8px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font-weight:700;font-size:13px;cursor:pointer}
   footer{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;color:var(--muted);font-size:12px;line-height:1.6}
   .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
   .promo{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;background:var(--card);border:1px solid color-mix(in srgb,var(--gold) 55%,var(--line));border-radius:16px;padding:14px 16px;color:var(--ink);text-decoration:none}
@@ -143,6 +157,20 @@
   <div class="upd" style="margin-top:6px">Diğer kurlar, günlük çapraz kur ile anlık dolar kurundan hesaplanır.</div>
   <h2>Emtia ve kripto</h2>
   <div class="grid" id="gCom"></div>
+
+  <h2 id="gundem">Piyasa gündemi</h2>
+  <div class="gd">
+    <div class="panel gd-p">
+      <div class="gd-h"><b>📅 Yaklaşan önemli tarihler</b><a href="/ekonomi-takvimi.html">Tüm takvim →</a></div>
+      <div id="gdTak" class="gd-list"><div class="gd-bos">Yükleniyor…</div></div>
+    </div>
+    <div class="panel gd-p" id="gdHabBox">
+      <div class="gd-h"><b>📰 Son ekonomi başlıkları</b><span id="gdHabT" class="gd-s"></span></div>
+      <div id="gdHab" class="gd-list"><div class="gd-bos">Yükleniyor…</div></div>
+      <button id="gdMore" class="gd-more" hidden>Daha fazla başlık</button>
+      <div class="gd-s" style="margin-top:8px">Başlıklar haber sitelerinden otomatik derlenir; tıklayınca haberin kaynağında açılır.</div>
+    </div>
+  </div>
 
   <h2>Grafik</h2>
   <div class="panel">
@@ -215,7 +243,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
+<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
 
 <script>
 (function(){
@@ -677,6 +705,49 @@
   setInterval(()=>{ if(!gotAny) return; ALL.forEach(c=>{ const v=c.v(); if(v==null||!isFinite(v)){ const el=EL[c.k]; el.querySelector(".ch").textContent="Şu an alınamıyor"; el.querySelector(".ch").className="ch"; el.querySelector(".upd").textContent="Tekrar deneniyor…"; } }); },12000);
   render();
   renderPF();
+})();
+</script>
+<script src="/takvim.js"></script>
+<script>
+/* Piyasa gündemi: ekonomi takvimi + haber başlıkları */
+(function(){
+  var esc=function(t){return String(t).replace(/[&<>"]/g,function(c){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});};
+  var tz={timeZone:"Europe/Istanbul"};
+  function gunNo(t){var p=new Date(t).toLocaleDateString("en-CA",tz).split("-");return Date.UTC(+p[0],+p[1]-1,+p[2])/864e5;}
+  function kalan(ts){var d=ts-Date.now(),s=Math.floor(d/36e5),g=gunNo(ts)-gunNo(Date.now());
+    if(d<0)return"Şimdi / az önce";if(g===0)return s<1?"1 saatten az":"Bugün, "+s+" saat sonra";if(g===1)return"Yarın";return g+" gün sonra";}
+  function tak(){
+    var T=window.PN_TAKVIM,el=document.getElementById("gdTak");if(!el)return;
+    if(!T){el.innerHTML='<div class="gd-bos">Takvim yüklenemedi.</div>';return;}
+    var now=Date.now(),L=T.olaylar.filter(function(e){return e.ts+2*36e5>=now;}).slice(0,5);
+    if(!L.length){el.innerHTML='<div class="gd-bos">Takvim güncelleniyor.</div>';return;}
+    el.innerHTML=L.map(function(e){var t=T.turler[e.k],d=new Date(e.ts);
+      return '<a class="gd-i" href="/ekonomi-takvimi.html"><div class="gd-t">'+t.i+" "+esc(t.ad)+(e.ek?' <span class="gd-s">· '+esc(e.ek)+"</span>":"")+'</div><div class="gd-m"><span>'+
+      d.toLocaleDateString("tr-TR",{day:"numeric",month:"long",weekday:"short",timeZone:"Europe/Istanbul"})+" · "+d.toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"})+
+      '</span><span class="gd-k">'+kalan(e.ts)+"</span></div></a>";}).join("");
+  }
+  function once(iso){var m=Math.round((Date.now()-Date.parse(iso))/6e4);
+    if(m<1)return"az önce";if(m<60)return m+" dk önce";var h=Math.floor(m/60);if(h<24)return h+" sa önce";return Math.floor(h/24)+" gün önce";}
+  var H=[],acik=false;
+  function hab(){
+    var el=document.getElementById("gdHab"),b=document.getElementById("gdMore");
+    var L=acik?H:H.slice(0,6);
+    el.innerHTML=L.map(function(h){return '<a class="gd-i" href="'+esc(h.u)+'" target="_blank" rel="noopener nofollow"><div class="gd-t">'+esc(h.t)+
+      '</div><div class="gd-m"><span class="gd-e">'+esc(h.e)+"</span><span>"+esc(h.k)+" · "+once(h.d)+"</span></div></a>";}).join("");
+    b.hidden=acik||H.length<=6;
+  }
+  async function habGetir(){
+    var url="https://raw.githubusercontent.com/piyasanabzi/piyasanabzi.github.io/veri/haberler.json?t="+Math.floor(Date.now()/3e5);
+    try{var r=await fetch(url,{cache:"no-store"});if(!r.ok)throw 0;var d=await r.json();
+      H=(d.haberler||[]).filter(function(h){return /^https?:\/\//.test(h.u);});
+      if(!H.length)throw 0;
+      document.getElementById("gdHabT").textContent="Güncelleme "+new Date(d.guncelleme).toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit",timeZone:"Europe/Istanbul"});
+      hab();
+    }catch(e){ if(!H.length) document.getElementById("gdHab").innerHTML='<div class="gd-bos">Başlıklar şu an alınamıyor, birazdan tekrar denenecek.</div>'; }
+  }
+  document.getElementById("gdMore").addEventListener("click",function(){acik=true;hab();});
+  tak(); habGetir();
+  setInterval(tak,6e4); setInterval(habGetir,10*6e4);
 })();
 </script>
 </body>

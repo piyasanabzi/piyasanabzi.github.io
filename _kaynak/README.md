@@ -15,3 +15,7 @@ ve ana sayfadaki "Rehberler" listesi bu klasördeki betikle üretilir.
 ## Geçmiş yatırım hesaplayıcısı (`gecmis-yatirim.html`)
 Sayfa elle yazılmıştır; içindeki aylık geçmiş veri (`/*VERI*/ ... /*VERI_SON*/`) betikle güncellenir.
 Ayda bir, depo kökünde çalıştır: `python3 _kaynak/gecmis_veri.py` (yeni biten ayı ekler).
+
+## Piyasa gündemi
+- **Haber başlıkları:** `.github/workflows/haberler.yml` her 30 dakikada `_kaynak/haberler.py`'yi çalıştırır ve sonucu `veri` dalına `haberler.json` olarak yazar. Ana sayfa bu dosyayı raw.githubusercontent.com'dan okur. Yalnızca başlık, kaynak, saat ve bağlantı saklanır.
+- **Ekonomi takvimi:** tarihler `_kaynak/takvim.py` içindedir; `content.py` çalışınca `takvim.js` ve `ekonomi-takvimi.html` üretilir. Liste en geç Haziran 2027'de yeni tarihlerle güncellenmeli.

@@ -31,7 +31,7 @@ footer a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom
 """
 LOGO='<svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0e1726"/><path d="M10 40 L22 30 L32 36 L46 20 L54 24" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>'
 FOOT='''<footer><div class="wrap">
-<a href="/">Canlı fiyatlar</a><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
+<a href="/">Canlı fiyatlar</a><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
 <div style="margin-top:8px">Bu sitedeki bilgiler genel bilgilendirme amaçlıdır, yatırım tavsiyesi değildir. © Piyasa Nabzı</div></div></footer>'''
 ARTS=[]
 def page(path,title,desc,body,crumb=None,article=True,date=TODAY):
