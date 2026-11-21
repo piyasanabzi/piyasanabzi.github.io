@@ -587,7 +587,7 @@
   }
   function save(){ if(!LS.set("pn-data-"+user,items)) toast("Kaydedilemedi: tarayıcı depolamaya izin vermiyor"); }
   // live values refresh the portfolio at most every 2 seconds, and not while the person is typing
-  let pfT=0; function pfTick(){ if(!user) return; const a=document.activeElement; if(a&&$("pf").contains(a)&&(a.tagName==="INPUT"||a.tagName==="SELECT")) return; if(Date.now()-pfT<2000) return; pfT=Date.now(); renderPF(); }
+  let pfT=0, pfLater=null; function pfTick(){ if(!user) return; const a=document.activeElement; if(a&&$("pf").contains(a)&&(a.tagName==="INPUT"||a.tagName==="SELECT")) return; const w=2000-(Date.now()-pfT); if(w>0){ if(!pfLater) pfLater=setTimeout(()=>{ pfLater=null; pfTick(); },w+50); return; } pfT=Date.now(); renderPF(); }
 
   // ---------- login (accounts stay on this device) ----------
   let mMode="login";
