@@ -65,6 +65,8 @@ def etiket(baslik):
     b = " " + baslik.replace("İ", "i").replace("I", "ı").lower() + " "
     if any(h in b for h in HARIC):
         return None
+    # "doların altına", "90 TL'nin altında" gibi "altı" anlamındaki kullanımları çıkar
+    b = re.sub(r"\S+(?:[ıiuü]n|n[ıiuü]n)\s+altın(?:a|da|dan)\b", " ", b)
     for ad, kel in ETIKETLER:
         if any(re.search(k, b) for k in kel):
             return ad
