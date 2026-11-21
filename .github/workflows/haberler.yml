@@ -1,0 +1,36 @@
+name: Piyasa gundemi haberleri
+
+on:
+  schedule:
+    - cron: "7,37 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: haberler
+  cancel-in-progress: true
+
+jobs:
+  topla:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+          sparse-checkout: _kaynak
+      - name: Basliklari topla
+        run: |
+          mkdir -p cikti
+          python3 _kaynak/haberler.py cikti/haberler.json
+      - name: veri dalina yaz
+        run: |
+          cd cikti
+          git init -q -b veri
+          git config user.name "piyasanabzi-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add haberler.json
+          git commit -q -m "Haber basliklari $(date -u +%Y-%m-%dT%H:%MZ)"
+          git push -q --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" veri
