@@ -146,6 +146,7 @@ urls.append(page("iletisim.html","İletişim","Piyasa Nabzı ile iletişime geç
 <h2>Bize ne yazabilirsin?</h2>
 <ul><li>Fiyatlarda gördüğün bir hata veya gecikme</li><li>Sitede görmek istediğin yeni bir özellik</li><li>Rehber yazılarıyla ilgili soru ve öneriler</li><li>Reklam ve iş birliği talepleri</li></ul>
 <p class="note">Not: Kişisel yatırım tavsiyesi veremiyoruz. Hesabın ve varlık kayıtların yalnızca kendi cihazında saklandığı için, unutulan şifreleri sıfırlayamıyoruz.</p>""",article=False))
+urls.insert(1,SITE+"/gecmis-yatirim.html")  # elle yazılmış sayfa; verisi _kaynak/gecmis_veri.py ile güncellenir
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"  <url><loc>{u}</loc><lastmod>{LM.get(u,TODAY)}</lastmod></url>\n" for u in urls)+"</urlset>\n"
 open(ROOT+"/sitemap.xml","w").write(sm)
 print("\n".join(urls))

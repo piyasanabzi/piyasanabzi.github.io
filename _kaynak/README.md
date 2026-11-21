@@ -11,3 +11,7 @@ ve ana sayfadaki "Rehberler" listesi bu klasördeki betikle üretilir.
 2. Depo kökünde çalıştır: `python3 _kaynak/content.py`
 3. Mevcut slug'ları ve sayfa adreslerini asla değiştirme (Google sıralaması bozulur).
 4. `index.html` içindeki canlı fiyat kodunu bu betik değiştirmez; yalnızca "Rehberler" listesini günceller.
+
+## Geçmiş yatırım hesaplayıcısı (`gecmis-yatirim.html`)
+Sayfa elle yazılmıştır; içindeki aylık geçmiş veri (`/*VERI*/ ... /*VERI_SON*/`) betikle güncellenir.
+Ayda bir, depo kökünde çalıştır: `python3 _kaynak/gecmis_veri.py` (yeni biten ayı ekler).

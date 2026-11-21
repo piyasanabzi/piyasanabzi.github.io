@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Geçmişte altın, dolar alsaydım ne olurdu? Hesaplayıcı | Piyasa Nabzı</title>
+<meta name="description" content="2005'ten bugüne istediğin ayda gram altın, dolar, euro veya bitcoin alsaydın paran bugün kaç TL olurdu? Ücretsiz geçmiş yatırım hesaplayıcısı.">
+<link rel="canonical" href="https://piyasanabzi.site/gecmis-yatirim.html">
+<meta property="og:title" content="Geçmişte altın, dolar alsaydım ne olurdu?">
+<meta property="og:description" content="İstediğin ayda gram altın, dolar, euro veya bitcoin alsaydın paran bugün kaç TL olurdu? Hesapla ve paylaş.">
+<meta property="og:url" content="https://piyasanabzi.site/gecmis-yatirim.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Nabzı">
+<meta name="theme-color" content="#0b111c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e1726'/%3E%3Cpath d='M10 40 L22 30 L32 36 L46 20 L54 24' fill='none' stroke='%23f2c14e' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b111c; --card:#121b2b; --card2:#172235; --ink:#eef2f8; --muted:#8e9bb3; --line:#1f2b40;
+    --gold:#f2c14e; --up:#22c55e; --down:#ef4444; --blue:#60a5fa;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f3f5f9; --card:#ffffff; --card2:#f7f9fc; --ink:#0f1a2b; --muted:#66748c; --line:#e3e8f0; --gold:#b7861b; --up:#16a34a; --down:#dc2626; --blue:#2563eb; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--ink);text-decoration:none}
+  .brand svg{width:34px;height:34px}
+  .btn{font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:8px 12px;border-radius:12px}
+  .crumb{font-size:13px;color:var(--muted);margin:18px 0 0}.crumb a{color:var(--muted)}
+  h1{font-size:clamp(24px,5vw,32px);margin:10px 0 8px;letter-spacing:-.02em;font-weight:800;line-height:1.2}
+  .lead{color:var(--muted);margin:0 0 18px;line-height:1.55}
+  h2{font-size:20px;margin:30px 0 10px;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px}
+  input,select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px;font:inherit;font-size:16px;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  .f{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+  .f .full{grid-column:1/-1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chips button{border:1px solid var(--line);background:var(--card2);color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:7px 11px;border-radius:999px;cursor:pointer}
+  .chips button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#1a1200}
+  .head{font-size:clamp(18px,4vw,22px);line-height:1.45;font-weight:600;margin:18px 0 14px}
+  .head b{color:var(--gold)}
+  .res{display:grid;gap:8px}
+  .r{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;position:relative;overflow:hidden}
+  .r.best{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
+  .r .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;position:relative}
+  .r .n{font-weight:800;font-size:15px}
+  .r .n small{font-weight:600;color:var(--muted);font-size:12px;margin-left:6px}
+  .r .v{font-weight:800;font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .r .sub{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);margin-top:4px;position:relative}
+  .r .sub b{font-variant-numeric:tabular-nums}
+  .r .track{height:6px;border-radius:6px;background:var(--card2);margin-top:10px;overflow:hidden}
+  .r .fill{height:100%;border-radius:6px;background:var(--gold);transition:width .4s}
+  .r.na{opacity:.55}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .tag{display:inline-block;background:var(--gold);color:#1a1200;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
+  .share{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .pbtn{border:0;background:var(--gold);color:#1a1200;font:inherit;font-weight:800;padding:12px 16px;border-radius:14px;cursor:pointer;text-decoration:none;font-size:14px}
+  .sbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;padding:12px 16px;border-radius:14px;cursor:pointer;text-decoration:none;font-size:14px}
+  .muted{color:var(--muted)}
+  .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:14px;line-height:1.55}
+  article{font-size:16px;line-height:1.7}
+  article a{color:var(--blue)}
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+  summary{font-weight:700;cursor:pointer}
+  details p{margin:8px 0 0;color:var(--muted);line-height:1.6}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+  footer{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;color:var(--muted);font-size:13px;line-height:1.6}
+  footer a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom:6px}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Geçmiş yatırım hesaplayıcısı nasıl çalışır?","acceptedAnswer":{"@type":"Answer","text":"Seçtiğin aydaki ortalama fiyatla, yazdığın TL tutarıyla ne kadar gram altın, dolar, euro veya bitcoin alınabileceği hesaplanır. Sonra bu miktarın bugünkü fiyatla kaç TL ettiği gösterilir."}},
+{"@type":"Question","name":"Geçmiş fiyatlar nereden geliyor?","acceptedAnswer":{"@type":"Answer","text":"Ons altın fiyatı aylık ortalama dünya fiyatıdır. Dolar ve euro kurları Avrupa Merkez Bankası'nın günlük kurlarının aylık ortalamasıdır. Bitcoin için Binance'teki ay sonu kapanış fiyatı kullanılır."}},
+{"@type":"Question","name":"Sonuçlar kuyumcu fiyatlarıyla aynı mı?","acceptedAnswer":{"@type":"Answer","text":"Hayır. Hesaplama has altının gösterge fiyatıyla yapılır; kuyumcu işçiliği, alış-satış farkı, komisyon ve vergiler dahil değildir. Gerçekte elde edilecek tutar biraz farklı olur."}}
+]}</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4295900331301338" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M419M3965F"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-M419M3965F");gtag("config","G-LP1EQD8PHJ");</script>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0e1726"/><path d="M10 40 L22 30 L32 36 L46 20 L54 24" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>Piyasa Nabzı</a><a class="btn" href="/">Canlı fiyatlar</a></div></header>
+
+<main class="wrap">
+  <div class="crumb"><a href="/">Ana sayfa</a> › Geçmiş yatırım hesaplayıcısı</div>
+  <h1>Geçmişte alsaydım ne olurdu?</h1>
+  <p class="lead">Bir tarih ve tutar seç; o gün gram altın, dolar, euro ya da bitcoin alsaydın paranın bugün kaç TL edeceğini gör.</p>
+
+  <div class="panel">
+    <div class="f">
+      <div class="full"><label for="amt">Yatırım tutarı (TL)</label><input id="amt" inputmode="decimal" value="10.000" autocomplete="off"></div>
+      <div><label for="mon">Ay</label><select id="mon"></select></div>
+      <div><label for="yr">Yıl</label><select id="yr"></select></div>
+    </div>
+    <div class="chips" id="chips"></div>
+  </div>
+
+  <div class="head" id="head" aria-live="polite">Hesaplanıyor…</div>
+  <div class="res" id="res"></div>
+  <div class="share">
+    <button class="pbtn" type="button" id="shr">Sonucu paylaş</button>
+    <a class="sbtn" id="wa" href="#" target="_blank" rel="noopener">WhatsApp'ta gönder</a>
+    <button class="sbtn" type="button" id="cpy">Bağlantıyı kopyala</button>
+  </div>
+  <div class="note" id="src">Bugünkü fiyatlar yükleniyor…</div>
+
+  <h2>Nasıl hesaplanıyor?</h2>
+  <article>
+    <p>Seçtiğin aydaki <b>ortalama fiyatla</b>, yazdığın tutarla ne kadar gram altın, dolar, euro veya bitcoin alınabileceği bulunur. Ardından bu miktar <b>bugünkü canlı fiyatla</b> TL'ye çevrilir. "TL olarak tutsaydım" satırı, paranın hiç değerlendirilmeden kenarda bekletildiği durumu gösterir.</p>
+    <p>Gram altın fiyatı, ons altının dolar fiyatından ve dolar kurundan hesaplanır (1 ons = 31,1035 gram). Çeyrek altın da aynı oranda değer kazandığı için sonuç çeyrek altın için de geçerlidir. Güncel fiyatları <a href="/">ana sayfada</a>, altın türleri arasındaki farkı <a href="/rehber/gram-altin-mi-ceyrek-altin-mi.html">bu rehberde</a> bulabilirsin.</p>
+  </article>
+
+  <h2>Sık sorulan sorular</h2>
+  <details><summary>Geçmiş fiyatlar nereden geliyor?</summary><p>Ons altın fiyatı aylık ortalama dünya fiyatıdır. Dolar ve euro kurları Avrupa Merkez Bankası'nın günlük kurlarının aylık ortalamasıdır. Bitcoin için Binance'teki ay sonu kapanış fiyatı kullanılır; bitcoin verisi Ağustos 2017'den başlar.</p></details>
+  <details><summary>Sonuçlar kuyumcu fiyatlarıyla aynı mı?</summary><p>Hayır. Hesaplama has altının gösterge fiyatıyla yapılır; kuyumcu işçiliği, alış-satış farkı, komisyon ve vergiler dahil değildir. Gerçekte eline geçecek tutar biraz farklı olur.</p></details>
+  <details><summary>Neden 2005'ten önceki tarihler yok?</summary><p>1 Ocak 2005'te Türk lirasından altı sıfır atıldı. Öncesindeki tutarları bugünkü TL ile doğrudan karşılaştırmak yanıltıcı olacağı için hesaplayıcı 2005'ten başlar.</p></details>
+  <details><summary>Enflasyon hesaba katılıyor mu?</summary><p>Hayır, sonuçlar nominal TL'dir. Aynı tutarın bugünkü alım gücü, o yıllardakinden çok daha düşüktür; bu yüzden "TL olarak tutsaydım" satırını bir karşılaştırma noktası olarak düşünebilirsin.</p></details>
+
+  <div class="note">Geçmişteki getiriler gelecekteki getirilerin göstergesi değildir. Bu sayfa genel bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</div>
+</main>
+<div class="toast" id="toast"></div>
+<footer><div class="wrap"><a href="/">Canlı fiyatlar</a><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
+<div style="margin-top:8px">Geçmiş veri kaynakları: altın datasets/gold-prices · dolar ve euro Avrupa Merkez Bankası (Frankfurter) · bitcoin Binance. Güncel fiyatlar: xaus.com ve Binance. © Piyasa Nabzı</div></div></footer>
+
+<script>
+/*VERI*/const D=[["2005-01",424.0,1.3555,1.3119,null],["2005-02",423.0,1.3144,1.3014,null],["2005-03",434.0,1.3133,1.3201,null],["2005-04",429.0,1.3638,1.2938,null],["2005-05",422.0,1.3705,1.2694,null],["2005-06",431.0,1.3613,1.2165,null],["2005-07",424.0,1.3403,1.2037,null],["2005-08",438.0,1.3451,1.2292,null],["2005-09",456.0,1.3406,1.2256,null],["2005-10",470.0,1.3593,1.2015,null],["2005-11",477.0,1.3604,1.1786,null],["2005-12",510.0,1.3526,1.1853,null],["2006-01",550.0,1.3351,1.2103,null],["2006-02",555.0,1.326,1.1938,null],["2006-03",557.0,1.337,1.202,null],["2006-04",611.0,1.335,1.2271,null],["2006-05",675.0,1.4406,1.277,null],["2006-06",596.0,1.6016,1.265,null],["2006-07",634.0,1.5542,1.2684,null],["2006-08",633.0,1.4676,1.2811,null],["2006-09",598.0,1.4827,1.2727,null],["2006-10",586.0,1.4792,1.2611,null],["2006-11",628.0,1.4583,1.2881,null],["2006-12",630.0,1.4311,1.3211,null],["2007-01",631.0,1.426,1.2999,null],["2007-02",665.0,1.3967,1.3074,null],["2007-03",655.0,1.4092,1.3242,null],["2007-04",679.0,1.3586,1.3516,null],["2007-05",667.0,1.3344,1.3511,null],["2007-06",656.0,1.3212,1.3419,null],["2007-07",665.0,1.2814,1.3716,null],["2007-08",665.0,1.3158,1.3622,null],["2007-09",713.0,1.2624,1.3896,null],["2007-10",755.0,1.2011,1.4227,null],["2007-11",806.0,1.1916,1.4684,null],["2007-12",803.0,1.1795,1.4578,null],["2008-01",890.0,1.1771,1.4718,null],["2008-02",922.0,1.1956,1.4748,null],["2008-03",968.0,1.2434,1.5527,null],["2008-04",910.0,1.3014,1.575,null],["2008-05",889.0,1.2476,1.5557,null],["2008-06",889.0,1.235,1.5553,null],["2008-07",940.0,1.213,1.577,null],["2008-08",839.0,1.1801,1.4975,null],["2008-09",830.0,1.2418,1.437,null],["2008-10",807.0,1.4763,1.3322,null],["2008-11",761.0,1.5981,1.2732,null],["2008-12",816.0,1.5543,1.3471,null],["2009-01",859.0,1.6048,1.3239,null],["2009-02",943.0,1.6647,1.2785,null],["2009-03",924.0,1.713,1.305,null],["2009-04",890.0,1.6133,1.319,null],["2009-05",929.0,1.5569,1.365,null],["2009-06",946.0,1.5465,1.4016,null],["2009-07",934.0,1.5177,1.4088,null],["2009-08",949.0,1.4884,1.4268,null],["2009-09",997.0,1.4911,1.4562,null],["2009-10",1043.0,1.473,1.4816,null],["2009-11",1127.0,1.4927,1.4914,null],["2009-12",1135.0,1.506,1.4605,null],["2010-01",1118.0,1.4735,1.4272,null],["2010-02",1095.0,1.5168,1.3686,null],["2010-03",1113.0,1.5346,1.3569,null],["2010-04",1149.0,1.4906,1.3406,null],["2010-05",1205.0,1.5492,1.2565,null],["2010-06",1233.0,1.5788,1.2208,null],["2010-07",1193.0,1.5406,1.277,null],["2010-08",1216.0,1.5113,1.2894,null],["2010-09",1271.0,1.4948,1.3067,null],["2010-10",1342.0,1.4248,1.3898,null],["2010-11",1370.0,1.4441,1.3661,null],["2010-12",1391.0,1.5259,1.3226,null],["2011-01",1360.0,1.5658,1.336,null],["2011-02",1375.0,1.59,1.3649,null],["2011-03",1423.0,1.5794,1.3999,null],["2011-04",1481.0,1.5217,1.4442,null],["2011-05",1513.0,1.5756,1.4349,null],["2011-06",1529.0,1.604,1.4388,null],["2011-07",1573.0,1.6583,1.4264,null],["2011-08",1759.0,1.7532,1.4343,null],["2011-09",1772.0,1.797,1.377,null],["2011-10",1666.0,1.8311,1.3706,null],["2011-11",1739.0,1.8126,1.3556,null],["2011-12",1640.0,1.8702,1.3168,null],["2012-01",1654.0,1.8413,1.2905,null],["2012-02",1745.0,1.7592,1.3224,null],["2012-03",1676.0,1.7902,1.3201,null],["2012-04",1649.0,1.7871,1.3162,null],["2012-05",1589.0,1.8106,1.2789,null],["2012-06",1599.0,1.8232,1.2526,null],["2012-07",1594.0,1.8132,1.2288,null],["2012-08",1630.0,1.7976,1.24,null],["2012-09",1745.0,1.8029,1.2856,null],["2012-10",1747.0,1.8024,1.2974,null],["2012-11",1722.0,1.7938,1.2828,null],["2012-12",1685.0,1.7865,1.3123,null],["2013-01",1672.0,1.7718,1.3288,null],["2013-02",1628.0,1.7771,1.3359,null],["2013-03",1593.0,1.8092,1.2964,null],["2013-04",1488.0,1.7969,1.3026,null],["2013-05",1414.0,1.8288,1.2982,null],["2013-06",1343.0,1.8978,1.3189,null],["2013-07",1286.0,1.9323,1.308,null],["2013-08",1352.0,1.9629,1.3309,null],["2013-09",1349.0,2.0194,1.3348,null],["2013-10",1317.0,1.9872,1.3635,null],["2013-11",1276.0,2.0245,1.3493,null],["2013-12",1222.0,2.0673,1.3708,null],["2014-01",1244.0,2.226,1.361,null],["2014-02",1300.0,2.21,1.3658,null],["2014-03",1336.0,2.2159,1.3823,null],["2014-04",1298.0,2.128,1.3813,null],["2014-05",1289.0,2.0926,1.3732,null],["2014-06",1279.0,2.1194,1.3592,null],["2014-07",1311.0,2.1197,1.3539,null],["2014-08",1295.0,2.1616,1.3316,null],["2014-09",1237.0,2.2128,1.2901,null],["2014-10",1222.0,2.2551,1.2673,null],["2014-11",1175.0,2.2358,1.2472,null],["2014-12",1201.0,2.2971,1.2323,null],["2015-01",1251.0,2.337,1.1621,null],["2015-02",1227.0,2.4634,1.135,null],["2015-03",1179.0,2.5912,1.0838,null],["2015-04",1199.0,2.6666,1.0779,null],["2015-05",1199.0,2.6451,1.115,null],["2015-06",1182.0,2.702,1.1213,null],["2015-07",1128.0,2.7015,1.0996,null],["2015-08",1118.0,2.8563,1.1139,null],["2015-09",1125.0,3.0153,1.1221,null],["2015-10",1159.0,2.9272,1.1235,null],["2015-11",1086.0,2.8736,1.0736,null],["2015-12",1076.0,2.9231,1.0878,null],["2016-01",1098.0,3.0123,1.086,null],["2016-02",1200.0,2.9424,1.1093,null],["2016-03",1245.0,2.8899,1.11,null],["2016-04",1242.0,2.8341,1.1339,null],["2016-05",1261.0,2.9383,1.1311,null],["2016-06",1276.0,2.9155,1.1229,null],["2016-07",1337.0,2.9623,1.1069,null],["2016-08",1340.0,2.9618,1.1212,null],["2016-09",1327.0,2.9686,1.1212,null],["2016-10",1267.0,3.0758,1.1026,null],["2016-11",1238.0,3.2894,1.0799,null],["2016-12",1157.0,3.5025,1.0543,null],["2017-01",1192.0,3.7555,1.0614,null],["2017-02",1234.0,3.6652,1.0643,null],["2017-03",1231.0,3.6718,1.0685,null],["2017-04",1267.0,3.6516,1.0723,null],["2017-05",1246.0,3.5689,1.1058,null],["2017-06",1260.0,3.5224,1.1229,null],["2017-07",1237.0,3.5638,1.1511,null],["2017-08",1283.0,3.5097,1.1807,4725],["2017-09",1314.0,3.473,1.1915,4379],["2017-10",1280.0,3.6779,1.1756,6463],["2017-11",1282.0,3.8943,1.1738,9839],["2017-12",1264.0,3.8424,1.1844,13716],["2018-01",1331.0,3.7729,1.22,10285],["2018-02",1331.0,3.783,1.2348,10327],["2018-03",1325.0,3.8904,1.2336,6924],["2018-04",1335.0,4.073,1.2276,9246],["2018-05",1303.0,4.4463,1.1812,7485],["2018-06",1282.0,4.6307,1.1678,6390],["2018-07",1238.0,4.7708,1.1686,7731],["2018-08",1202.0,5.9314,1.1549,7011],["2018-09",1198.0,6.3342,1.1659,6627],["2018-10",1215.0,5.8263,1.1484,6372],["2018-11",1221.0,5.3574,1.1367,4041],["2018-12",1250.0,5.3242,1.1387,3703],["2019-01",1292.0,5.375,1.1416,3434],["2019-02",1320.0,5.276,1.1351,3814],["2019-03",1301.0,5.4841,1.1302,4104],["2019-04",1286.0,5.7579,1.1238,5321],["2019-05",1284.0,6.0524,1.1185,8555],["2019-06",1359.0,5.8106,1.1293,10854],["2019-07",1413.0,5.6628,1.1218,10081],["2019-08",1500.0,5.6509,1.1126,9587],["2019-09",1511.0,5.7038,1.1004,8289],["2019-10",1495.0,5.7925,1.1053,9141],["2019-11",1471.0,5.7389,1.1051,7542],["2019-12",1479.0,5.8553,1.1119,7195],["2020-01",1561.0,5.9285,1.11,9353],["2020-02",1597.0,6.0704,1.0905,8524],["2020-03",1592.0,6.3452,1.1063,6410],["2020-04",1683.0,6.8697,1.0862,8620],["2020-05",1716.0,6.9287,1.0902,9448],["2020-06",1732.0,6.8245,1.1255,9139],["2020-07",1847.0,6.8774,1.1463,11335],["2020-08",1969.0,7.2827,1.1828,11650],["2020-09",1922.0,7.5551,1.1792,10777],["2020-10",1900.0,7.9577,1.1775,13791],["2020-11",1866.0,7.9857,1.1838,19696],["2020-12",1858.0,7.6975,1.2174,28924],["2021-01",1867.0,7.3998,1.2171,33093],["2021-02",1808.0,7.0909,1.2098,45136],["2021-03",1718.0,7.6751,1.1899,58741],["2021-04",1760.0,8.1753,1.1979,57694],["2021-05",1850.0,8.3856,1.2146,37254],["2021-06",1835.0,8.6188,1.2047,35045],["2021-07",1808.0,8.5931,1.1822,41462],["2021-08",1785.0,8.4771,1.1772,47101],["2021-09",1775.0,8.5559,1.177,43824],["2021-10",1777.0,9.2061,1.1601,61300],["2021-11",1822.0,10.7316,1.1414,56951],["2021-12",1790.0,13.621,1.1305,46217],["2022-01",1816.0,13.5689,1.1314,38467],["2022-02",1856.0,13.6582,1.1342,43160],["2022-03",1948.0,14.6327,1.1019,45510],["2022-04",1937.0,14.726,1.0819,37631],["2022-05",1849.0,15.6334,1.0578,31801],["2022-06",1837.0,16.9999,1.0566,19942],["2022-07",1733.0,17.4787,1.0179,23293],["2022-08",1765.0,18.0395,1.0128,20050],["2022-09",1681.0,18.3244,0.9904,19423],["2022-10",1664.0,18.5895,0.9826,20491],["2022-11",1725.0,18.613,1.0201,17164],["2022-12",1798.0,18.6648,1.0592,16542],["2023-01",1898.0,18.7863,1.0769,23125],["2023-02",1855.0,18.8504,1.0715,23142],["2023-03",1913.0,19.0069,1.0706,28465],["2023-04",2000.0,19.3536,1.0968,29233],["2023-05",1992.0,19.779,1.0868,27210],["2023-06",1943.0,23.7622,1.084,30472],["2023-07",1951.0,26.513,1.1058,29232],["2023-08",1919.0,26.9305,1.0909,25941],["2023-09",1916.0,27.0183,1.0684,26963],["2023-10",1916.0,27.8815,1.0563,34640],["2023-11",1984.0,28.6601,1.0808,37724],["2023-12",2026.0,29.1177,1.091,42284],["2024-01",2034.0,30.0933,1.0905,42580],["2024-02",2023.0,30.815,1.0795,61131],["2024-03",2158.0,32.0293,1.0872,71280],["2024-04",2331.0,32.3403,1.0728,60672],["2024-05",2351.0,32.2417,1.0812,67540],["2024-06",2326.0,32.5942,1.0759,62772],["2024-07",2398.0,32.9177,1.0844,64628],["2024-08",2470.0,33.6964,1.1012,58974],["2024-09",2571.0,34.0567,1.1106,63328],["2024-10",2690.0,34.25,1.0904,70292],["2024-11",2651.0,34.454,1.063,96408],["2024-12",2648.0,35.0029,1.0474,93576],["2025-01",2710.0,35.5507,1.0354,102430],["2025-02",2895.0,36.1986,1.0413,84350],["2025-03",2983.0,37.1682,1.0807,82550],["2025-04",3218.0,38.1409,1.1214,94172],["2025-05",3309.0,38.8282,1.1278,104592],["2025-06",3353.0,39.4512,1.1516,107146],["2025-07",3340.0,40.2377,1.1677,115764],["2025-08",3368.0,40.8358,1.1631,108246],["2025-09",3668.0,41.3316,1.1732,114049],["2025-10",4058.0,41.856,1.163,109608],["2025-11",4087.0,42.2923,1.156,90360],["2025-12",4309.0,42.6898,1.1711,87648],["2026-01",4753.0,43.2301,1.1738,78741],["2026-02",5020.0,43.7058,1.1824,66973],["2026-03",4856.0,44.2058,1.1558,68284],["2026-04",4721.0,44.8031,1.1706,76347],["2026-05",4587.0,45.5397,1.1673,73674],["2026-06",4228.0,46.285,1.1518,58625],["2026-07",4073.0,47.0856,1.1417,62888],["2026-08",4411.0,47.8815,1.1593,78581],["2026-09",4319.0,48.6545,1.1513,83624],["2026-10",4105.0,49.4729,1.1202,77582]];/*VERI_SON*/
+(function(){
+  const $=id=>document.getElementById(id);
+  const OZ=31.1034768;
+  const AYLAR=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"];
+  const fTL=(v,d=0)=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
+  const fQ=(v,d)=>new Intl.NumberFormat("tr-TR",{maximumFractionDigits:d}).format(v);
+  const fP=v=>(v>=0?"+%":"−%")+new Intl.NumberFormat("tr-TR",{maximumFractionDigits:v>=1000||v<=-1000?0:1}).format(Math.abs(v));
+  // yıl sonrası bulunma eki: 2020'de, 2016'da, 2015'te
+  const ek=y=>{ y=+y; const d=y%10, t=Math.floor(y/10)%10; if(d) return ["","de","de","te","te","te","da","de","de","da"][d]; if(t) return ["","da","de","da","da","de","da","de","de","da"][t]; return "de"; };
+  const M=Object.fromEntries(D.map(r=>[r[0],{g:r[1],u:r[2],e:r[3],b:r[4]}]));
+  const last=D[D.length-1];
+
+  // bugünkü fiyatlar: önce son ay verisi, sonra canlı veri gelince güncellenir
+  const NOW={g:last[1],u:last[2],e:last[3],b:last[4],live:false};
+  // her varlık için: o aydaki 1 birimin TL fiyatı
+  const A=[
+    {k:"gold",n:"Gram altın",unit:"gram",dq:2,p:x=>x.g/OZ*x.u},
+    {k:"usd",n:"Dolar",unit:"$",dq:0,p:x=>x.u},
+    {k:"eur",n:"Euro",unit:"€",dq:0,p:x=>x.e*x.u},
+    {k:"btc",n:"Bitcoin",unit:"BTC",dq:4,p:x=>x.b?x.b*x.u:null},
+    {k:"tl",n:"TL olarak tutsaydım",unit:"",dq:0,p:()=>1}
+  ];
+
+  function num(v){ v=String(v||"").trim().replace(/\s|₺|TL/gi,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); else if(/^\d{1,3}(\.\d{3})+$/.test(v)) v=v.replace(/\./g,""); return parseFloat(v); }
+
+  // seçim kutuları
+  const years=[...new Set(D.map(r=>r[0].slice(0,4)))];
+  years.slice().reverse().forEach(y=>{ const o=document.createElement("option"); o.value=y; o.textContent=y; $("yr").appendChild(o); });
+  AYLAR.forEach((a,i)=>{ const o=document.createElement("option"); o.value=String(i+1).padStart(2,"0"); o.textContent=a; $("mon").appendChild(o); });
+  const lastY=+last[0].slice(0,4);
+  const CH=[[1,"1 yıl önce"],[3,"3 yıl önce"],[5,"5 yıl önce"],[10,"10 yıl önce"],[15,"15 yıl önce"],[20,"20 yıl önce"]];
+  CH.forEach(([n,t])=>{ const b=document.createElement("button"); b.type="button"; b.textContent=t; b.dataset.y=n; b.onclick=()=>{ setDate(clampKey((lastY-n)+"-"+last[0].slice(5))); run(); }; $("chips").appendChild(b); });
+
+  function clampKey(k){ if(M[k]) return k; if(k<D[0][0]) return D[0][0]; if(k>last[0]) return last[0]; const y=k.slice(0,4); const inY=D.filter(r=>r[0].startsWith(y)); return inY.length?inY[inY.length-1][0]:last[0]; }
+  function setDate(k){ $("yr").value=k.slice(0,4); $("mon").value=k.slice(5,7); }
+  function key(){ return $("yr").value+"-"+$("mon").value; }
+
+  // başlangıç: adres çubuğundaki ?tutar=&tarih= ya da 5 yıl önce
+  const q=new URLSearchParams(location.search);
+  if(q.get("tutar")){ const t=num(q.get("tutar")); if(t>0) $("amt").value=fQ(t,2); }
+  setDate(clampKey(/^\d{4}-\d{2}$/.test(q.get("tarih")||"") ? q.get("tarih") : (lastY-5)+"-"+last[0].slice(5)));
+
+  let lastText="";
+  function run(){
+    let k=key();
+    if(!M[k]){ k=clampKey(k); setDate(k); }
+    const amt=num($("amt").value), then=M[k];
+    const label=AYLAR[+k.slice(5)-1]+" "+k.slice(0,4)+"'"+ek(k.slice(0,4));
+    document.querySelectorAll("#chips button").forEach(b=>b.setAttribute("aria-pressed", (lastY-+b.dataset.y)+"-"+last[0].slice(5)===k));
+    if(!(amt>0)){ $("head").textContent="Geçerli bir tutar yaz."; $("res").innerHTML=""; return; }
+    const rows=A.map(a=>{
+      const p0=a.p(then), p1=a.p(NOW);
+      if(!p0||!p1) return {a,na:true};
+      const qty=amt/p0, val=qty*p1;
+      return {a,qty,val,ch:(val/amt-1)*100};
+    });
+    const ok=rows.filter(r=>!r.na).sort((x,y)=>y.val-x.val);
+    const mx=Math.max(...ok.map(r=>r.val));
+    const best=ok[0];
+    const el=$("res"); el.innerHTML="";
+    [...ok,...rows.filter(r=>r.na)].forEach(r=>{
+      const d=document.createElement("div"); d.className="r"+(r===best?" best":"")+(r.na?" na":"");
+      if(r.na){ d.innerHTML=`<div class="top"><div class="n"></div><div class="v">—</div></div><div class="sub"><span>Bu tarih için veri yok (bitcoin verisi Ağustos 2017'den başlar)</span></div>`; d.querySelector(".n").textContent=r.a.n; el.appendChild(d); return; }
+      const qtxt = r.a.k==="tl" ? "Paran olduğu gibi kalır" : `${fQ(r.qty,r.a.dq)} ${r.a.unit} alırdın`;
+      const kat = r.val/amt;
+      d.innerHTML=`<div class="top"><div class="n"></div><div class="v"></div></div>
+        <div class="sub"><span class="q"></span><b class="c"></b></div>
+        <div class="track"><div class="fill"></div></div>`;
+      d.querySelector(".n").textContent=r.a.n; if(r===best&&ok.length>1){ const t=document.createElement("span"); t.className="tag"; t.textContent="En çok kazandıran"; d.querySelector(".n").appendChild(t); }
+      d.querySelector(".v").textContent=fTL(r.val);
+      d.querySelector(".q").textContent=qtxt;
+      const c=d.querySelector(".c"); c.textContent = r.a.k==="tl" ? "±%0" : fP(r.ch)+(kat>=2?` (${fQ(kat,1)} kat)`:""); c.className="c "+(r.ch>0.05?"up":r.ch<-0.05?"down":"");
+      d.querySelector(".fill").style.width=Math.max(1.5,r.val/mx*100)+"%";
+      if(r.a.k==="tl") d.querySelector(".fill").style.background="var(--muted)";
+      el.appendChild(d);
+    });
+    const g=ok.find(r=>r.a.k==="gold");
+    $("head").innerHTML="";
+    const h=document.createElement("span");
+    h.append(`${label} ${fTL(amt)} ile `); const b1=document.createElement("b"); b1.textContent=best.a.k==="tl"?"hiçbir şey almasaydın":best.a.n.toLowerCase()+" alsaydın"; h.append(b1);
+    h.append(" bugün "); const b2=document.createElement("b"); b2.textContent=fTL(best.val); h.append(b2); h.append(" olurdu.");
+    $("head").appendChild(h);
+    lastText=`${label} ${fTL(amt)} ile ${best.a.n.toLowerCase()} alsaydım bugün ${fTL(best.val)} olurdu`+(g&&g!==best?`, gram altın alsaydım ${fTL(g.val)}.`:".");
+    const url=location.origin+location.pathname+"?tutar="+Math.round(amt)+"&tarih="+k;
+    try{ history.replaceState(null,"",url); }catch(e){}
+    $("wa").href="https://wa.me/?text="+encodeURIComponent(lastText+" Sen de hesapla: "+url);
+  }
+
+  function toast(t){ const el=$("toast"); el.textContent=t; el.classList.add("on"); clearTimeout(toast.h); toast.h=setTimeout(()=>el.classList.remove("on"),1800); }
+  async function copy(){ try{ await navigator.clipboard.writeText(location.href); toast("Bağlantı kopyalandı"); }catch(e){ toast("Kopyalanamadı"); } }
+  $("cpy").onclick=copy;
+  $("shr").onclick=async()=>{ if(navigator.share){ try{ await navigator.share({title:"Geçmişte alsaydım ne olurdu?",text:lastText,url:location.href}); }catch(e){} } else copy(); };
+  $("amt").addEventListener("input",run); $("mon").addEventListener("change",run); $("yr").addEventListener("change",run);
+  $("amt").addEventListener("blur",()=>{ const v=num($("amt").value); if(v>0) $("amt").value=fQ(v,2); });
+
+  const lastLabel=AYLAR[+last[0].slice(5)-1]+" "+last[0].slice(0,4);
+  function srcNote(){
+    $("src").textContent = NOW.live
+      ? "Bugünkü değerler canlı fiyatlarla (altın xaus.com, döviz ve bitcoin Binance) hesaplanır. Geçmiş fiyatlar aylık ortalamadır. İşçilik, komisyon ve vergi dahil değildir."
+      : `Canlı fiyatlara ulaşılamadı; bugünkü değerler ${lastLabel} ortalamasıyla hesaplandı. Geçmiş fiyatlar aylık ortalamadır. İşçilik, komisyon ve vergi dahil değildir.`;
+  }
+
+  async function j(url,ms=8000){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms); try{ const r=await fetch(url,{signal:c.signal,cache:"no-store"}); if(!r.ok) throw new Error(r.status); return await r.json(); } finally{ clearTimeout(t); } }
+  async function live(){
+    const syms=encodeURIComponent(JSON.stringify(["USDTTRY","EURUSDT","BTCUSDT"]));
+    const hosts=["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"];
+    const bin=(async()=>{ for(const h of hosts){ try{ return await j(h+"/api/v3/ticker/price?symbols="+syms); }catch(e){} } return null; })();
+    const [b,gd]=await Promise.all([bin, j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null)]);
+    let n=0;
+    if(b){ b.forEach(x=>{ const p=+x.price; if(!(p>0)) return; if(x.symbol==="USDTTRY"){NOW.u=p;n++;} if(x.symbol==="EURUSDT"){NOW.e=p;n++;} if(x.symbol==="BTCUSDT"){NOW.b=p;n++;} }); }
+    if(gd&&+gd.spot_usd_oz>0){ NOW.g=+gd.spot_usd_oz; n++; if(!b&&+gd.btc_usd>0) NOW.b=+gd.btc_usd; }
+    NOW.live = n>=4;
+    srcNote(); run();
+  }
+  srcNote(); run(); live();
+})();
+</script>
+</body>
+</html>
