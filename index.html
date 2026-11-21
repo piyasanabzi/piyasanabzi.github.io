@@ -125,12 +125,15 @@
 
 <main class="wrap">
   <h1>Canlı altın ve döviz fiyatları</h1>
-  <p class="lead">Dolar, euro ve bitcoin anlık; altın ve gümüş her dakika, petrol saatte bir güncellenir.</p>
+  <p class="lead">Dolar, euro, sterlin ve diğer kurlar, bitcoin anlık; altın ve gümüş her dakika, petrol saatte bir güncellenir.</p>
 
   <h2>Altın</h2>
   <div class="grid" id="gGold"></div>
   <h2>Döviz</h2>
   <div class="grid" id="gFx"></div>
+  <h2>Diğer kurlar</h2>
+  <div class="grid" id="gFx2"></div>
+  <div class="upd" style="margin-top:6px">Diğer kurlar, günlük çapraz kur ile anlık dolar kurundan hesaplanır.</div>
   <h2>Emtia ve kripto</h2>
   <div class="grid" id="gCom"></div>
 
@@ -189,7 +192,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
+<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
 
 <script>
 (function(){
@@ -205,7 +208,7 @@
   const S = {
     usdtry:null, usdtry24:null, eurusd:null, eurusd24:null, btc:null, btc24:null,
     goldOz:null, goldOz24:null, silverOz:null, brent:null, brentCh:null, wti:null, wtiCh:null, ng:null, ngCh:null,
-    t:{fx:null, gold:null, oil:null}
+    t:{fx:null, gold:null, oil:null}, x:{}, x24:{}
   };
   const eurtry=()=> S.eurusd&&S.usdtry ? S.eurusd*S.usdtry : null;
   const eurtry24=()=> S.eurusd24&&S.usdtry24 ? S.eurusd24*S.usdtry24 : null;
@@ -215,6 +218,9 @@
   // pure-gold grams in Turkish coins (22 ayar = 0.916)
   const COINS=[["Çeyrek altın",1.75*0.916],["Yarım altın",3.50*0.916],["Tam altın",7.00*0.916],["Cumhuriyet altını",7.216*0.916]];
 
+  const XC=[["gbp","Sterlin","GBP/TRY"],["chf","İsviçre frangı","CHF/TRY"],["sar","Suudi riyali","SAR/TRY"],["aed","BAE dirhemi","AED/TRY"],["jpy","Japon yeni","JPY/TRY"],["cny","Çin yuanı","CNY/TRY"],["rub","Rus rublesi","RUB/TRY"],["azn","Azerbaycan manatı","AZN/TRY"],["cad","Kanada doları","CAD/TRY"],["aud","Avustralya doları","AUD/TRY"],["kwd","Kuveyt dinarı","KWD/TRY"],["qar","Katar riyali","QAR/TRY"]];
+  const xtry=k=> S.x[k]>0&&S.usdtry ? S.usdtry/S.x[k] : null;
+  const xtry24=k=> S.x24[k]>0&&S.usdtry24 ? S.usdtry24/S.x24[k] : null;
   const CARDS = {
     gGold:[
       {k:"gram", n:"Gram altın", s:"24 ayar", big:true, gold:true, v:()=>gramTL(), v24:()=>gramTL24(), f:v=>fTL(v), t:"gold"},
@@ -228,6 +234,7 @@
       {k:"parite", n:"Euro / Dolar", s:"parite", v:()=>S.eurusd, v24:()=>S.eurusd24, f:v=>fN(v,4), t:"fx"},
       {k:"usd100", n:"100 Dolar", s:"TL karşılığı", v:()=>S.usdtry&&S.usdtry*100, v24:()=>S.usdtry24&&S.usdtry24*100, f:v=>fTL(v), t:"fx"}
     ],
+    gFx2: XC.map(([k,n,s])=>({k:"x_"+k, n, s, v:()=>xtry(k), v24:()=>xtry24(k), f:v=>fN(v,4), t:"fx"})),
     gCom:[
       {k:"brent", n:"Brent petrol", s:"varil, USD", v:()=>S.brent, ch:()=>S.brentCh, f:v=>fUSD(v), t:"oil"},
       {k:"wti", n:"WTI petrol", s:"varil, USD", v:()=>S.wti, ch:()=>S.wtiCh, f:v=>fUSD(v), t:"oil"},
@@ -262,7 +269,7 @@
       const t=S.t[c.t]; if(t) el.querySelector(".upd").textContent="Güncelleme "+tm(t);
     });
     // tape
-    const items=[["Gram altın",gramTL(),v=>fTL(v)],["Dolar",S.usdtry,v=>fN(v,4)],["Euro",eurtry(),v=>fN(v,4)],["Ons",S.goldOz,v=>fUSD(v)],["Gümüş",S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry,v=>fTL(v)],["Brent",S.brent,v=>fUSD(v)],["Bitcoin",S.btc,v=>fUSD(v,0)]].filter(x=>x[1]);
+    const items=[["Gram altın",gramTL(),v=>fTL(v)],["Dolar",S.usdtry,v=>fN(v,4)],["Euro",eurtry(),v=>fN(v,4)],["Sterlin",xtry("gbp"),v=>fN(v,4)],["Ons",S.goldOz,v=>fUSD(v)],["Gümüş",S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry,v=>fTL(v)],["Brent",S.brent,v=>fUSD(v)],["Bitcoin",S.btc,v=>fUSD(v,0)]].filter(x=>x[1]);
     const html=items.map(([n,v,f])=>`<span>${n}<b>${f(v)}</b></span>`).join("");
     $("tape").innerHTML=html+html;
     calc();
@@ -271,7 +278,7 @@
   let rq=false; const schedule=()=>{ if(rq) return; rq=true; requestAnimationFrame(()=>{ rq=false; render(); }); };
 
   // ---------- calculator ----------
-  const UNITS=[["gram","Gram altın",()=>gramTL()],...COINS.map(([n,g],i)=>["coin"+i,n,()=>gramTL()&&gramTL()*g]),["ag","Gram gümüş",()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry],["usd","Dolar",()=>S.usdtry],["eur","Euro",eurtry],["btc","Bitcoin",()=>S.btc&&S.usdtry&&S.btc*S.usdtry]];
+  const UNITS=[["gram","Gram altın",()=>gramTL()],...COINS.map(([n,g],i)=>["coin"+i,n,()=>gramTL()&&gramTL()*g]),["ag","Gram gümüş",()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry],["usd","Dolar",()=>S.usdtry],["eur","Euro",eurtry],["gbp","Sterlin",()=>xtry("gbp")],["chf","İsviçre frangı",()=>xtry("chf")],["sar","Suudi riyali",()=>xtry("sar")],["btc","Bitcoin",()=>S.btc&&S.usdtry&&S.btc*S.usdtry]];
   UNITS.forEach(([k,n])=>{ const o=document.createElement("option"); o.value=k; o.textContent=n; $("unit").appendChild(o); });
   function num(v){ v=String(v||"").trim().replace(/\s/g,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); else if(/^\d{1,3}(\.\d{3})+$/.test(v)) v=v.replace(/\./g,""); return parseFloat(v); }
   function calc(){ const q=num($("qty").value), u=UNITS.find(x=>x[0]===$("unit").value), p=u&&u[2](); $("calcRes").textContent=(q>=0&&p)?fTL(q*p):"—"; }
@@ -358,6 +365,22 @@
     S.t.oil=new Date(at); schedule();
   }
 
+  // ---------- other currencies (daily cross rates vs USD) ----------
+  const XKEYS=XC.map(x=>x[0]);
+  function pick(o){ const r={}; XKEYS.forEach(k=>{ const v=+(o[k]??o[k.toUpperCase()]); if(v>0) r[k]=v; }); return r; }
+  async function first(urls){ for(const u of urls){ try{ return await j(u,8000); }catch(e){} } throw new Error("fx2"); }
+  const FXU=d=>[`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${d}/v1/currencies/usd.min.json`,`https://${d}.currency-api.pages.dev/v1/currencies/usd.min.json`];
+  async function fx2(){
+    const c=LS.get("pn-fx2",null);
+    if(c&&Date.now()-c.at<3*3600e3&&c.x&&Object.keys(c.x).length){ S.x=c.x; S.x24=c.x24||{}; schedule(); return; }
+    let x={}, x24={}, date=null;
+    try{ const d=await first(FXU("latest")); x=pick(d.usd||{}); date=d.date; }catch(e){}
+    if(!Object.keys(x).length){ try{ const d=await j("https://open.er-api.com/v6/latest/USD",8000); x=pick(d.rates||{}); }catch(e){} }
+    if(!Object.keys(x).length) throw new Error("fx2");
+    if(date){ try{ const y=new Date(date+"T12:00:00Z"); y.setUTCDate(y.getUTCDate()-1); const d=await first(FXU(y.toISOString().slice(0,10))); x24=pick(d.usd||{}); }catch(e){} }
+    S.x=x; S.x24=x24; LS.set("pn-fx2",{at:Date.now(),x,x24}); schedule();
+  }
+
   // ---------- chart ----------
   let chartKey="gold";
   const series={};
@@ -390,7 +413,7 @@
   function demo(){
     if(gotAny) return;
     $("demo").hidden=false; setLive(false,"Önizleme");
-    Object.assign(S,{usdtry:42.31,usdtry24:42.18,eurusd:1.158,eurusd24:1.161,btc:91250,btc24:89900,goldOz:4085.4,goldOz24:4061.2,silverOz:51.3,brent:63.8,brentCh:-0.6,wti:60.1,wtiCh:-0.4});
+    Object.assign(S,{usdtry:42.31,usdtry24:42.18,eurusd:1.158,eurusd24:1.161,btc:91250,btc24:89900,goldOz:4085.4,goldOz24:4061.2,x:{gbp:0.76,chf:0.80,sar:3.75,aed:3.6725,jpy:155,cny:7.1,rub:80,azn:1.7,cad:1.40,aud:1.53,kwd:0.307,qar:3.64},x24:{gbp:0.761,chf:0.801,sar:3.75,aed:3.6725,jpy:154.6,cny:7.1,rub:80.4,azn:1.7,cad:1.401,aud:1.532,kwd:0.307,qar:3.64},silverOz:51.3,brent:63.8,brentCh:-0.6,wti:60.1,wtiCh:-0.4});
     const now=Date.now(); S.t={fx:new Date(),gold:new Date(),oil:new Date()};
     goldSeries=Array.from({length:60},(_,i)=>({t:now-(60-i)*24*6e4,p:4061+Math.sin(i/6)*12+i*0.4}));
     ["USDTTRY","BTCUSDT","EURUSDT"].forEach((s,k)=>{ const base=[42.0,88000,1.16][k]; series[s]=Array.from({length:168},(_,i)=>({t:now-(168-i)*36e5,p:base*(1+Math.sin(i/14)*0.004+i*0.00002*(k===1?20:1))})); });
@@ -409,6 +432,9 @@
     {k:"gumus",n:"Gümüş",u:"gram",e:"🥈",p:()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry},
     {k:"usd",n:"Dolar",u:"$",e:"💵",p:()=>S.usdtry},
     {k:"eur",n:"Euro",u:"€",e:"💶",p:eurtry},
+    {k:"gbp",n:"Sterlin",u:"£",e:"💷",p:()=>xtry("gbp")},
+    {k:"chf",n:"İsviçre frangı",u:"CHF",e:"💴",p:()=>xtry("chf")},
+    {k:"sar",n:"Suudi riyali",u:"SAR",e:"💴",p:()=>xtry("sar")},
     {k:"btc",n:"Bitcoin",u:"BTC",e:"🪙",p:()=>S.btc&&S.usdtry&&S.btc*S.usdtry}
   ];
   const AT=Object.fromEntries(ATYPES.map(a=>[a.k,a]));
@@ -536,7 +562,8 @@
   const safe=fn=>fn().catch(()=>{});
   safe(binanceRest).then(()=>{ if(gotAny) setLive(true,"Canlı"); });
   connectWS();
-  safe(gold); safe(goldIntraday); safe(oil);
+  safe(gold); safe(goldIntraday); safe(oil); safe(fx2);
+  setInterval(()=>safe(fx2),3*3600e3);
   setInterval(()=>safe(gold),60000);
   setInterval(()=>safe(goldIntraday),5*60000);
   setInterval(()=>safe(oil),60*60000);
