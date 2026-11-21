@@ -119,6 +119,14 @@
   .gd-k{font-weight:800;color:var(--gold)}
   .gd-bos{color:var(--muted);font-size:13px;padding:6px 0}
   .gd-more{margin-top:8px;width:100%;padding:10px;border-radius:12px;border:1px solid var(--line);background:transparent;color:var(--ink);font-weight:700;font-size:13px;cursor:pointer}
+  .sd-bar{display:flex;align-items:center;gap:10px;margin:10px auto 0;max-width:1100px;width:calc(100% - 32px);padding:10px 12px;border-radius:14px;background:color-mix(in srgb,#ef4444 12%,var(--card));border:1px solid color-mix(in srgb,#ef4444 45%,var(--line));color:var(--ink);text-decoration:none}
+  .sd-bar[hidden]{display:none}
+  .sd-l{flex:none;display:inline-flex;align-items:center;gap:6px;background:#dc2626;color:#fff;font-size:11px;font-weight:900;letter-spacing:.04em;padding:4px 8px;border-radius:8px}
+  .sd-l i{width:7px;height:7px;border-radius:50%;background:#fff;animation:sdp 1.2s infinite}
+  @keyframes sdp{50%{opacity:.25}}
+  .sd-t{flex:1;font-size:14px;font-weight:700;line-height:1.3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+  .sd-x{flex:none;color:var(--muted);font-size:14px;padding:4px 6px;cursor:pointer}
+  .gd-sd{font-size:10.5px;font-weight:900;padding:1px 7px;border-radius:999px;background:#dc2626;color:#fff;letter-spacing:.03em}
   footer{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;color:var(--muted);font-size:12px;line-height:1.6}
   .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:12px;line-height:1.5}
   .promo{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;background:var(--card);border:1px solid color-mix(in srgb,var(--gold) 55%,var(--line));border-radius:16px;padding:14px 16px;color:var(--ink);text-decoration:none}
@@ -143,6 +151,7 @@
   </div>
 </header>
 <div class="tape" aria-hidden="true"><div class="in" id="tape"></div></div>
+<a id="sdBar" class="sd-bar" href="#" target="_blank" rel="noopener nofollow" hidden><span class="sd-l"><i></i>SON DAKİKA</span><span id="sdTxt" class="sd-t"></span><span id="sdX" class="sd-x" role="button" aria-label="Kapat">✕</span></a>
 
 <main class="wrap">
   <h1>Canlı altın ve döviz fiyatları</h1>
@@ -728,13 +737,22 @@
   }
   function once(iso){var m=Math.round((Date.now()-Date.parse(iso))/6e4);
     if(m<1)return"az önce";if(m<60)return m+" dk önce";var h=Math.floor(m/60);if(h<24)return h+" sa önce";return Math.floor(h/24)+" gün önce";}
-  var H=[],acik=false;
+  var H=[],acik=false,SD=60*6e4;
+  function yeni(h){var a=Date.now()-Date.parse(h.d);return a>=-6e5&&a<=SD;}
+  function sdGoster(){
+    var bar=document.getElementById("sdBar");if(!bar)return;
+    var k=null;try{k=localStorage.getItem("pn-sd-kapat");}catch(e){}
+    var kt=Date.parse(k)||0;var h=H.find(function(x){return yeni(x)&&Date.parse(x.d)>kt;});
+    if(!h){bar.hidden=true;return;}
+    bar.href=h.u;document.getElementById("sdTxt").textContent=h.t+" — "+h.k;bar.dataset.d=h.d;bar.hidden=false;
+  }
   function hab(){
     var el=document.getElementById("gdHab"),b=document.getElementById("gdMore");
     var L=acik?H:H.slice(0,6);
     el.innerHTML=L.map(function(h){return '<a class="gd-i" href="'+esc(h.u)+'" target="_blank" rel="noopener nofollow"><div class="gd-t">'+esc(h.t)+
-      '</div><div class="gd-m"><span class="gd-e">'+esc(h.e)+"</span><span>"+esc(h.k)+" · "+once(h.d)+"</span></div></a>";}).join("");
+      '</div><div class="gd-m">'+(yeni(h)?'<span class="gd-sd">SON DAKİKA</span>':"")+'<span class="gd-e">'+esc(h.e)+"</span><span>"+esc(h.k)+" · "+once(h.d)+"</span></div></a>";}).join("");
     b.hidden=acik||H.length<=6;
+    sdGoster();
   }
   async function habGetir(){
     var url="https://raw.githubusercontent.com/piyasanabzi/piyasanabzi.github.io/veri/haberler.json?t="+Math.floor(Date.now()/3e5);
@@ -746,6 +764,9 @@
     }catch(e){ if(!H.length) document.getElementById("gdHab").innerHTML='<div class="gd-bos">Başlıklar şu an alınamıyor, birazdan tekrar denenecek.</div>'; }
   }
   document.getElementById("gdMore").addEventListener("click",function(){acik=true;hab();});
+  document.getElementById("sdX").addEventListener("click",function(ev){ev.preventDefault();ev.stopPropagation();
+    var bar=document.getElementById("sdBar");try{localStorage.setItem("pn-sd-kapat",bar.dataset.d||"");}catch(e){}bar.hidden=true;});
+  setInterval(function(){if(H.length)hab();},6e4);
   tak(); habGetir();
   setInterval(tak,6e4); setInterval(habGetir,10*6e4);
 })();

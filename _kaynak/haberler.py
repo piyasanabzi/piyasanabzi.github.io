@@ -58,7 +58,10 @@ def tarih(s):
 
 def temizle(t):
     t = html.unescape(re.sub(r"<[^>]+>", "", t or "")).strip()
-    return re.sub(r"\s+", " ", t)
+    t = re.sub(r"\s+", " ", t)
+    # Bazı siteler başlığa "SON DAKİKA |" ekliyor; "son dakika" etiketini biz yayın saatine göre veriyoruz.
+    t = re.sub(r"^(?:🔴\s*)?son dakika\s*(?:haberi)?\s*[|:!\-–—]*\s*", "", t, flags=re.I)
+    return t[:1].upper() + t[1:] if t else t
 
 
 def etiket(baslik):
