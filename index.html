@@ -110,6 +110,10 @@
   .promo{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:10px;background:var(--card);border:1px solid color-mix(in srgb,var(--gold) 55%,var(--line));border-radius:16px;padding:14px 16px;color:var(--ink);text-decoration:none}
   .promo>span:first-child{display:grid;gap:4px;font-size:13px;line-height:1.45}.promo b{font-size:15px}
   .promo .go{flex:none;background:var(--gold);color:#1a1200;font-weight:800;font-size:13px;padding:9px 12px;border-radius:12px}
+  .alf{display:grid;gap:8px}.alf .two{display:grid;grid-template-columns:1.2fr 1fr;gap:8px}
+  .alf input,.alf select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px;font:inherit;font-size:16px;outline:none}
+  .alf input:focus,.alf select:focus{border-color:var(--blue)}
+  #alList{margin-top:12px}#alList .asset.hit{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
   .demo{background:#5a3b00;color:#ffe2a6;text-align:center;font-size:12px;font-weight:700;padding:6px}
 </style>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4295900331301338" crossorigin="anonymous"></script>
@@ -163,6 +167,20 @@
     <div class="res" id="calcRes">—</div>
   </div>
   <a class="promo" href="/gecmis-yatirim.html"><span><b>Geçmişte alsaydım ne olurdu?</b><span class="muted">2005'ten bugüne istediğin ayda altın, dolar, euro ya da bitcoin alsaydın paran bugün kaç TL olurdu, hesapla.</span></span><span class="go">Hesapla →</span></a>
+
+  <a class="promo" href="/kuyumcu-fiyat-hesaplama.html"><span><b>Kuyumcunun fiyatı uygun mu?</b><span class="muted">Kuyumcunun söylediği fiyatı yaz; içindeki altının gerçek değerini, işçiliği ve farkı gör.</span></span><span class="go">Kontrol et →</span></a>
+
+  <h2 id="alarm">Fiyat alarmı</h2>
+  <div class="panel">
+    <form class="alf" id="alForm" autocomplete="off">
+      <div class="two"><select id="alType" aria-label="Takip edilecek fiyat"></select><input id="alT" inputmode="decimal" placeholder="Hedef fiyat" aria-label="Hedef fiyat"></div>
+      <div class="muted" id="alNow" style="font-size:13px">&nbsp;</div>
+      <div class="err" id="alErr"></div>
+      <button class="pbtn" type="submit">🔔 Alarm kur</button>
+    </form>
+    <div id="alList"></div>
+    <div class="muted" id="alInfo" style="font-size:12px;margin-top:10px;line-height:1.5">Hedef fiyata ulaşıldığında bildirim gönderilir. Alarm, bu sayfa bir sekmede açık kaldığı sürece çalışır; alarmların yalnızca bu cihazda saklanır.</div>
+  </div>
 
   <h2 id="varliklarim">Varlıklarım ve borçlarım</h2>
   <div class="panel" id="pf"></div>
@@ -288,6 +306,7 @@
     $("tape").innerHTML=html+html;
     calc();
     pfTick();
+    alarmTick();
   }
   let rq=false; const schedule=()=>{ if(rq) return; rq=true; requestAnimationFrame(()=>{ rq=false; render(); }); };
 
@@ -570,6 +589,77 @@
     try{ sessionStorage.setItem("pn-session",user); LS.set("pn-remember",user); }catch(e){}
     closeModal(); renderPF(); toast(mMode==="register"?"Hesabın oluşturuldu":"Hoş geldin, "+users[key].name);
     document.getElementById("varliklarim").scrollIntoView({behavior:"smooth"});
+  };
+
+  // ---------- price alarms (on this device, while the page is open) ----------
+  const ALA=[
+    {k:"gram",n:"Gram altın",v:()=>gramTL(),f:v=>fTL(v)},
+    {k:"ceyrek",n:"Çeyrek altın",v:()=>gramTL()&&gramTL()*COINS[0][1],f:v=>fTL(v,0)},
+    {k:"ons",n:"Ons altın (USD)",v:()=>S.goldOz,f:v=>fUSD(v)},
+    {k:"ag",n:"Gram gümüş",v:()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry,f:v=>fTL(v)},
+    {k:"usd",n:"Dolar",v:()=>S.usdtry,f:v=>fN(v,4)+" ₺"},
+    {k:"eur",n:"Euro",v:eurtry,f:v=>fN(v,4)+" ₺"},
+    {k:"gbp",n:"Sterlin",v:()=>xtry("gbp"),f:v=>fN(v,4)+" ₺"},
+    {k:"btc",n:"Bitcoin (USD)",v:()=>S.btc,f:v=>fUSD(v,0)},
+    {k:"brent",n:"Brent petrol (USD)",v:()=>S.brent,f:v=>fUSD(v)}
+  ];
+  const ALK=Object.fromEntries(ALA.map(a=>[a.k,a]));
+  ALA.forEach(a=>{ const o=document.createElement("option"); o.value=a.k; o.textContent=a.n; $("alType").appendChild(o); });
+  let alarms=LS.get("pn-alarms",[]).filter(a=>ALK[a.k]), alPend=null, alT=0, beepCtx=null;
+  const alSave=()=>LS.set("pn-alarms",alarms);
+  const alCur=k=>{ if(!$("demo").hidden) return null; const v=ALK[k].v(); return v!=null&&isFinite(v)&&v>0?v:null; };
+  const dt=t=>new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(t);
+  function beep(){ try{ beepCtx=beepCtx||new (window.AudioContext||window.webkitAudioContext)(); const o=beepCtx.createOscillator(), g=beepCtx.createGain(); o.frequency.value=880; g.gain.setValueAtTime(.001,beepCtx.currentTime); g.gain.exponentialRampToValueAtTime(.2,beepCtx.currentTime+.02); g.gain.exponentialRampToValueAtTime(.001,beepCtx.currentTime+.6); o.connect(g); g.connect(beepCtx.destination); o.start(); o.stop(beepCtx.currentTime+.6); }catch(e){} }
+  let titleT=null; const baseTitle=document.title;
+  function flashTitle(msg){ clearInterval(titleT); let on=false; titleT=setInterval(()=>{ on=!on; document.title=on?"🔔 "+msg:baseTitle; },1000); }
+  window.addEventListener("focus",()=>{ clearInterval(titleT); document.title=baseTitle; });
+  function alFire(a,v){
+    const t=ALK[a.k], msg=`${t.n} ${t.f(a.t)} ${a.dir==="up"?"üstüne çıktı":"altına düştü"}`;
+    toast("🔔 "+msg); beep(); flashTitle(msg);
+    try{ if("Notification" in window && Notification.permission==="granted") new Notification("Piyasa Nabzı: "+msg,{body:"Şu an: "+t.f(v),tag:a.id}); }catch(e){}
+  }
+  function alarmTick(){
+    let changed=false;
+    alarms.forEach(a=>{ if(a.hit) return; const v=alCur(a.k); if(v==null) return; if(a.dir==="up"?v>=a.t:v<=a.t){ a.hit=Date.now(); a.hv=v; changed=true; alFire(a,v); } });
+    if(changed){ alSave(); renderAl(); }
+    const v=alCur($("alType").value); $("alNow").textContent=v!=null?"Şu an: "+ALK[$("alType").value].f(v):"Fiyat yükleniyor…";
+    if(Date.now()-alT>2000) renderAl();
+  }
+  function renderAl(){
+    alT=Date.now(); const el=$("alList"); el.innerHTML="";
+    alarms.forEach(a=>{
+      const t=ALK[a.k], v=alCur(a.k), d=document.createElement("div"); d.className="asset"+(a.hit?" hit":"");
+      d.innerHTML=`<div class="ico">${a.hit?"✅":"🔔"}</div><div><div class="t"></div><div class="sub"></div></div><div><div class="val"></div><div class="pl"></div></div><button class="del" type="button">Sil</button>`;
+      d.querySelector(".t").textContent=t.n;
+      d.querySelector(".sub").textContent=`${t.f(a.t)} ${a.dir==="up"?"üstüne çıkınca":"altına düşünce"}`;
+      const val=d.querySelector(".val"), pl=d.querySelector(".pl");
+      if(a.hit){ val.textContent="Ulaştı"; val.className="val up"; pl.textContent=dt(a.hit)+" · "+t.f(a.hv); pl.className="pl muted"; }
+      else if(v!=null){ val.textContent=t.f(v); const dist=Math.abs(a.t/v-1)*100; pl.textContent="%"+fN(dist,dist<1?2:1)+" uzakta"; pl.className="pl muted"; }
+      else val.textContent="—";
+      const del=d.querySelector(".del");
+      if(alPend===a.id){ del.classList.add("sure"); del.textContent="Emin misin?"; }
+      del.onclick=()=>{ if(alPend!==a.id){ alPend=a.id; renderAl(); setTimeout(()=>{ if(alPend===a.id){ alPend=null; renderAl(); } },3000); return; } alPend=null; alarms=alarms.filter(x=>x.id!==a.id); alSave(); renderAl(); toast("Alarm silindi"); };
+      el.appendChild(d);
+    });
+  }
+  $("alType").addEventListener("change",()=>{ $("alErr").textContent=""; alarmTick(); });
+  $("alForm").onsubmit=async e=>{
+    e.preventDefault(); $("alErr").textContent="";
+    const k=$("alType").value, v=alCur(k), t=num($("alT").value);
+    if(v==null){ $("alErr").textContent="Bu fiyat henüz yüklenmedi, birkaç saniye sonra tekrar dene."; return; }
+    if(!(t>0)){ $("alErr").textContent="Geçerli bir hedef fiyat yaz."; return; }
+    if(Math.abs(t/v-1)<0.0005){ $("alErr").textContent="Hedef, şu anki fiyata çok yakın."; return; }
+    if(alarms.filter(a=>!a.hit).length>=20){ $("alErr").textContent="En fazla 20 aktif alarm kurabilirsin."; return; }
+    alarms.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),k,t,dir:t>v?"up":"down",at:Date.now(),hit:null});
+    if(!alSave()){ $("alErr").textContent="Bu tarayıcı kayıt yapmaya izin vermiyor."; alarms.pop(); return; }
+    $("alT").value=""; renderAl();
+    try{ beepCtx=beepCtx||new (window.AudioContext||window.webkitAudioContext)(); beepCtx.resume(); }catch(_){}
+    let note="Alarm kuruldu";
+    if("Notification" in window){
+      if(Notification.permission==="default"){ try{ await Notification.requestPermission(); }catch(_){} }
+      if(Notification.permission==="denied") note="Alarm kuruldu (bildirim izni kapalı, sadece sayfada uyarı çıkar)";
+    }
+    toast(note);
   };
 
   // ---------- start ----------

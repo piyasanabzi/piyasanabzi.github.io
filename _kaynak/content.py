@@ -115,6 +115,9 @@ urls.append(page("hakkimizda.html","Hakkımızda","Piyasa Nabzı nedir, fiyatlar
 <ul><li>Gram, çeyrek, yarım, tam ve Cumhuriyet altını, ons altın ve gümüş fiyatları</li>
 <li>Dolar, euro ve euro/dolar kurları</li><li>Brent ve WTI petrol, bitcoin fiyatları</li>
 <li>Son 24 saat ve 7 günlük grafikler, altın hesaplayıcı</li>
+<li><a href="/gecmis-yatirim.html">Geçmiş yatırım hesaplayıcısı</a>: geçmişte altın, dolar, euro ya da bitcoin alsaydın bugün ne olurdu?</li>
+<li><a href="/kuyumcu-fiyat-hesaplama.html">Kuyumcu fiyatı hesaplama</a>: kuyumcunun fiyatındaki işçilik ve farkı gör</li>
+<li>Seçtiğin fiyat hedefe ulaşınca haber veren fiyat alarmı</li>
 <li>Giriş yaparak varlıklarını ve borçlarını ekleyip kâr/zarar durumunu görebileceğin bir takip bölümü</li></ul>
 <h2>Fiyatlar nereden geliyor?</h2>
 <p>Altın ve gümüş fiyatları xaus.com, döviz ve bitcoin fiyatları Binance, petrol fiyatları OilPriceAPI üzerinden alınır. Çeyrek, yarım, tam ve Cumhuriyet altını fiyatları, Darphane'nin açıkladığı ağırlık ve ayar bilgileriyle gram altın fiyatından <b>hesaplanan tahmini</b> değerlerdir; kuyumcu işçiliği ve alış-satış farkı içermez.</p>
@@ -146,7 +149,7 @@ urls.append(page("iletisim.html","İletişim","Piyasa Nabzı ile iletişime geç
 <h2>Bize ne yazabilirsin?</h2>
 <ul><li>Fiyatlarda gördüğün bir hata veya gecikme</li><li>Sitede görmek istediğin yeni bir özellik</li><li>Rehber yazılarıyla ilgili soru ve öneriler</li><li>Reklam ve iş birliği talepleri</li></ul>
 <p class="note">Not: Kişisel yatırım tavsiyesi veremiyoruz. Hesabın ve varlık kayıtların yalnızca kendi cihazında saklandığı için, unutulan şifreleri sıfırlayamıyoruz.</p>""",article=False))
-urls.insert(1,SITE+"/gecmis-yatirim.html")  # elle yazılmış sayfa; verisi _kaynak/gecmis_veri.py ile güncellenir
+urls[1:1]=[SITE+"/gecmis-yatirim.html",SITE+"/kuyumcu-fiyat-hesaplama.html"]  # elle yazılmış sayfalar (gecmis verisi: _kaynak/gecmis_veri.py)
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"  <url><loc>{u}</loc><lastmod>{LM.get(u,TODAY)}</lastmod></url>\n" for u in urls)+"</urlset>\n"
 open(ROOT+"/sitemap.xml","w").write(sm)
 print("\n".join(urls))

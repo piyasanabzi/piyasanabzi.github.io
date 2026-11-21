@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Kuyumcu fiyatı hesaplama: işçilik ve fark ne kadar? | Piyasa Nabzı</title>
+<meta name="description" content="Kuyumcunun söylediği çeyrek, gram altın veya bilezik fiyatını yaz; içindeki altının güncel değerini, işçiliği ve fark yüzdesini anında gör.">
+<link rel="canonical" href="https://piyasanabzi.site/kuyumcu-fiyat-hesaplama.html">
+<meta property="og:title" content="Kuyumcunun fiyatı uygun mu? İşçilik hesaplama">
+<meta property="og:description" content="Kuyumcunun söylediği fiyatı yaz; içindeki altının güncel değerini, işçiliği ve farkı gör.">
+<meta property="og:url" content="https://piyasanabzi.site/kuyumcu-fiyat-hesaplama.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Nabzı">
+<meta name="theme-color" content="#0b111c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e1726'/%3E%3Cpath d='M10 40 L22 30 L32 36 L46 20 L54 24' fill='none' stroke='%23f2c14e' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b111c; --card:#121b2b; --card2:#172235; --ink:#eef2f8; --muted:#8e9bb3; --line:#1f2b40;
+    --gold:#f2c14e; --up:#22c55e; --down:#ef4444; --blue:#60a5fa;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f3f5f9; --card:#ffffff; --card2:#f7f9fc; --ink:#0f1a2b; --muted:#66748c; --line:#e3e8f0; --gold:#b7861b; --up:#16a34a; --down:#dc2626; --blue:#2563eb; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--ink);text-decoration:none}
+  .brand svg{width:34px;height:34px}
+  .btn{font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:8px 12px;border-radius:12px}
+  .crumb{font-size:13px;color:var(--muted);margin:18px 0 0}.crumb a{color:var(--muted)}
+  h1{font-size:clamp(24px,5vw,32px);margin:10px 0 8px;letter-spacing:-.02em;font-weight:800;line-height:1.2}
+  .lead{color:var(--muted);margin:0 0 18px;line-height:1.55}
+  h2{font-size:20px;margin:30px 0 10px;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px}
+  input,select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px;font:inherit;font-size:16px;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  .f{display:grid;gap:12px;grid-template-columns:1fr 1fr;align-items:end}
+  .f .full{grid-column:1/-1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chips button{border:1px solid var(--line);background:var(--card2);color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:7px 11px;border-radius:999px;cursor:pointer}
+  .chips button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#1a1200}
+  .head{font-size:clamp(18px,4vw,22px);line-height:1.45;font-weight:600;margin:18px 0 14px}
+  .head b{color:var(--gold)}
+  .res{display:grid;gap:8px}
+  .r{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;position:relative;overflow:hidden}
+  .r.best{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
+  .r .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;position:relative}
+  .r .n{font-weight:800;font-size:15px}
+  .r .n small{font-weight:600;color:var(--muted);font-size:12px;margin-left:6px}
+  .r .v{font-weight:800;font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .r .sub{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);margin-top:4px;position:relative}
+  .r .sub b{font-variant-numeric:tabular-nums}
+  .r .track{height:6px;border-radius:6px;background:var(--card2);margin-top:10px;overflow:hidden}
+  .r .fill{height:100%;border-radius:6px;background:var(--gold);transition:width .4s}
+  .r.na{opacity:.55}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .tag{display:inline-block;background:var(--gold);color:#1a1200;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
+  .share{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .pbtn{border:0;background:var(--gold);color:#1a1200;font:inherit;font-weight:800;padding:12px 16px;border-radius:14px;cursor:pointer;text-decoration:none;font-size:14px}
+  .sbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;padding:12px 16px;border-radius:14px;cursor:pointer;text-decoration:none;font-size:14px}
+  .muted{color:var(--muted)}
+  .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:14px;line-height:1.55}
+  article{font-size:16px;line-height:1.7}
+  article a{color:var(--blue)}
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+  summary{font-weight:700;cursor:pointer}
+  details p{margin:8px 0 0;color:var(--muted);line-height:1.6}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+  footer{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;color:var(--muted);font-size:13px;line-height:1.6}
+  footer a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom:6px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:12px}
+  .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;padding:10px;border-radius:9px;cursor:pointer;font-size:14px}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+  .live{font-size:13px;color:var(--muted);margin-top:12px}.live b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .verdict{border-radius:16px;padding:14px 16px;margin:18px 0 10px;border:1px solid var(--line);background:var(--card)}
+  .verdict .big{font-size:20px;font-weight:800;margin-bottom:4px}
+  .verdict p{margin:0;color:var(--muted);line-height:1.5;font-size:14px}
+  .verdict.ok{border-color:color-mix(in srgb,var(--up) 55%,var(--line))}.verdict.ok .big{color:var(--up)}
+  .verdict.mid{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}.verdict.mid .big{color:var(--gold)}
+  .verdict.bad{border-color:color-mix(in srgb,var(--down) 55%,var(--line))}.verdict.bad .big{color:var(--down)}
+  .rows{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .rows div{display:flex;justify-content:space-between;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:15px}
+  .rows div:last-child{border-bottom:0}
+  .rows span{color:var(--muted)} .rows b{font-variant-numeric:tabular-nums;text-align:right}
+  .scale{position:relative;height:8px;border-radius:8px;margin:14px 0 4px;background:linear-gradient(90deg,var(--up) 0 33%,var(--gold) 33% 66%,var(--down) 66% 100%);opacity:.85}
+  .scale i{position:absolute;top:-5px;width:4px;height:18px;border-radius:3px;background:var(--ink);transform:translateX(-2px);transition:left .3s}
+  .scale-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Kuyumcunun altın fiyatının uygun olup olmadığını nasıl anlarım?","acceptedAnswer":{"@type":"Answer","text":"Ürünün içindeki saf altın miktarını güncel gram altın fiyatıyla çarparak has altın değerini bul. Kuyumcunun istediği fiyat ile bu değer arasındaki fark, işçilik ve kuyumcunun kâr payıdır. Farkın yüzdesi ne kadar düşükse fiyat o kadar uygundur."}},
+{"@type":"Question","name":"Çeyrek altında kuyumcu farkı ne kadar olur?","acceptedAnswer":{"@type":"Answer","text":"Çeyrek, yarım ve tam gibi sarrafiye altınlarda ve gram altında işçilik düşüktür; fark genellikle birkaç yüzde ile sınırlıdır. Bilezik ve takılarda ise işçilik nedeniyle fark daha yüksek olur."}},
+{"@type":"Question","name":"Altın satarken işçilik geri alınır mı?","acceptedAnswer":{"@type":"Answer","text":"Genellikle hayır. Kuyumcu altını satın alırken çoğunlukla yalnızca içindeki altının değerini öder, hatta bunun biraz altında teklif verir. Alırken ödenen işçilik satışta geri alınmaz."}}
+]}</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4295900331301338" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M419M3965F"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-M419M3965F");gtag("config","G-LP1EQD8PHJ");</script>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0e1726"/><path d="M10 40 L22 30 L32 36 L46 20 L54 24" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>Piyasa Nabzı</a><a class="btn" href="/">Canlı fiyatlar</a></div></header>
+
+<main class="wrap">
+  <div class="crumb"><a href="/">Ana sayfa</a> › Kuyumcu fiyatı hesaplama</div>
+  <h1>Kuyumcunun fiyatı uygun mu?</h1>
+  <p class="lead">Kuyumcunun söylediği fiyatı yaz. İçindeki altının güncel değerini, işçiliği ve aradaki farkı hemen gör.</p>
+
+  <div class="panel">
+    <div class="seg" id="mode"><button type="button" data-m="buy" aria-pressed="true">Kuyumcudan alıyorum</button><button type="button" data-m="sell" aria-pressed="false">Kuyumcuya satıyorum</button></div>
+    <div class="f">
+      <div class="full"><label for="type">Ürün</label><select id="type"></select></div>
+      <div><label for="qty" id="qtyL">Adet</label><input id="qty" inputmode="decimal" value="1" autocomplete="off"></div>
+      <div><label for="price" id="priceL">Kuyumcunun istediği toplam fiyat (TL)</label><input id="price" inputmode="decimal" placeholder="ör. 10.250" autocomplete="off"></div>
+    </div>
+    <div class="live" id="live">Güncel altın fiyatı yükleniyor…</div>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="note" id="src">Hesaplama, has altının gösterge fiyatıyla yapılır. Kuyumcular kendi alış-satış fiyatlarını belirler; birkaç kuyumcudan fiyat almak en iyi karşılaştırmayı verir. Yatırım tavsiyesi değildir.</div>
+
+  <h2>Nasıl hesaplanıyor?</h2>
+  <article>
+    <p>Her altın ürününün içinde belirli miktarda <b>saf (24 ayar) altın</b> vardır. Örneğin çeyrek altın 1,75 gram ve 22 ayardır, yani yaklaşık 1,60 gram saf altın içerir. Bu miktar güncel gram altın fiyatıyla çarpılınca ürünün <b>has altın değeri</b> bulunur.</p>
+    <p>Kuyumcunun istediği fiyat ile has altın değeri arasındaki fark; <b>işçilik</b>, kuyumcunun kâr payı ve alış-satış makasından oluşur. Çeyrek, yarım, tam ve gram altında bu fark düşük olur. Bilezik ve takılarda işçilik nedeniyle daha yüksektir. Ayrıntılar için <a href="/rehber/bilezik-alirken-iscilik.html">bilezik ve işçilik rehberine</a> ve <a href="/rehber/altin-alirken-dikkat-edilmesi-gerekenler.html">altın alırken dikkat edilmesi gerekenler</a> yazısına bakabilirsin.</p>
+  </article>
+
+  <h2>Sık sorulan sorular</h2>
+  <details><summary>Fark ne kadar olursa normaldir?</summary><p>Kesin bir kural yoktur; kuyumcudan kuyumcuya ve şehirden şehire değişir. Kabaca, sarrafiye (çeyrek, yarım, tam) ve gram altında birkaç yüzdelik fark olağandır. Burma bilezikte biraz daha, desenli bilezik ve takılarda çok daha yüksek fark görülebilir. Sayfadaki yorum yalnızca kaba bir yol göstericidir.</p></details>
+  <details><summary>Altın satarken işçilik geri alınır mı?</summary><p>Genellikle hayır. Kuyumcu altını satın alırken çoğunlukla yalnızca içindeki altının değerini öder, hatta biraz altında teklif verir. Alırken ödediğin işçilik satışta geri gelmez.</p></details>
+  <details><summary>Kuyumcunun fiyatı neden sitedeki değerden düşük olabilir?</summary><p>Sitedeki fiyatlar uluslararası piyasadan hesaplanan gösterge değerlerdir. Kuyumcunun kendi alış maliyeti, kurdaki anlık oynamalar ve stok durumu nedeniyle küçük farklar olabilir. Fiyat has değerin belirgin şekilde altındaysa ürünün ayarını, damgasını ve faturasını mutlaka kontrol et.</p></details>
+</main>
+<div class="toast" id="toast"></div>
+<footer><div class="wrap"><a href="/">Canlı fiyatlar</a><a href="/gecmis-yatirim.html">Geçmişte alsaydım</a><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
+<div style="margin-top:8px">Altın fiyatı xaus.com, dolar kuru Binance üzerinden alınır. © Piyasa Nabzı</div></div></footer>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const OZ=31.1034768;
+  const fTL=(v,d=2)=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
+  const fN=(v,d)=>new Intl.NumberFormat("tr-TR",{maximumFractionDigits:d}).format(v);
+  const fPct=v=>"%"+new Intl.NumberFormat("tr-TR",{minimumFractionDigits:1,maximumFractionDigits:1}).format(Math.abs(v));
+  function num(v){ v=String(v||"").trim().replace(/\s|₺|TL/gi,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); else if(/^\d{1,3}(\.\d{3})+$/.test(v)) v=v.replace(/\./g,""); return parseFloat(v); }
+
+  // pure: saf altın oranı (gram başına) ya da adet başına saf altın; band: [makul, yüksek] eşikleri (alış %, satış %)
+  const P=[
+    {k:"gram",n:"Gram altın (24 ayar)",u:"gram",pure:1,buy:[2,5],sell:[2,4]},
+    {k:"ceyrek",n:"Çeyrek altın",u:"adet",pure:1.75*0.916,buy:[3,7],sell:[2,5]},
+    {k:"yarim",n:"Yarım altın",u:"adet",pure:3.50*0.916,buy:[3,7],sell:[2,5]},
+    {k:"tam",n:"Tam altın",u:"adet",pure:7.00*0.916,buy:[3,7],sell:[2,5]},
+    {k:"ata",n:"Cumhuriyet (Ata) altını",u:"adet",pure:7.216*0.916,buy:[3,7],sell:[2,5]},
+    {k:"a22",n:"22 ayar bilezik / takı",u:"gram",pure:0.916,buy:[8,15],sell:[3,7]},
+    {k:"a18",n:"18 ayar takı",u:"gram",pure:0.750,buy:[20,40],sell:[5,10]},
+    {k:"a14",n:"14 ayar takı",u:"gram",pure:0.585,buy:[20,40],sell:[5,10]}
+  ];
+  P.forEach(p=>{ const o=document.createElement("option"); o.value=p.k; o.textContent=p.n; $("type").appendChild(o); });
+  let mode="buy", gram=null, liveOK=false;
+
+  const q=new URLSearchParams(location.search);
+  if(P.some(p=>p.k===q.get("urun"))) $("type").value=q.get("urun");
+  if(q.get("mod")==="sell") mode="sell";
+
+  function paintMode(){
+    document.querySelectorAll("#mode button").forEach(b=>b.setAttribute("aria-pressed",b.dataset.m===mode));
+    $("priceL").textContent= mode==="buy" ? "Kuyumcunun istediği toplam fiyat (TL)" : "Kuyumcunun verdiği toplam teklif (TL)";
+  }
+  function run(){
+    const p=P.find(x=>x.k===$("type").value);
+    $("qtyL").textContent= p.u==="adet" ? "Adet" : "Ağırlık (gram)";
+    $("live").innerHTML = gram ? `Güncel gram altın (24 ayar): <b>${fTL(gram)}</b>${liveOK?"":" · canlı fiyat alınamadı"}` : (liveOK===null?"Canlı fiyat alınamadı. Lütfen biraz sonra tekrar dene.":"Güncel altın fiyatı yükleniyor…");
+    const qty=num($("qty").value), price=num($("price").value), out=$("out");
+    out.innerHTML="";
+    if(!gram) return;
+    if(!(qty>0)){ out.innerHTML=`<div class="verdict"><p>Geçerli bir ${p.u==="adet"?"adet":"ağırlık"} yaz.</p></div>`; return; }
+    const pureG=p.pure*qty, has=pureG*gram;
+    const rows=[["İçindeki saf altın",fN(pureG,3)+" gram"],["Has altın değeri (güncel)",fTL(has)]];
+    if(!(price>0)){
+      rows.push([mode==="buy"?"Kuyumcunun fiyatı":"Kuyumcunun teklifi","Fiyatı yaz"]);
+      out.innerHTML=`<div class="verdict"><div class="big">${fTL(has)}</div><p>Bu ürünün içindeki altının şu anki değeri. Kuyumcunun söylediği fiyatı yazarsan farkı ve işçiliği hesaplayalım.</p></div>`+table(rows);
+      return;
+    }
+    // buy: ödenen fazlası; sell: kuyumcunun kestiği
+    const diff = mode==="buy" ? price-has : has-price;
+    const pct = diff/has*100;
+    const [lo,hi]=p[mode];
+    rows.push([mode==="buy"?"Kuyumcunun fiyatı":"Kuyumcunun teklifi",fTL(price)]);
+    if(mode==="buy"){
+      rows.push([diff>=0?"İşçilik ve kâr payı":"Has değerin altında",(diff>=0?"":"−")+fTL(Math.abs(diff))+" ("+fPct(pct)+")"]);
+      if(p.u==="gram"&&qty>0) rows.push(["Gram başına fark",fTL(diff/qty)]);
+      else if(qty>1) rows.push(["Adet başına fark",fTL(diff/qty)]);
+    } else {
+      rows.push([diff>=0?"Kuyumcunun kestiği":"Has değerin üstünde",(diff>=0?"":"+")+fTL(Math.abs(diff))+" ("+fPct(pct)+")"]);
+    }
+    let cls,big,txt;
+    if(pct<-1.5){
+      cls="mid";
+      big= mode==="buy" ? "Has değerin altında" : "Has değerin üstünde bir teklif";
+      txt= mode==="buy" ? "İstenen fiyat, içindeki altının gösterge değerinden düşük. Bu olağan değil: ürünün ayarını, damgasını ve faturasını mutlaka kontrol et." : "Teklif, altının gösterge değerinden yüksek. Satıcı için iyi bir teklif görünüyor.";
+    } else if(pct<=lo){
+      cls="ok"; big= mode==="buy" ? "Uygun görünüyor" : "İyi bir teklif";
+      txt= mode==="buy" ? `Fark ${fPct(pct)}. Bu ürün türü için makul bir seviye.` : `Kuyumcu ${fPct(Math.max(pct,0))} kesiyor. Bu ürün türü için makul bir seviye.`;
+    } else if(pct<=hi){
+      cls="mid"; big= mode==="buy" ? "Biraz yüksek" : "Ortalama bir teklif";
+      txt= mode==="buy" ? `Fark ${fPct(pct)}. Pazarlık yapabilir ya da başka bir kuyumcudan da fiyat alabilirsin.` : `Kuyumcu ${fPct(pct)} kesiyor. Başka bir kuyumcudan da teklif alman daha iyi bir fiyat bulmanı sağlayabilir.`;
+    } else {
+      cls="bad"; big= mode==="buy" ? "Yüksek" : "Düşük bir teklif";
+      txt= mode==="buy" ? `Fark ${fPct(pct)}. Bu ürün türü için yüksek. ${p.u==="gram"&&p.k!=="gram"?"Desenli ya da el işi bir ürünse işçilik yüksek olabilir; yatırım için alıyorsan gram altın veya burma bilezik daha az fark içerir.":"Başka kuyumculardan da fiyat almanı öneririz."}` : `Kuyumcu ${fPct(pct)} kesiyor. Bu ürün türü için yüksek; başka kuyumculardan da teklif al.`;
+    }
+    const pos=Math.max(0,Math.min(100, pct<=0?0 : pct<=lo? pct/lo*33 : pct<=hi? 33+(pct-lo)/(hi-lo)*33 : 66+Math.min(1,(pct-hi)/hi)*34));
+    out.innerHTML=`<div class="verdict ${cls}"><div class="big">${big}</div><p>${txt}</p>
+      <div class="scale" aria-hidden="true"><i style="left:${pos}%"></i></div><div class="scale-l"><span>Makul (≤%${lo})</span><span>Yüksek (>%${hi})</span></div></div>`+table(rows);
+  }
+  function table(rows){ return `<div class="rows">${rows.map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join("")}</div>`; }
+
+  document.querySelectorAll("#mode button").forEach(b=>b.onclick=()=>{ mode=b.dataset.m; paintMode(); run(); });
+  ["qty","price"].forEach(id=>$(id).addEventListener("input",run));
+  $("type").addEventListener("change",()=>{ const p=P.find(x=>x.k===$("type").value); if(p.u==="adet"&&!(num($("qty").value)>=1)) $("qty").value="1"; run(); });
+  $("price").addEventListener("blur",()=>{ const v=num($("price").value); if(v>0) $("price").value=fN(v,2); });
+
+  async function j(url,ms=8000){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms); try{ const r=await fetch(url,{signal:c.signal,cache:"no-store"}); if(!r.ok) throw new Error(r.status); return await r.json(); } finally{ clearTimeout(t); } }
+  async function usdtry(){ for(const h of ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"]){ try{ const d=await j(h+"/api/v3/ticker/price?symbol=USDTTRY"); if(+d.price>0) return +d.price; }catch(e){} } return null; }
+  async function live(){
+    const [u,g]=await Promise.all([usdtry(), j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null)]);
+    let v=null;
+    if(g&&+g.spot_usd_oz>0&&u) v=g.spot_usd_oz/OZ*u;           // ana sayfayla aynı yöntem
+    else if(g&&g.xau&&+g.xau.price>0) v = g.xau.unit==="gram" ? +g.xau.price : g.xau.price/OZ;
+    if(v){ gram=v; liveOK=true; } else if(!gram) liveOK=null;
+    run();
+  }
+  paintMode(); run(); live(); setInterval(live,60000);
+})();
+</script>
+</body>
+</html>
