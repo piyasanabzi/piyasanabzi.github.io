@@ -408,18 +408,30 @@
     if(+d.silver_usd_oz>0) S.silverOz=+d.silver_usd_oz;
     S.t.gold=new Date(); gotAny=true; schedule();
   }
-  let goldSeries=null, fxFromXaus=false;
+  let goldSeries=null, goldSrc="", goldTried=false, fxFromXaus=false;
+  const parsePts=d=>(d.points||d.data||d.series||[]).map(p=>({t:new Date(typeof p.t==="number"&&p.t<1e12?p.t*1000:p.t).getTime(), p:+p.p})).filter(p=>p.p>0&&isFinite(p.t)).sort((a,b)=>a.t-b.t);
   async function goldIntraday(){
-    const d=await j("https://xaus.com/api/v1/intraday?symbol=xau&hours=24");
-    const pts=(d.points||d.data||d.series||[]).map(p=>({t:new Date(typeof p.t==="number"&&p.t<1e12?p.t*1000:p.t).getTime(), p:+p.p})).filter(p=>p.p>0&&isFinite(p.t));
-    pts.sort((a,b)=>a.t-b.t);
-    if(pts.length){
-      goldSeries=pts;
-      const target=Date.now()-24*3600*1000; let ref=pts[0];
-      for(const p of pts){ if(Math.abs(p.t-target)<Math.abs(ref.t-target)) ref=p; }
-      S.goldOz24 = (Date.now()-ref.t > 6*3600*1000) ? ref.p : null;   // only if the reference is really from ~a day ago
-      schedule(); if(chartKey==="gold") drawChart();
+    let pts=[];
+    // Hafta sonu altın piyasası kapalı: son 24 saatte veri yoksa son işlem saatlerini göster
+    for(const h of [24,72,168]){
+      try{ pts=parsePts(await j("https://xaus.com/api/v1/intraday?symbol=xau&hours="+h)); }catch(e){ pts=[]; }
+      if(pts.length>=2){ goldSrc = h===24 ? "" : "son işlem saatleri"; if(h>24) pts=pts.filter(p=>p.t>=pts[pts.length-1].t-24*3600e3); break; }
     }
+    if(pts.length<2){
+      // Yedek: Binance PAXG (altına endeksli token, 7/24 işlem görür)
+      try{ const d=await bj("/klines?symbol=PAXGUSDT&interval=1h&limit=25"); pts=d.map(k=>({t:k[0],p:+k[4]})); goldSrc="PAXG"; }catch(e){ pts=[]; }
+    }
+    goldTried=true;
+    if(pts.length>=2){
+      goldSeries=pts;
+      if(!goldSrc){
+        const target=Date.now()-24*3600*1000; let ref=pts[0];
+        for(const p of pts){ if(Math.abs(p.t-target)<Math.abs(ref.t-target)) ref=p; }
+        S.goldOz24 = (Date.now()-ref.t > 6*3600*1000) ? ref.p : null;   // only if the reference is really from ~a day ago
+      }
+      schedule();
+    }
+    if(chartKey==="gold") drawChart();
   }
 
   const OIL_KEY="pn-oil";
@@ -462,10 +474,14 @@
   }
   async function drawChart(){
     const svg=$("chart"); const titles={gold:"Ons altın (USD), son 24 saat",USDTTRY:"Dolar (TL), son 7 gün",EURTRY:"Euro (TL), son 7 gün",BTCUSDT:"Bitcoin (USD), son 7 gün"};
+    if(chartKey==="gold"&&goldSrc) titles.gold = goldSrc==="PAXG" ? "Ons altın (USD), son 24 saat · PAXG" : "Ons altın (USD), son işlem saatleri (piyasa kapalı)";
     $("cTitle").textContent=titles[chartKey];
-    let pts=null;
-    try{ pts = chartKey==="gold" ? goldSeries : await klines(chartKey); }catch(e){ pts=null; }
-    if(!pts||pts.length<2){ svg.innerHTML=`<text x="300" y="110" text-anchor="middle" fill="currentColor" opacity=".5" font-size="14">Grafik verisi yükleniyor…</text>`; $("cLast").textContent=""; $("cRange").textContent=""; return; }
+    let pts=null, hata=false;
+    try{ pts = chartKey==="gold" ? goldSeries : await klines(chartKey); }catch(e){ pts=null; hata=true; }
+    if(!pts||pts.length<2){
+      const msg = (hata || (chartKey==="gold" && goldTried)) ? "Grafik şu an alınamıyor, birazdan tekrar denenecek" : "Grafik verisi yükleniyor…";
+      svg.setAttribute("preserveAspectRatio","xMidYMid meet"); svg.innerHTML=`<text x="300" y="115" text-anchor="middle" fill="currentColor" opacity=".55" font-size="26">${msg}</text>`; $("cLast").textContent=""; $("cRange").textContent=""; return; }
+    svg.setAttribute("preserveAspectRatio","none");
     const W=600,H=220,pad=8; const ps=pts.map(p=>p.p); const mn=Math.min(...ps), mx=Math.max(...ps), rg=(mx-mn)||1;
     const x=i=>pad+(W-2*pad)*i/(pts.length-1), y=v=>pad+(H-2*pad)*(1-(v-mn)/rg);
     const up=ps[ps.length-1]>=ps[0]; const col=up?"var(--up)":"var(--down)";
