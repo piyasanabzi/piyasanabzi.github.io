@@ -55,6 +55,8 @@
   .flash-up{background:color-mix(in srgb,var(--up) 14%,var(--card))!important}
   .flash-down{background:color-mix(in srgb,var(--down) 14%,var(--card))!important}
   .upd{font-size:11px;color:var(--muted);margin-top:4px}
+  .ab{font-size:12px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+  .ab:empty{display:none}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
   .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
   .tabs button{border:1px solid var(--line);background:var(--card2);color:var(--muted);font:inherit;font-size:13px;font-weight:700;padding:8px 12px;border-radius:999px;cursor:pointer}
@@ -236,7 +238,7 @@
     <a href="/rehber/" style="color:var(--gold)">Tüm rehberler →</a>
   </div>
 
-  <div class="note">Fiyatlar uluslararası piyasa verilerinden hesaplanan gösterge değerlerdir; banka, döviz bürosu ve kuyumcu alış-satış fiyatları farklıdır. Yatırım tavsiyesi değildir. Çeyrek, yarım, tam ve Cumhuriyet altını değerleri içerdikleri saf altın miktarından hesaplanır, işçilik dahil değildir. Dolar ve euro, Binance'teki USDT/TRY ve EUR/USDT işlemlerinden alınır ve resmî kurdan biraz farklı olabilir.</div>
+  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için piyasadaki <b>alış ve satış</b> fiyatları gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu veri alınamazsa değerler uluslararası fiyattan hesaplanır ve "tahmini" olarak işaretlenir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar piyasa kuruna göre gösterilir, anlık hareketi Binance'ten izlenir. Yatırım tavsiyesi değildir.</div>
 </main>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="box">
@@ -253,7 +255,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
+<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: piyasa alış-satış fiyatları finans.truncgil.com · ons altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
 
 <script>
 (function(){
@@ -269,7 +271,7 @@
   const S = {
     usdtry:null, usdtry24:null, eurusd:null, eurusd24:null, btc:null, btc24:null,
     goldOz:null, goldOz24:null, silverOz:null, brent:null, brentCh:null, wti:null, wtiCh:null, ng:null, ngCh:null,
-    t:{fx:null, gold:null, oil:null}, x:{}, x24:{}, r24:{}
+    t:{fx:null, gold:null, oil:null, kc:null}, x:{}, x24:{}, r24:{}, tg:null, usdtRaw:null, usdtRaw24:null, usdAdj:1
   };
   const eurtry=()=> S.eurusd&&S.usdtry ? S.eurusd*S.usdtry : null;
   const eurtry24=()=> S.eurusd24&&S.usdtry24 ? S.eurusd24*S.usdtry24 : null;
@@ -278,19 +280,28 @@
 
   // pure-gold grams in Turkish coins (22 ayar = 0.916)
   const COINS=[["Çeyrek altın",1.75*0.916],["Yarım altın",3.50*0.916],["Tam altın",7.00*0.916],["Cumhuriyet altını",7.216*0.916]];
+  // Piyasa (kuyumcu) alış-satış fiyatları: finans.truncgil.com. Yoksa uluslararası fiyattan hesaplanan değere düşülür.
+  const TG_KEYS=["ceyrek","yarim","tam","ata"];
+  const tgf=k=> (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null;
+  const gramSat=()=> tgf("gram")? tgf("gram").s : gramTL();
+  const gramAl =()=> tgf("gram")? tgf("gram").a : gramTL();
+  const coinSat=i=> tgf(TG_KEYS[i])? tgf(TG_KEYS[i]).s : (gramTL()&&gramTL()*COINS[i][1]);
+  const coinAl =i=> tgf(TG_KEYS[i])? tgf(TG_KEYS[i]).a : (gramTL()&&gramTL()*COINS[i][1]);
+  const agTL=()=> tgf("gumus")? tgf("gumus").s : (S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry);
+  const agAl=()=> tgf("gumus")? tgf("gumus").a : (S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry);
 
   const XC=[["gbp","Sterlin","GBP/TRY"],["chf","İsviçre frangı","CHF/TRY"],["sar","Suudi riyali","SAR/TRY"],["aed","BAE dirhemi","AED/TRY"],["jpy","Japon yeni","JPY/TRY"],["cny","Çin yuanı","CNY/TRY"],["rub","Rus rublesi","RUB/TRY"],["azn","Azerbaycan manatı","AZN/TRY"],["cad","Kanada doları","CAD/TRY"],["aud","Avustralya doları","AUD/TRY"],["kwd","Kuveyt dinarı","KWD/TRY"],["qar","Katar riyali","QAR/TRY"]];
   const xtry=k=> S.x[k]>0&&S.usdtry ? S.usdtry/S.x[k] : null;
   const xtry24=k=> S.x24[k]>0&&S.usdtry24 ? S.usdtry24/S.x24[k] : null;
   const CARDS = {
     gGold:[
-      {k:"gram", n:"Gram altın", s:"24 ayar", big:true, gold:true, v:()=>gramTL(), v24:()=>gramTL24(), f:v=>fTL(v), t:"gold"},
-      ...COINS.map(([n,g],i)=>({k:"coin"+i, n, s:"tahmini", gold:true, v:()=>gramTL()&&gramTL()*g, v24:()=>gramTL24()&&gramTL24()*g, f:v=>fTL(v,0), t:"gold"})),
+      {k:"gram", n:"Gram altın", s:"24 ayar", big:true, gold:true, tg:"gram", v:()=>gramSat(), v24:()=>gramTL24(), f:v=>fTL(v), t:"gold"},
+      ...COINS.map(([n,g],i)=>({k:"coin"+i, n, s:"tahmini", gold:true, tg:TG_KEYS[i], v:()=>coinSat(i), v24:()=>gramTL24()&&gramTL24()*g, f:v=>fTL(v,0), t:"gold"})),
       {k:"ons", n:"Ons altın", s:"USD", gold:true, v:()=>S.goldOz, v24:()=>S.goldOz24, f:v=>fUSD(v), t:"gold"},
-      {k:"ag", n:"Gram gümüş", s:"TL", v:()=>S.silverOz&&S.usdtry? S.silverOz/OZ*S.usdtry:null, v24:()=>S.r24&&S.r24.xag>0&&S.usdtry24? (1/S.r24.xag)/OZ*S.usdtry24:null, f:v=>fTL(v), t:"gold"}
+      {k:"ag", n:"Gram gümüş", s:"TL", tg:"gumus", v:()=>agTL(), v24:()=>S.r24&&S.r24.xag>0&&S.usdtry24? (1/S.r24.xag)/OZ*S.usdtry24:null, f:v=>fTL(v), t:"gold"}
     ],
     gFx:[
-      {k:"usd", n:"Dolar", s:"USD/TRY", v:()=>S.usdtry, v24:()=>S.usdtry24, f:v=>fN(v,4), t:"fx"},
+      {k:"usd", n:"Dolar", s:"USD/TRY", tg:"usd", v:()=>S.usdtry, v24:()=>S.usdtry24, f:v=>fN(v,4), t:"fx"},
       {k:"eur", n:"Euro", s:"EUR/TRY", v:eurtry, v24:eurtry24, f:v=>fN(v,4), t:"fx"},
       {k:"parite", n:"Euro / Dolar", s:"parite", v:()=>S.eurusd, v24:()=>S.eurusd24, f:v=>fN(v,4), t:"fx"},
       {k:"usd100", n:"100 Dolar", s:"TL karşılığı", v:()=>S.usdtry&&S.usdtry*100, v24:()=>S.usdtry24&&S.usdtry24*100, f:v=>fTL(v), t:"fx"}
@@ -307,7 +318,7 @@
   Object.entries(CARDS).forEach(([gid,list])=>{
     list.forEach(c=>{
       const d=document.createElement("div"); d.className="c"+(c.big?" big":"")+(c.gold?" gold":"");
-      d.innerHTML=`<div class="n"><span></span><small></small></div><div class="p">—</div><div class="ch">&nbsp;</div><div class="upd">&nbsp;</div>`;
+      d.innerHTML=`<div class="n"><span></span><small></small></div><div class="p">—</div>${c.tg?'<div class="ab"></div>':''}<div class="ch">&nbsp;</div><div class="upd">&nbsp;</div>`;
       d.querySelector(".n span").textContent=c.n; d.querySelector(".n small").textContent=c.s;
       $(gid).appendChild(d); EL[c.k]=d;
     });
@@ -332,14 +343,20 @@
         if(LAST[c.k]!=null && v!==LAST[c.k]){ const cls=v>LAST[c.k]?"flash-up":"flash-down"; el.classList.remove("flash-up","flash-down"); void el.offsetWidth; el.classList.add(cls); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove(cls),700); }
         p.textContent=txt; LAST[c.k]=v;
       }
-      let ch=null;
-      if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
+      let ch=null, chL=" (24s)"; const tq=c.tg&&tgf(c.tg);
+      if(tq && isFinite(tq.ch)){ ch=tq.ch; chL=" (gün)"; }
+      else if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
       const chEl=el.querySelector(".ch");
-      if(ch!=null&&isFinite(ch)){ chEl.textContent=pct(ch)+" (24s)"; chEl.className="ch "+(ch>=0?"up":"down"); }
-      const t=S.t[c.t]; if(t) el.querySelector(".upd").textContent="Güncelleme "+tm(t);
+      if(ch!=null&&isFinite(ch)){ chEl.textContent=pct(ch)+chL; chEl.className="ch "+(ch>=0?"up":"down"); }
+      if(c.tg){
+        const ab=el.querySelector(".ab"), sm=el.querySelector(".n small");
+        if(tq){ ab.textContent = c.big ? "Alış "+c.f(tq.a)+" · Satış "+c.f(tq.s) : "Alış "+c.f(tq.a); if(c.k.startsWith("coin")) sm.textContent="satış"; }
+        else { ab.textContent=""; if(c.k.startsWith("coin")) sm.textContent="tahmini"; }
+      }
+      const t=(tq&&S.t.kc)||S.t[c.t]; if(t) el.querySelector(".upd").textContent="Güncelleme "+tm(t);
     });
     // tape
-    const items=[["Gram altın",gramTL(),v=>fTL(v)],["Dolar",S.usdtry,v=>fN(v,4)],["Euro",eurtry(),v=>fN(v,4)],["Sterlin",xtry("gbp"),v=>fN(v,4)],["Ons",S.goldOz,v=>fUSD(v)],["Gümüş",S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry,v=>fTL(v)],["Brent",S.brent,v=>fUSD(v)],["Bitcoin",S.btc,v=>fUSD(v,0)]].filter(x=>x[1]);
+    const items=[["Gram altın",gramSat(),v=>fTL(v)],["Çeyrek",coinSat(0),v=>fTL(v,0)],["Dolar",S.usdtry,v=>fN(v,4)],["Euro",eurtry(),v=>fN(v,4)],["Sterlin",xtry("gbp"),v=>fN(v,4)],["Ons",S.goldOz,v=>fUSD(v)],["Gümüş",agTL(),v=>fTL(v)],["Brent",S.brent,v=>fUSD(v)],["Bitcoin",S.btc,v=>fUSD(v,0)]].filter(x=>x[1]);
     const html=items.map(([n,v,f])=>`<span>${n}<b>${f(v)}</b></span>`).join("");
     $("tape").innerHTML=html+html;
     calc();
@@ -349,7 +366,7 @@
   let rq=false; const schedule=()=>{ if(rq) return; rq=true; requestAnimationFrame(()=>{ rq=false; render(); }); };
 
   // ---------- calculator ----------
-  const UNITS=[["gram","Gram altın",()=>gramTL()],...COINS.map(([n,g],i)=>["coin"+i,n,()=>gramTL()&&gramTL()*g]),["ag","Gram gümüş",()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry],["usd","Dolar",()=>S.usdtry],["eur","Euro",eurtry],["gbp","Sterlin",()=>xtry("gbp")],["chf","İsviçre frangı",()=>xtry("chf")],["sar","Suudi riyali",()=>xtry("sar")],["btc","Bitcoin",()=>S.btc&&S.usdtry&&S.btc*S.usdtry]];
+  const UNITS=[["gram","Gram altın",()=>gramAl()],...COINS.map(([n,g],i)=>["coin"+i,n,()=>coinAl(i)]),["ag","Gram gümüş",()=>agAl()],["usd","Dolar",()=>S.usdtry],["eur","Euro",eurtry],["gbp","Sterlin",()=>xtry("gbp")],["chf","İsviçre frangı",()=>xtry("chf")],["sar","Suudi riyali",()=>xtry("sar")],["btc","Bitcoin",()=>S.btc&&S.usdtry&&S.btc*S.usdtry]];
   UNITS.forEach(([k,n])=>{ const o=document.createElement("option"); o.value=k; o.textContent=n; $("unit").appendChild(o); });
   function num(v){ v=String(v||"").trim().replace(/\s/g,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); else if(/^\d{1,3}(\.\d{3})+$/.test(v)) v=v.replace(/\./g,""); return parseFloat(v); }
   function calc(){ const q=num($("qty").value), u=UNITS.find(x=>x[0]===$("unit").value), p=u&&u[2](); $("calcRes").textContent=(q>=0&&p)?fTL(q*p):"—"; }
@@ -379,7 +396,7 @@
     binanceOK=true;
   }
   function applyTick(sym,last,open){
-    if(sym==="USDTTRY"){ S.usdtry=last; S.usdtry24=open; }
+    if(sym==="USDTTRY"){ S.usdtRaw=last; S.usdtRaw24=open; S.usdtry=last*S.usdAdj; S.usdtry24=open*S.usdAdj; }
     else if(sym==="EURUSDT"){ S.eurusd=last; S.eurusd24=open; }
     else if(sym==="BTCUSDT"){ S.btc=last; S.btc24=open; }
     S.t.fx=new Date(); gotAny=true; schedule();
@@ -401,7 +418,7 @@
       const r=d.fx_rates||{}; const rate=k=>{ const v=r[k]; return +(v&&typeof v==="object"?(v.rate||v.value):v); };
       let tr=rate("TRY"); if(!(tr>0) && +d.fx_rate>0) tr=+d.fx_rate;
       if(!(tr>0) && d.xau && +d.xau.price>0 && +d.spot_usd_oz>0) tr = d.xau.unit==="gram" ? d.xau.price/(d.spot_usd_oz/OZ) : d.xau.price/d.spot_usd_oz;
-      if(tr>0){ S.usdtry=tr; S.t.fx=new Date(); }
+      if(tr>0 && !tgf("usd")){ S.usdtry=tr; S.t.fx=new Date(); }
       const eu=rate("EUR"); if(eu>0) S.eurusd=1/eu;
       if(+d.btc_usd>0) S.btc=+d.btc_usd;
       fxFromXaus=true;
@@ -464,6 +481,31 @@
     S.x=x; S.x24=x24; S.r24=r24; LS.set("pn-fx3",{at:Date.now(),x,x24,r24}); schedule();
   }
 
+  // ---------- piyasa (kuyumcu) alış-satış fiyatları ----------
+  const tgNum=v=> typeof v==="number" ? v : +String(v||"").replace(/[^0-9,.-]/g,"").replace(/\./g,"").replace(",",".");
+  async function kc(){
+    const bust="?t="+Math.floor(Date.now()/60e3);
+    let d=null, v4=true;
+    try{ d=await j("https://finans.truncgil.com/v4/today.json"+bust, 8000); }catch(e){ d=null; }
+    if(!d||!d.GRA){ v4=false; d=await j("https://finans.truncgil.com/today.json"+bust, 8000); }
+    const g=(k4,kl)=>{ const x=v4?d[k4]:d[kl]; if(!x) return null;
+      const a=tgNum(v4?x.Buying:x["Alış"]), s_=tgNum(v4?x.Selling:x["Satış"]), ch=tgNum(v4?x.Change:x["Değişim"]);
+      return (a>0&&s_>0&&s_>=a*0.9&&s_<a*1.5)?{a,s:s_,ch:isFinite(ch)?ch:null}:null; };
+    const tg={gram:g("GRA","gram-altin"), ceyrek:g("CEYREKALTIN","ceyrek-altin"), yarim:g("YARIMALTIN","yarim-altin"), tam:g("TAMALTIN","tam-altin"),
+      ata:g("CUMHURIYETALTINI","cumhuriyet-altini")||g("ATAALTIN","ata-altin"), a14:g("14AYARALTIN","14-ayar-altin"), b22:g("22AYARBILEZIK","22-ayar-bilezik"), gumus:g("GUMUS","gumus"), usd:g("USD","USD"), at:Date.now()};
+    // makullük kontrolü: gram altın uluslararası değerden %15'ten fazla sapıyorsa kullanma
+    const ref=(S.goldOz>0&&tg.usd)? S.goldOz*tg.usd.s/OZ : gramTL();
+    if(tg.gram && ref && Math.abs(tg.gram.s/ref-1)>0.15) throw new Error("kc sapma");
+    if(!tg.gram) throw new Error("kc veri yok");
+    S.tg=tg; S.t.kc=new Date();
+    // dolar: Binance anlık hareketini koru, seviyeyi piyasa kuruna hizala
+    if(tg.usd){
+      if(S.usdtRaw>0){ const adj=tg.usd.s/S.usdtRaw; if(adj>0.95&&adj<1.05){ S.usdAdj=adj; S.usdtry=S.usdtRaw*adj; if(S.usdtRaw24>0) S.usdtry24=S.usdtRaw24*adj; } }
+      else { S.usdtry=tg.usd.s; S.t.fx=new Date(); }
+    }
+    gotAny=true; schedule();
+  }
+
   // ---------- chart ----------
   let chartKey="gold";
   const series={};
@@ -509,14 +551,14 @@
 
   // ---------- portfolio (on this device) ----------
   const ATYPES=[
-    {k:"gram",n:"Gram altın (24 ayar)",u:"gram",e:"🥇",p:()=>gramTL()},
-    {k:"ceyrek",n:"Çeyrek altın",u:"adet",e:"🥇",p:()=>gramTL()&&gramTL()*COINS[0][1]},
-    {k:"yarim",n:"Yarım altın",u:"adet",e:"🥇",p:()=>gramTL()&&gramTL()*COINS[1][1]},
-    {k:"tam",n:"Tam altın",u:"adet",e:"🥇",p:()=>gramTL()&&gramTL()*COINS[2][1]},
-    {k:"ata",n:"Cumhuriyet altını",u:"adet",e:"🥇",p:()=>gramTL()&&gramTL()*COINS[3][1]},
-    {k:"a22",n:"22 ayar altın (bilezik)",u:"gram",e:"🥇",p:()=>gramTL()&&gramTL()*0.916},
-    {k:"a14",n:"14 ayar altın",u:"gram",e:"🥇",p:()=>gramTL()&&gramTL()*0.585},
-    {k:"gumus",n:"Gümüş",u:"gram",e:"🥈",p:()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry},
+    {k:"gram",n:"Gram altın (24 ayar)",u:"gram",e:"🥇",p:()=>gramAl()},
+    {k:"ceyrek",n:"Çeyrek altın",u:"adet",e:"🥇",p:()=>coinAl(0)},
+    {k:"yarim",n:"Yarım altın",u:"adet",e:"🥇",p:()=>coinAl(1)},
+    {k:"tam",n:"Tam altın",u:"adet",e:"🥇",p:()=>coinAl(2)},
+    {k:"ata",n:"Cumhuriyet altını",u:"adet",e:"🥇",p:()=>coinAl(3)},
+    {k:"a22",n:"22 ayar altın (bilezik)",u:"gram",e:"🥇",p:()=>tgf("b22")?tgf("b22").a:(gramTL()&&gramTL()*0.916)},
+    {k:"a14",n:"14 ayar altın",u:"gram",e:"🥇",p:()=>tgf("a14")?tgf("a14").a:(gramTL()&&gramTL()*0.585)},
+    {k:"gumus",n:"Gümüş",u:"gram",e:"🥈",p:()=>agAl()},
     {k:"usd",n:"Dolar",u:"$",e:"💵",p:()=>S.usdtry},
     {k:"eur",n:"Euro",u:"€",e:"💶",p:eurtry},
     {k:"gbp",n:"Sterlin",u:"£",e:"💷",p:()=>xtry("gbp")},
@@ -647,10 +689,10 @@
 
   // ---------- price alarms (on this device, while the page is open) ----------
   const ALA=[
-    {k:"gram",n:"Gram altın",v:()=>gramTL(),f:v=>fTL(v)},
-    {k:"ceyrek",n:"Çeyrek altın",v:()=>gramTL()&&gramTL()*COINS[0][1],f:v=>fTL(v,0)},
+    {k:"gram",n:"Gram altın",v:()=>gramSat(),f:v=>fTL(v)},
+    {k:"ceyrek",n:"Çeyrek altın",v:()=>coinSat(0),f:v=>fTL(v,0)},
     {k:"ons",n:"Ons altın (USD)",v:()=>S.goldOz,f:v=>fUSD(v)},
-    {k:"ag",n:"Gram gümüş",v:()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry,f:v=>fTL(v)},
+    {k:"ag",n:"Gram gümüş",v:()=>agTL(),f:v=>fTL(v)},
     {k:"usd",n:"Dolar",v:()=>S.usdtry,f:v=>fN(v,4)+" ₺"},
     {k:"eur",n:"Euro",v:eurtry,f:v=>fN(v,4)+" ₺"},
     {k:"gbp",n:"Sterlin",v:()=>xtry("gbp"),f:v=>fN(v,4)+" ₺"},
@@ -720,7 +762,8 @@
   const safe=fn=>fn().catch(()=>{});
   safe(binanceRest).then(()=>{ if(gotAny) setLive(true,"Canlı"); });
   connectWS();
-  safe(gold); safe(goldIntraday); safe(oil); safe(fx2);
+  safe(gold); safe(goldIntraday); safe(oil); safe(fx2); safe(kc);
+  setInterval(()=>safe(kc),60e3);
   setInterval(()=>safe(fx2),3*3600e3);
   setInterval(()=>safe(gold),60000);
   setInterval(()=>safe(goldIntraday),5*60000);

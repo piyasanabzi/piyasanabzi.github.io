@@ -51,7 +51,7 @@ A["gram-altin-nasil-hesaplanir"]="""
 <p>Bu formül altının "ham" değerini verir. Kuyumcularda iki ek fark görürsün:</p>
 <ul><li><b>Alış-satış farkı (makas):</b> Kuyumcunun senden alırken verdiği fiyat ile sana satarken istediği fiyat farklıdır.</li>
 <li><b>İşçilik:</b> Bilezik, kolye gibi takılarda ve bazen sarrafiye altınlarda üretim maliyeti fiyata eklenir.</li></ul>
-<p>Piyasa Nabzı'nda gördüğün çeyrek, yarım ve tam altın fiyatları bu formülle hesaplanan <b>tahmini</b> değerlerdir ve işçilik içermez.</p>
+<p>Piyasa Nabzı'nda gram, çeyrek, yarım ve tam altın için piyasadaki <b>alış ve satış</b> fiyatlarını ayrı ayrı görebilirsin. Satış fiyatı ile bu formülle bulunan saf altın değeri arasındaki fark, sarrafiye işçiliği ve kuyumcunun payından kaynaklanır.</p>
 """ + CTA + """<p class="note">Bu yazı genel bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</p>"""
 A["22-ayar-24-ayar-farki"]="""
 <p><b>Kısa cevap:</b> 24 ayar altın neredeyse saftır (en az %99,5 altın). 22 ayar altının ise yaklaşık %91,6'sı altın, geri kalanı onu sertleştiren başka metallerdir.</p>
@@ -121,17 +121,17 @@ urls.append(page("hakkimizda.html","Hakkımızda","Piyasa Nabzı nedir, fiyatlar
 <li>Seçtiğin fiyat hedefe ulaşınca haber veren fiyat alarmı</li>
 <li>Giriş yaparak varlıklarını ve borçlarını ekleyip kâr/zarar durumunu görebileceğin bir takip bölümü</li></ul>
 <h2>Fiyatlar nereden geliyor?</h2>
-<p>Altın ve gümüş fiyatları xaus.com, döviz ve bitcoin fiyatları Binance, petrol fiyatları OilPriceAPI üzerinden alınır. Çeyrek, yarım, tam ve Cumhuriyet altını fiyatları, Darphane'nin açıkladığı ağırlık ve ayar bilgileriyle gram altın fiyatından <b>hesaplanan tahmini</b> değerlerdir; kuyumcu işçiliği ve alış-satış farkı içermez.</p>
+<p>Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüşün piyasadaki <b>alış ve satış</b> fiyatları finans.truncgil.com üzerinden alınır. Ons altın xaus.com, döviz ve bitcoin Binance, petrol fiyatları OilPriceAPI üzerinden gelir. Piyasa verisi geçici olarak alınamazsa çeyrek, yarım ve tam altın değerleri Darphane'nin açıkladığı ağırlık ve ayar bilgileriyle hesaplanır ve sitede "tahmini" olarak işaretlenir.</p>
 <h2>Önemli not</h2>
 <p>Sitedeki fiyatlar bilgilendirme amaçlıdır ve kuyumcu ya da bankalardaki fiyatlardan farklı olabilir. Hiçbir içerik yatırım tavsiyesi değildir. Alım-satım kararlarını kendi değerlendirmenle vermelisin.</p>
 <p>Ayrıca altınla ilgili merak edilen konuları anlattığımız <a href="/rehber/">rehberlerimize</a> göz atabilirsin.</p>""",article=False))
 urls.append(page("gizlilik.html","Gizlilik Politikası","Piyasa Nabzı'nın hangi verileri nasıl işlediği, çerezler ve üçüncü taraf hizmetler hakkında bilgi.","""
-<p class="note">Son güncelleme: 21 Kasım 2026</p>
+<p class="note">Son güncelleme: 24 Kasım 2026</p>
 <p>Bu sayfa, <b>piyasanabzi.site</b> adresindeki Piyasa Nabzı sitesini kullandığında hangi bilgilerin nasıl işlendiğini açıklar.</p>
 <h2>Hesap ve varlık bilgileri</h2>
 <p>Sitede oluşturduğun hesap (kullanıcı adı ve şifrenin tek yönlü şifrelenmiş hali) ve eklediğin varlık/borç kayıtları <b>yalnızca kendi cihazının tarayıcısında</b> (localStorage) saklanır. Bu bilgiler bize ya da herhangi bir sunucuya gönderilmez; biz bu bilgileri göremeyiz. Tarayıcı verilerini sildiğinde bu kayıtlar da silinir ve başka bir cihazdan erişilemez.</p>
 <h2>Fiyat verileri ve üçüncü taraf hizmetler</h2>
-<p>Güncel fiyatları göstermek için tarayıcın doğrudan şu hizmetlere bağlanır: xaus.com (altın ve gümüş), Binance (döviz ve bitcoin) ve OilPriceAPI (petrol). Bu bağlantılar sırasında, internetin olağan işleyişi gereği IP adresin ve tarayıcı bilgilerin bu hizmetler tarafından görülebilir. Site, GitHub Pages üzerinde barındırılmaktadır; GitHub da teknik kayıt amacıyla benzer bilgileri işleyebilir.</p>
+<p>Güncel fiyatları göstermek için tarayıcın doğrudan şu hizmetlere bağlanır: finans.truncgil.com (piyasa alış-satış fiyatları), xaus.com (ons altın ve gümüş), Binance (döviz ve bitcoin) ve OilPriceAPI (petrol). Bu bağlantılar sırasında, internetin olağan işleyişi gereği IP adresin ve tarayıcı bilgilerin bu hizmetler tarafından görülebilir. Site, GitHub Pages üzerinde barındırılmaktadır; GitHub da teknik kayıt amacıyla benzer bilgileri işleyebilir.</p>
 <h2>Çerezler ve reklamlar</h2>
 <p>Sitede Google AdSense gibi üçüncü taraf reklam hizmetleri kullanılabilir. Google dahil üçüncü taraf sağlayıcılar, bu siteye ve diğer sitelere yaptığın önceki ziyaretlere dayalı reklamlar göstermek için çerezler kullanır. Google'ın reklam çerezlerini kullanması, Google ve iş ortaklarının sana bu siteye ve/veya internetteki diğer sitelere yaptığın ziyaretlere dayalı reklamlar sunmasını sağlar.</p>
 <p>Kişiselleştirilmiş reklamları <a href="https://adssettings.google.com" rel="nofollow">Google Reklam Ayarları</a> sayfasından kapatabilirsin. Üçüncü taraf sağlayıcıların kişiselleştirilmiş reklam çerezlerini <a href="https://www.aboutads.info/choices" rel="nofollow">aboutads.info</a> adresinden de devre dışı bırakabilirsin. Google'ın verileri nasıl kullandığı hakkında bilgi için <a href="https://policies.google.com/technologies/partner-sites" rel="nofollow">bu sayfaya</a> bakabilirsin.</p>
