@@ -102,10 +102,11 @@ A["altin-alirken-dikkat-edilmesi-gerekenler"]="""
 <p>Evde saklanan altın hırsızlık ve kaybolma riski taşır. Tutarı yüksekse güvenli saklama seçeneklerini araştırmak iyi olur.</p>
 """ + CTA + """<p class="note">Bu yazı genel bilgilendirme amaçlıdır, yatırım tavsiyesi değildir.</p>"""
 for _f in sorted(glob.glob(os.path.join(HERE,"yazilar","*.py"))): exec(open(_f).read())
+exec(open(os.path.join(HERE,"gorseller.py")).read())
 LM={SITE+"/":max(a[3] for a in ARTS)}
 urls=[SITE+"/"]
 for s,t,d,dt in ARTS:
-    u=page(f"rehber/{s}.html",t,d,A[s]+more(s),crumb='<a href="/rehber/">Rehberler</a>',date=dt); urls.append(u); LM[u]=dt
+    u=page(f"rehber/{s}.html",t,d,gorsel_ekle(s,A[s])+more(s),crumb='<a href="/rehber/">Rehberler</a>',date=dt); urls.append(u); LM[u]=dt
 lst="".join(f'<a href="/rehber/{s}.html">{t}<div class="note" style="font-weight:400;margin-top:4px">{d}</div></a>' for s,t,d,_ in ARTS[::-1])
 urls.append(page("rehber/index.html","Altın ve piyasa rehberleri","Çeyrek altın kaç gram, gram altın nasıl hesaplanır, ayar farkları ve altın alırken dikkat edilmesi gerekenler.",
  '<p>Altın ve piyasalarla ilgili sık sorulan soruları sade bir dille anlattığımız yazılar:</p><div class="more">'+lst+'</div>',crumb="Rehberler",article=False))
@@ -167,3 +168,7 @@ _s2=_re.sub(r'(<h2 id="rehberler">Rehberler</h2>\s*<div class="guides">).*?(\n  
 assert _s2!=_s or _links in _s
 open(_p,"w").write(_s2)
 print(len(ARTS),"yazi;",len(urls),"url")
+
+# --- üst menü (tüm sayfalar) ---
+exec(open(os.path.join(HERE,"nav.py")).read().split('if __name__ == "__main__":')[0])
+print("menü:", uygula(ROOT), "sayfa")

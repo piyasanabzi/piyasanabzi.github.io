@@ -27,6 +27,7 @@ th{color:var(--muted);font-size:13px}
 .cta{display:inline-block;background:var(--gold);color:#1a1200;font-weight:800;padding:12px 16px;border-radius:14px;text-decoration:none;margin:6px 0}
 .more{display:grid;gap:8px;margin:10px 0 24px}.more a{display:block;background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;color:var(--ink);text-decoration:none;font-weight:700}
 .note{font-size:13px;color:var(--muted)}
+.gorsel{margin:18px 0 22px}.gorsel img{display:block;width:100%;height:auto;border-radius:18px}.gorsel figcaption{color:var(--muted);font-size:13px;margin-top:8px;text-align:center}
 footer{border-top:1px solid var(--line);margin-top:30px;padding:18px 0 40px;font-size:13px;color:var(--muted)}
 footer a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom:6px}
 """
