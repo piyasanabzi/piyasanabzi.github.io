@@ -116,6 +116,21 @@ _g("brent-ve-wti-petrol-farki", "Brent ve WTI",
    _compare(("Brent", ["Kuzey Denizi", "Avrupa, Türkiye", "Deniz yoluyla", "Genelde pahalı"]), ("WTI", ["ABD, Oklahoma", "ABD piyasası", "Hafif, tatlı", "Genelde ucuz"]), _BLUE),
    "Brent ve WTI petrolünü karşılaştıran iki kart", "Dünyadaki iki ana petrol fiyat referansı. İkisi genelde birlikte hareket eder.")
 
+_g("kuyumcu-alis-satis-farki", "Alış, satış ve makas",
+   f'<rect x="40" y="250" width="230" height="70" rx="16" fill="{_CARD}" stroke="{_LINE}" stroke-width="2"/>' + _t(155, 280, "Alış", 22, _MUT, 700, "middle") + _t(155, 308, "kuyumcu senden alır", 18, _INK, 700, "middle")
+   + f'<rect x="330" y="96" width="230" height="70" rx="16" fill="{_GOLD}"/>' + _t(445, 126, "Satış", 22, "#1a1200", 800, "middle") + _t(445, 154, "kuyumcu sana satar", 18, "#1a1200", 700, "middle")
+   + f'<line x1="300" y1="130" x2="300" y2="286" stroke="{_RED}" stroke-width="4"/>' + f'<line x1="270" y1="285" x2="330" y2="285" stroke="{_RED}" stroke-width="4"/>' + f'<line x1="270" y1="131" x2="330" y2="131" stroke="{_RED}" stroke-width="4"/>'
+   + _t(300, 216, "MAKAS", 24, _RED, 800, "middle"),
+   "Alış fiyatı ile satış fiyatı arasındaki farkın makas olduğunu gösteren görsel", "Çeyrek, yarım ve tam altında satış fiyatına sarrafiye işçiliği de eklenir; bu yüzden fark gramdan büyüktür.")
+_g("dolar-mi-altin-mi", "Dolar ve altın",
+   _compare(("Dolar", ["Dolar/TL kuruna bağlı", "Genelde daha sakin", "Düşük alış-satış farkı", "Mevduatta az faiz"]), ("Altın", ["Ons × dolar kuru", "Daha hareketli", "Takıda işçilik var", "Krizlerde talep görür"])),
+   "Dolar ve altını karşılaştıran iki kart", "Gram altın hem dolara hem de dünya altın fiyatına bağlı olduğu için daha hareketlidir.")
+_fl = [(100, "Fed faizi", "artırır"), (300, "Dolar", "güçlenir"), (500, "Ons altın", "baskılanır")]
+_g("fed-faiz-karari-nedir", "Fed faiz artırırsa genelde…",
+   "".join(f'<rect x="{x-88}" y="120" width="176" height="110" rx="18" fill="{_GOLD if i==0 else _CARD}" stroke="{_LINE}" stroke-width="2"/>' + _t(x, 166, a, 22, "#1a1200" if i==0 else _INK, 800, "middle") + _t(x, 200, b, 20, "#1a1200" if i==0 else _MUT, 700, "middle") for i, (x, a, b) in enumerate(_fl))
+   + _t(200, 184, "→", 32, _INK, 800, "middle") + _t(400, 184, "→", 32, _INK, 800, "middle")
+   + _t(300, 300, "Faiz indiriminde çoğu zaman tersi olur.", 21, _INK, 700, "middle"),
+   "Fed faiz artırınca doların güçlendiğini ve ons altının baskılandığını gösteren akış", "Bu genel bir eğilimdir; piyasalar kararı önceden fiyatlayabilir ve sürprizlerde tepki farklı olabilir.")
 def gorsel_ekle(slug, html):
     if slug not in GORSEL: return html
     alt, cap = GORSEL[slug]
