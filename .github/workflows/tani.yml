@@ -5,9 +5,20 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          UA="Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124 Mobile Safari/537.36"
-          curl -sS -A "$UA" https://www.haremaltin.com/ -o /tmp/h.html
-          curl -sS -A "$UA" https://www.haremaltin.com/assets/js/functions.js -o /tmp/f.js
-          echo "=== HTML socket ctx"; grep -n -B3 -A20 "socketonly\|fiyat_baglan" /tmp/h.html | cut -c1-300 | head -80
-          echo "=== F.JS"; grep -n -B3 -A25 "socket\|io(" /tmp/f.js | cut -c1-300 | head -120
-          echo "=== socket.io version"; curl -sS -A "$UA" https://www.haremaltin.com/assets/js/socket.io/dist/socket.io.js | head -c 300
+          mkdir /tmp/n && cd /tmp/n && npm i -s socket.io-client@4 >/dev/null 2>&1
+          cat > s.js <<'JS'
+          const {io}=require("socket.io-client");
+          const org=process.argv[2];
+          const s=io("wss://hrmsocketonly.haremaltin.com:443",{transports:["websocket"],extraHeaders:{Origin:org}});
+          let done=false;
+          s.on("connect",()=>console.log(org,"CONNECTED"));
+          s.on("connect_error",e=>console.log(org,"ERR",e.message));
+          s.on("price_changed",d=>{ if(done) return; done=true; console.log("META",JSON.stringify(d.meta)); for(const k in d.data){ const x=d.data[k]; console.log(k, x.alis, x.satis, x.tarih||"", JSON.stringify(x).slice(0,160)); } });
+          setTimeout(()=>process.exit(0),12000);
+          JS
+          node s.js https://piyasanabzi.site
+          node s.js https://www.haremaltin.com
+          echo "=== TRUNCGIL"
+          curl -sS "https://finans.truncgil.com/v4/today.json?t=$(date +%s)" | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('Update_Date'));[print(k,d[k]['Buying'],d[k]['Selling']) for k in ['USD','EUR','GBP','GRA','HAS','CEYREKALTIN','YARIMALTIN','TAMALTIN','CUMHURIYETALTINI','ATAALTIN','GUMUS','14AYARALTIN'] if k in d]"
+          echo "=== XAUS"; curl -sS "https://xaus.com/api/v1/spot" | head -c 120; echo
+          echo "=== BINANCE"; curl -sS "https://data-api.binance.vision/api/v3/ticker/price?symbols=%5B%22USDTTRY%22,%22EURUSDT%22%5D"; echo
