@@ -131,6 +131,24 @@ _g("fed-faiz-karari-nedir", "Fed faiz artırırsa genelde…",
    + _t(200, 184, "→", 32, _INK, 800, "middle") + _t(400, 184, "→", 32, _INK, 800, "middle")
    + _t(300, 300, "Faiz indiriminde çoğu zaman tersi olur.", 21, _INK, 700, "middle"),
    "Fed faiz artırınca doların güçlendiğini ve ons altının baskılandığını gösteren akış", "Bu genel bir eğilimdir; piyasalar kararı önceden fiyatlayabilir ve sürprizlerde tepki farklı olabilir.")
+_days = ["Pzt", "Sal", "Çar", "Per", "Cum", "Cmt", "Paz"]
+_g("altin-fiyati-hafta-sonu", "Altın ve döviz piyasası",
+   "".join(f'<rect x="{30+i*80}" y="110" width="66" height="120" rx="14" fill="{_GOLD if i<5 else _CARD}" stroke="{_LINE}" stroke-width="2"/>' + _t(63 + i * 80, 178, d, 20, "#1a1200" if i < 5 else _MUT, 800, "middle") for i, d in enumerate(_days))
+   + _t(220, 270, "Açık (≈24 saat)", 21, _GOLD, 800, "middle") + _t(503, 270, "Kapalı", 21, _MUT, 800, "middle")
+   + _t(300, 320, "Hafta sonu son cuma fiyatı geçerli kalır.", 20, _INK, 700, "middle"),
+   "Altın ve döviz piyasasının hafta içi açık, hafta sonu kapalı olduğunu gösteren takvim", "Hafta sonu gelen haberler, piyasalar pazartesi açıldığında fiyata yansır.")
+_bf = [(100, "Şirket", "hisse çıkarır"), (300, "Borsa", "alım-satım"), (500, "Yatırımcı", "ortak olur")]
+_g("borsa-nedir", "Borsa nasıl çalışır?",
+   "".join(f'<rect x="{x-88}" y="120" width="176" height="110" rx="18" fill="{_GOLD if i==1 else _CARD}" stroke="{_LINE}" stroke-width="2"/>' + _t(x, 166, a, 22, "#1a1200" if i==1 else _INK, 800, "middle") + _t(x, 200, b, 20, "#1a1200" if i==1 else _MUT, 700, "middle") for i, (x, a, b) in enumerate(_bf))
+   + _t(200, 184, "→", 32, _INK, 800, "middle") + _t(400, 184, "→", 32, _INK, 800, "middle")
+   + _t(300, 300, "BIST 100 = büyük 100 hissenin genel yönü", 21, _INK, 700, "middle"),
+   "Şirketlerin hisse çıkardığını, borsada alınıp satıldığını ve yatırımcının ortak olduğunu gösteren akış", "Hisse fiyatı şirketin performansına ve piyasanın genel havasına göre değişir.")
+_tf = [(100, "TCMB", "faizi artırır"), (300, "TL mevduatı", "cazipleşir"), (500, "Dolar talebi", "azalabilir")]
+_g("tcmb-faiz-karari-nedir", "TCMB faiz artırırsa genelde…",
+   "".join(f'<rect x="{x-90}" y="120" width="180" height="110" rx="18" fill="{_GOLD if i==0 else _CARD}" stroke="{_LINE}" stroke-width="2"/>' + _t(x, 166, a, 22, "#1a1200" if i==0 else _INK, 800, "middle") + _t(x, 200, b, 20, "#1a1200" if i==0 else _MUT, 700, "middle") for i, (x, a, b) in enumerate(_tf))
+   + _t(200, 184, "→", 32, _INK, 800, "middle") + _t(400, 184, "→", 32, _INK, 800, "middle")
+   + _t(300, 300, "Faiz indiriminde çoğu zaman tersi olur.", 21, _INK, 700, "middle"),
+   "TCMB faiz artırınca TL mevduatının cazipleştiğini ve dolar talebinin azalabileceğini gösteren akış", "Kararlar genellikle saat 14:00'te açıklanır; asıl etki beklentiden farklı kararlarda görülür.")
 def gorsel_ekle(slug, html):
     if slug not in GORSEL: return html
     alt, cap = GORSEL[slug]
