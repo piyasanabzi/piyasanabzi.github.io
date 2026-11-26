@@ -5,14 +5,22 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          UA="Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124 Mobile Safari/537.36"
-          curl -sS -A "$UA" https://www.haremaltin.com/ -o /tmp/h.html
+          mkdir /tmp/n && cd /tmp/n && npm i -s socket.io-client@4 >/dev/null 2>&1
+          cat > s.js <<'JS'
+          const {io}=require("socket.io-client");
+          const s=io("wss://hrmsocketonly.haremaltin.com:443",{transports:["websocket"]});
+          s.on("price_changed",d=>{ for(const k of ["KULCEALTIN","CEYREK_YENI","YARIM_YENI","TEK_YENI","ATA_YENI","GUMUSTRY","USDTRY","EURTRY","GBPTRY"]){ const x=d.data[k]; if(x) console.log("HAREM",k,x.alis,x.satis); } process.exit(0); });
+          setTimeout(()=>process.exit(0),12000);
+          JS
+          google-chrome --headless=new --no-sandbox --disable-gpu --virtual-time-budget=20000 --window-size=1280,2000 --dump-dom "https://piyasanabzi.site/?r=$RANDOM" > /tmp/site.html 2>/dev/null || true
+          node s.js
           python3 - <<'PY'
           import re,html
-          s=open('/tmp/h.html',encoding='utf-8',errors='ignore').read()
-          for code in ['ALTIN','KULCEALTIN','CEYREK_YENI','TEK_YENI','ATA_YENI','USDTRY','GUMUSTRY','AYAR22']:
-              for m in list(re.finditer(r'%s'%code,s))[:3]:
-                  seg=s[max(0,m.start()-400):m.start()+100]
-                  t=re.sub(r'<[^>]+>',' ',seg); t=re.sub(r'\s+',' ',html.unescape(t))
-                  print(code,'::',t[-260:])
+          s=open('/tmp/site.html',encoding='utf-8',errors='ignore').read()
+          for gid in ['gGold','gFx','gFx2']:
+              m=re.search(r'id="%s"(.*?)</div>\s*\n\s*<h2'%gid,s,re.S)
+              seg=m.group(1) if m else ''
+              txt=re.sub(r'<[^>]+>',' | ',seg); txt=html.unescape(re.sub(r'(\s*\|\s*)+',' | ',txt))
+              print("SITE",gid, txt[:1200])
           PY
+          google-chrome --headless=new --no-sandbox --disable-gpu --virtual-time-budget=15000 --dump-dom "https://piyasanabzi.site/kuyumcu-fiyat-hesaplama.html?r=$RANDOM" 2>/dev/null | python3 -c "import sys,re,html;s=sys.stdin.read();t=html.unescape(re.sub(r'<[^>]+>',' ',s));t=re.sub(r'\s+',' ',t);i=t.find('gram');print('KUYUMCU',t[i-200:i+400])"

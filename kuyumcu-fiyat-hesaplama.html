@@ -137,7 +137,7 @@
 </main>
 <div class="toast" id="toast"></div>
 <footer><div class="wrap"><a href="/">Canlı fiyatlar</a><a href="/gecmis-yatirim.html">Geçmişte alsaydım</a><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
-<div style="margin-top:8px">Altın fiyatı xaus.com, dolar kuru Binance üzerinden alınır. © Piyasa Nabzı</div></div></footer>
+<div style="margin-top:8px">Has altın fiyatı Kapalıçarşı (Harem Altın) yayınından, alınamazsa xaus.com ve Binance üzerinden hesaplanır. © Piyasa Nabzı</div></div></footer>
 
 <script>
 (function(){
@@ -225,11 +225,18 @@
 
   async function j(url,ms=8000){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms); try{ const r=await fetch(url,{signal:c.signal,cache:"no-store"}); if(!r.ok) throw new Error(r.status); return await r.json(); } finally{ clearTimeout(t); } }
   async function usdtry(){ for(const h of ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"]){ try{ const d=await j(h+"/api/v3/ticker/price?symbol=USDTTRY"); if(+d.price>0) return +d.price; }catch(e){} } return null; }
+  // Kapalıçarşı has altın fiyatı (Harem Altın yayını); alınamazsa uluslararası fiyattan hesap
+  function harem(){ return new Promise(res=>{ let w, done=false; const fin=v=>{ if(done) return; done=true; try{ w.close(); }catch(_){} res(v); };
+    try{ w=new WebSocket("wss://hrmsocketonly.haremaltin.com/socket.io/?EIO=4&transport=websocket"); }catch(e){ return res(null); }
+    w.onmessage=e=>{ const m=String(e.data); if(m==="2"){ w.send("3"); return; } if(m[0]==="0"){ w.send("40"); return; }
+      if(m.startsWith("42")){ try{ const [ev,p]=JSON.parse(m.slice(2)); const x=ev==="price_changed"&&p&&p.data&&p.data.ALTIN; if(x&&+x.satis>0) fin(+x.satis); }catch(_){} } };
+    w.onerror=()=>fin(null); setTimeout(()=>fin(null),8000); }); }
   async function live(){
-    const [u,g]=await Promise.all([usdtry(), j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null)]);
+    const [u,g,h]=await Promise.all([usdtry(), j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null), harem()]);
     let v=null;
     if(g&&+g.spot_usd_oz>0&&u) v=g.spot_usd_oz/OZ*u;           // ana sayfayla aynı yöntem
     else if(g&&g.xau&&+g.xau.price>0) v = g.xau.unit==="gram" ? +g.xau.price : g.xau.price/OZ;
+    if(h && (!v || Math.abs(h/v-1)<0.15)) v=h;
     if(v){ gram=v; liveOK=true; } else if(!gram) liveOK=null;
     run();
   }

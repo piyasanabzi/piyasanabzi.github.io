@@ -238,7 +238,7 @@
     <a href="/rehber/" style="color:var(--gold)">Tüm rehberler →</a>
   </div>
 
-  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için piyasadaki <b>alış ve satış</b> fiyatları gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu veri alınamazsa değerler uluslararası fiyattan hesaplanır ve "tahmini" olarak işaretlenir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar piyasa kuruna göre gösterilir, anlık hareketi Binance'ten izlenir. Yatırım tavsiyesi değildir.</div>
+  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için Kapalıçarşı'daki <b>alış ve satış</b> fiyatları anlık gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu veri alınamazsa değerler uluslararası fiyattan hesaplanır ve "tahmini" olarak işaretlenir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar ve euro da Kapalıçarşı kuruyla gösterilir. Yatırım tavsiyesi değildir.</div>
 </main>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="box">
@@ -255,7 +255,7 @@
   </div>
 </div>
 <div class="toast" id="toast"></div>
-<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: piyasa alış-satış fiyatları finans.truncgil.com · ons altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
+<footer><div class="wrap"><nav class="flinks"><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a></nav>Veri kaynakları: Kapalıçarşı alış-satış fiyatları Harem Altın (haremaltin.com) ve finans.truncgil.com · ons altın ve gümüş xaus.com · döviz ve bitcoin Binance · diğer kurlar fawazahmed0/exchange-api ve ExchangeRate-API (<a href="https://www.exchangerate-api.com" rel="nofollow" style="color:inherit">exchangerate-api.com</a>) · petrol OilPriceAPI. © Piyasa Nabzı</div></footer>
 
 <script>
 (function(){
@@ -271,9 +271,9 @@
   const S = {
     usdtry:null, usdtry24:null, eurusd:null, eurusd24:null, btc:null, btc24:null,
     goldOz:null, goldOz24:null, silverOz:null, brent:null, brentCh:null, wti:null, wtiCh:null, ng:null, ngCh:null,
-    t:{fx:null, gold:null, oil:null, kc:null}, x:{}, x24:{}, r24:{}, tg:null, usdtRaw:null, usdtRaw24:null, usdAdj:1
+    t:{fx:null, gold:null, oil:null, kc:null}, x:{}, x24:{}, r24:{}, tg:null, hr:null, usdtRaw:null, usdtRaw24:null, usdAdj:1
   };
-  const eurtry=()=> S.eurusd&&S.usdtry ? S.eurusd*S.usdtry : null;
+  const eurtry=()=> hrf("EURTRY") ? hrf("EURTRY").s : (S.eurusd&&S.usdtry ? S.eurusd*S.usdtry : null);
   const eurtry24=()=> S.eurusd24&&S.usdtry24 ? S.eurusd24*S.usdtry24 : null;
   const gramTL=()=> S.goldOz&&S.usdtry ? S.goldOz/OZ*S.usdtry : null;
   const gramTL24=()=> S.goldOz24&&S.usdtry24 ? S.goldOz24/OZ*S.usdtry24 : null;
@@ -283,7 +283,11 @@
   const COINS=[["Çeyrek altın",1.75*0.916],["Yarım altın",3.50*0.916],["Tam altın",7.00*0.916],["Cumhuriyet altını",7.216*0.916]];
   // Piyasa (kuyumcu) alış-satış fiyatları: finans.truncgil.com. Yoksa uluslararası fiyattan hesaplanan değere düşülür.
   const TG_KEYS=["ceyrek","yarim","tam","ata"];
-  const tgf=k=> (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null;
+  // Kapalıçarşı canlı fiyatları (Harem Altın yayını) öncelikli; yoksa Truncgil
+  const HMAP={gram:"KULCEALTIN",ceyrek:"CEYREK_YENI",yarim:"YARIM_YENI",tam:"TEK_YENI",ata:"ATA_YENI",gumus:"GUMUSTRY",usd:"USDTRY",eur:"EURTRY",
+    gbp:"GBPTRY",chf:"CHFTRY",sar:"SARTRY",jpy:"JPYTRY",cad:"CADTRY",aud:"AUDTRY",kwd:"KWDTRY"};
+  const hrf=c=>{ const x=S.hr&&S.hr[c]; return x&&x.s>0&&Date.now()-x.at<10*60e3 ? x : null; };
+  const tgf=k=>{ const h=HMAP[k]&&hrf(HMAP[k]); if(h) return h; return (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null; };
   const gramSat=()=> tgf("gram")? tgf("gram").s : gramTL();
   const gramAl =()=> tgf("gram")? tgf("gram").a : gramTL();
   const coinSat=i=> tgf(TG_KEYS[i])? tgf(TG_KEYS[i]).s : (gramTL()&&gramTL()*COINS[i][1]);
@@ -292,7 +296,7 @@
   const agAl=()=> tgf("gumus")? tgf("gumus").a : (S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry);
 
   const XC=[["gbp","Sterlin","GBP/TRY"],["chf","İsviçre frangı","CHF/TRY"],["sar","Suudi riyali","SAR/TRY"],["aed","BAE dirhemi","AED/TRY"],["jpy","Japon yeni","JPY/TRY"],["cny","Çin yuanı","CNY/TRY"],["rub","Rus rublesi","RUB/TRY"],["azn","Azerbaycan manatı","AZN/TRY"],["cad","Kanada doları","CAD/TRY"],["aud","Avustralya doları","AUD/TRY"],["kwd","Kuveyt dinarı","KWD/TRY"],["qar","Katar riyali","QAR/TRY"]];
-  const xtry=k=> S.x[k]>0&&S.usdtry ? S.usdtry/S.x[k] : null;
+  const xtry=k=> (HMAP[k]&&hrf(HMAP[k])) ? hrf(HMAP[k]).s : (S.x[k]>0&&S.usdtry ? S.usdtry/S.x[k] : null);
   const xtry24=k=> S.x24[k]>0&&S.usdtry24 ? S.usdtry24/S.x24[k] : null;
   const CARDS = {
     gGold:[
@@ -303,11 +307,11 @@
     ],
     gFx:[
       {k:"usd", n:"Dolar", s:"USD/TRY", tg:"usd", v:()=>S.usdtry, v24:()=>S.usdtry24, f:v=>fN(v,4), t:"fx"},
-      {k:"eur", n:"Euro", s:"EUR/TRY", v:eurtry, v24:eurtry24, f:v=>fN(v,4), t:"fx"},
+      {k:"eur", n:"Euro", s:"EUR/TRY", tg:"eur", v:eurtry, v24:eurtry24, f:v=>fN(v,4), t:"fx"},
       {k:"parite", n:"Euro / Dolar", s:"parite", v:()=>S.eurusd, v24:()=>S.eurusd24, f:v=>fN(v,4), t:"fx"},
       {k:"usd100", n:"100 Dolar", s:"TL karşılığı", v:()=>S.usdtry&&S.usdtry*100, v24:()=>S.usdtry24&&S.usdtry24*100, f:v=>fTL(v), t:"fx"}
     ],
-    gFx2: XC.map(([k,n,s])=>({k:"x_"+k, n, s, v:()=>xtry(k), v24:()=>xtry24(k), f:v=>fN(v,4), t:"fx"})),
+    gFx2: XC.map(([k,n,s])=>({k:"x_"+k, n, s, tg:HMAP[k]?k:undefined, v:()=>xtry(k), v24:()=>xtry24(k), f:v=>fN(v,4), t:"fx"})),
     gCom:[
       {k:"brent", n:"Brent petrol", s:"varil, USD", v:()=>S.brent, ch:()=>S.brentCh, f:v=>fUSD(v), t:"oil"},
       {k:"wti", n:"WTI petrol", s:"varil, USD", v:()=>S.wti, ch:()=>S.wtiCh, f:v=>fUSD(v), t:"oil"},
@@ -345,7 +349,8 @@
         p.textContent=txt; LAST[c.k]=v;
       }
       let ch=null, chL=" (24s)"; const tq=c.tg&&tgf(c.tg);
-      if(c.c24) ch=c.c24();
+      if(tq && tq.src==="h" && tq.ch!=null && isFinite(tq.ch)){ ch=tq.ch; chL=" (gün)"; }
+      else if(c.c24) ch=c.c24();
       else if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
       if((ch==null||!isFinite(ch)) && tq && isFinite(tq.ch) && tq.ch!==0){ ch=tq.ch; chL=" (gün)"; }
       const chEl=el.querySelector(".ch");
@@ -501,12 +506,41 @@
     if(!tg.gram) throw new Error("kc veri yok");
     S.tg=tg; S.t.kc=new Date();
     // dolar: Binance anlık hareketini koru, seviyeyi piyasa kuruna hizala
-    if(tg.usd){
+    if(tg.usd && !hrf("USDTRY")){
       if(S.usdtRaw>0){ const adj=tg.usd.s/S.usdtRaw; if(adj>0.95&&adj<1.05){ S.usdAdj=adj; S.usdtry=S.usdtRaw*adj; if(S.usdtRaw24>0) S.usdtry24=S.usdtRaw24*adj; } }
       else { S.usdtry=tg.usd.s; S.t.fx=new Date(); }
     }
     gotAny=true; schedule();
   }
+
+  // ---------- Kapalıçarşı canlı yayın (Harem Altın, socket.io / Engine.IO v4) ----------
+  let hws=null, hFail=0;
+  function hIn(data){
+    const now=Date.now(), hr=Object.assign({},S.hr||{});
+    for(const code in data){ const x=data[code]; if(!x) continue;
+      const a=+x.alis, s_=+x.satis, k=+x.kapanis;
+      if(a>0&&s_>0&&s_>=a*0.8&&s_<a*1.5) hr[code]={a, s:s_, ch:k>0?(s_/k-1)*100:null, src:"h", at:now};
+    }
+    // makullük: gram altın uluslararası değerden %15'ten fazla saparsa yayını kullanma
+    const g=hr.KULCEALTIN, ref=gramTL();
+    if(g && ref && Math.abs(g.s/ref-1)>0.15) return;
+    S.hr=hr; S.t.kc=new Date();
+    const u=hr.USDTRY;
+    if(u&&u.at===now){ if(S.usdtRaw>0){ const adj=u.s/S.usdtRaw; if(adj>0.95&&adj<1.05) S.usdAdj=adj; } S.usdtry=u.s; S.t.fx=new Date(); }
+    gotAny=true; schedule();
+  }
+  function harem(){
+    if(hws && hws.readyState<2) return;
+    try{ hws=new WebSocket("wss://hrmsocketonly.haremaltin.com/socket.io/?EIO=4&transport=websocket"); }catch(e){ return setTimeout(harem,60000); }
+    hws.onmessage=e=>{ const m=String(e.data);
+      if(m==="2"){ hws.send("3"); return; }
+      if(m[0]==="0"){ hws.send("40"); return; }
+      if(m.startsWith("42")){ try{ const [ev,p]=JSON.parse(m.slice(2)); if(ev==="price_changed"&&p&&p.data){ hFail=0; hIn(p.data); } }catch(_){} }
+    };
+    hws.onerror=()=>{ try{ hws.close(); }catch(_){} };
+    hws.onclose=()=>{ hFail++; setTimeout(harem, hFail<4?5000:120000); };
+  }
+  document.addEventListener("visibilitychange",()=>{ if(!document.hidden && (!hws||hws.readyState>1)) harem(); });
 
   // ---------- chart ----------
   let chartKey="gold";
@@ -764,7 +798,7 @@
   const safe=fn=>fn().catch(()=>{});
   safe(binanceRest).then(()=>{ if(gotAny) setLive(true,"Canlı"); });
   connectWS();
-  safe(gold); safe(goldIntraday); safe(oil); safe(fx2); safe(kc);
+  safe(gold); safe(goldIntraday); safe(oil); safe(fx2); safe(kc); harem();
   setInterval(()=>safe(kc),60e3);
   setInterval(()=>safe(fx2),3*3600e3);
   setInterval(()=>safe(gold),60000);
