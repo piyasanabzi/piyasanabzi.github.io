@@ -277,6 +277,7 @@
   const eurtry24=()=> S.eurusd24&&S.usdtry24 ? S.eurusd24*S.usdtry24 : null;
   const gramTL=()=> S.goldOz&&S.usdtry ? S.goldOz/OZ*S.usdtry : null;
   const gramTL24=()=> S.goldOz24&&S.usdtry24 ? S.goldOz24/OZ*S.usdtry24 : null;
+  const gold24=()=> gramTL()&&gramTL24() ? (gramTL()/gramTL24()-1)*100 : null;
 
   // pure-gold grams in Turkish coins (22 ayar = 0.916)
   const COINS=[["Çeyrek altın",1.75*0.916],["Yarım altın",3.50*0.916],["Tam altın",7.00*0.916],["Cumhuriyet altını",7.216*0.916]];
@@ -295,10 +296,10 @@
   const xtry24=k=> S.x24[k]>0&&S.usdtry24 ? S.usdtry24/S.x24[k] : null;
   const CARDS = {
     gGold:[
-      {k:"gram", n:"Gram altın", s:"24 ayar", big:true, gold:true, tg:"gram", v:()=>gramSat(), v24:()=>gramTL24(), f:v=>fTL(v), t:"gold"},
-      ...COINS.map(([n,g],i)=>({k:"coin"+i, n, s:"tahmini", gold:true, tg:TG_KEYS[i], v:()=>coinSat(i), v24:()=>gramTL24()&&gramTL24()*g, f:v=>fTL(v,0), t:"gold"})),
+      {k:"gram", n:"Gram altın", s:"24 ayar", big:true, gold:true, tg:"gram", c24:gold24, v:()=>gramSat(), v24:()=>gramTL24(), f:v=>fTL(v), t:"gold"},
+      ...COINS.map(([n,g],i)=>({k:"coin"+i, n, s:"tahmini", gold:true, tg:TG_KEYS[i], c24:gold24, v:()=>coinSat(i), v24:()=>gramTL24()&&gramTL24()*g, f:v=>fTL(v,0), t:"gold"})),
       {k:"ons", n:"Ons altın", s:"USD", gold:true, v:()=>S.goldOz, v24:()=>S.goldOz24, f:v=>fUSD(v), t:"gold"},
-      {k:"ag", n:"Gram gümüş", s:"TL", tg:"gumus", v:()=>agTL(), v24:()=>S.r24&&S.r24.xag>0&&S.usdtry24? (1/S.r24.xag)/OZ*S.usdtry24:null, f:v=>fTL(v), t:"gold"}
+      {k:"ag", n:"Gram gümüş", s:"TL", tg:"gumus", c24:()=>{ const b=S.r24&&S.r24.xag>0&&S.usdtry24? (1/S.r24.xag)/OZ*S.usdtry24:null; return b&&S.silverOz&&S.usdtry? (S.silverOz/OZ*S.usdtry/b-1)*100:null; }, v:()=>agTL(), v24:()=>S.r24&&S.r24.xag>0&&S.usdtry24? (1/S.r24.xag)/OZ*S.usdtry24:null, f:v=>fTL(v), t:"gold"}
     ],
     gFx:[
       {k:"usd", n:"Dolar", s:"USD/TRY", tg:"usd", v:()=>S.usdtry, v24:()=>S.usdtry24, f:v=>fN(v,4), t:"fx"},
@@ -344,8 +345,9 @@
         p.textContent=txt; LAST[c.k]=v;
       }
       let ch=null, chL=" (24s)"; const tq=c.tg&&tgf(c.tg);
-      if(tq && isFinite(tq.ch)){ ch=tq.ch; chL=" (gün)"; }
+      if(c.c24) ch=c.c24();
       else if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
+      if((ch==null||!isFinite(ch)) && tq && isFinite(tq.ch) && tq.ch!==0){ ch=tq.ch; chL=" (gün)"; }
       const chEl=el.querySelector(".ch");
       if(ch!=null&&isFinite(ch)){ chEl.textContent=pct(ch)+chL; chEl.className="ch "+(ch>=0?"up":"down"); }
       if(c.tg){
