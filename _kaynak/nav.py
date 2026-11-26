@@ -6,6 +6,7 @@ MENU = [
     ("/", "Canlı fiyatlar"),
     ("/rehber/", "Rehberler"),
     ("/ekonomi-takvimi.html", "Ekonomi takvimi"),
+    ("/dugun-altini-hesaplama.html", "Düğün altını"),
     ("/kuyumcu-fiyat-hesaplama.html", "Kuyumcu hesabı"),
     ("/gecmis-yatirim.html", "Geçmiş yatırım"),
     ("/hakkimizda.html", "Hakkımızda"),

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Düğün altını hesaplama: takılan altınlar bugün kaç TL? | Piyasa Nabzı</title>
+<meta name="description" content="Düğünde takılan çeyrek, yarım, tam, Ata altını ve bileziklerin sayısını yaz; bugünkü toplam değerini ve kuyumcudan bekleyebileceğin yaklaşık teklifi anında gör.">
+<link rel="canonical" href="https://piyasanabzi.site/dugun-altini-hesaplama.html">
+<meta property="og:title" content="Düğün altınların bugün kaç TL ediyor?">
+<meta property="og:description" content="Çeyrek, yarım, tam altın ve bileziklerini yaz; toplam değeri canlı fiyatla hesapla.">
+<meta property="og:url" content="https://piyasanabzi.site/dugun-altini-hesaplama.html">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Piyasa Nabzı">
+<meta name="theme-color" content="#0b111c">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e1726'/%3E%3Cpath d='M10 40 L22 30 L32 36 L46 20 L54 24' fill='none' stroke='%23f2c14e' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0b111c; --card:#121b2b; --card2:#172235; --ink:#eef2f8; --muted:#8e9bb3; --line:#1f2b40;
+    --gold:#f2c14e; --up:#22c55e; --down:#ef4444; --blue:#60a5fa;
+  }
+  @media (prefers-color-scheme: light){
+    :root{ --bg:#f3f5f9; --card:#ffffff; --card2:#f7f9fc; --ink:#0f1a2b; --muted:#66748c; --line:#e3e8f0; --gold:#b7861b; --up:#16a34a; --down:#dc2626; --blue:#2563eb; }
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;background:var(--bg);color:var(--ink);font-family:Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:760px;margin:0 auto;padding:0 16px}
+  header{position:sticky;top:0;z-index:5;background:color-mix(in srgb,var(--bg) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .bar{display:flex;align-items:center;justify-content:space-between;height:60px;gap:10px}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:19px;color:var(--ink);text-decoration:none}
+  .brand svg{width:34px;height:34px}
+  .btn{font-size:13px;font-weight:700;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--card);padding:8px 12px;border-radius:12px}
+  .crumb{font-size:13px;color:var(--muted);margin:18px 0 0}.crumb a{color:var(--muted)}
+  h1{font-size:clamp(24px,5vw,32px);margin:10px 0 8px;letter-spacing:-.02em;font-weight:800;line-height:1.2}
+  .lead{color:var(--muted);margin:0 0 18px;line-height:1.55}
+  h2{font-size:20px;margin:30px 0 10px;letter-spacing:-.01em}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:16px}
+  label{display:block;font-size:12px;font-weight:700;color:var(--muted);margin:0 0 6px}
+  input,select{width:100%;border:1px solid var(--line);background:var(--card2);color:var(--ink);border-radius:12px;padding:12px;font:inherit;font-size:16px;outline:none}
+  input:focus,select:focus{border-color:var(--gold)}
+  .f{display:grid;gap:12px;grid-template-columns:1fr 1fr;align-items:end}
+  .f .full{grid-column:1/-1}
+  .chips{display:flex;flex-wrap:wrap;gap:6px;margin-top:12px}
+  .chips button{border:1px solid var(--line);background:var(--card2);color:var(--ink);font:inherit;font-size:13px;font-weight:700;padding:7px 11px;border-radius:999px;cursor:pointer}
+  .chips button[aria-pressed="true"]{background:var(--gold);border-color:var(--gold);color:#1a1200}
+  .head{font-size:clamp(18px,4vw,22px);line-height:1.45;font-weight:600;margin:18px 0 14px}
+  .head b{color:var(--gold)}
+  .res{display:grid;gap:8px}
+  .r{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:12px 14px;position:relative;overflow:hidden}
+  .r.best{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}
+  .r .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px;position:relative}
+  .r .n{font-weight:800;font-size:15px}
+  .r .n small{font-weight:600;color:var(--muted);font-size:12px;margin-left:6px}
+  .r .v{font-weight:800;font-size:19px;font-variant-numeric:tabular-nums;white-space:nowrap}
+  .r .sub{display:flex;justify-content:space-between;gap:10px;font-size:13px;color:var(--muted);margin-top:4px;position:relative}
+  .r .sub b{font-variant-numeric:tabular-nums}
+  .r .track{height:6px;border-radius:6px;background:var(--card2);margin-top:10px;overflow:hidden}
+  .r .fill{height:100%;border-radius:6px;background:var(--gold);transition:width .4s}
+  .r.na{opacity:.55}
+  .up{color:var(--up)} .down{color:var(--down)}
+  .tag{display:inline-block;background:var(--gold);color:#1a1200;font-size:11px;font-weight:800;padding:2px 7px;border-radius:999px;margin-left:6px;vertical-align:2px}
+  .share{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+  .pbtn{border:0;background:var(--gold);color:#1a1200;font:inherit;font-weight:800;padding:12px 16px;border-radius:14px;cursor:pointer;text-decoration:none;font-size:14px}
+  .sbtn{border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-weight:700;padding:12px 16px;border-radius:14px;cursor:pointer;text-decoration:none;font-size:14px}
+  .muted{color:var(--muted)}
+  .note{background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;font-size:12px;color:var(--muted);margin-top:14px;line-height:1.55}
+  article{font-size:16px;line-height:1.7}
+  article a{color:var(--blue)}
+  details{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:12px 14px;margin-bottom:8px}
+  summary{font-weight:700;cursor:pointer}
+  details p{margin:8px 0 0;color:var(--muted);line-height:1.6}
+  .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:12px;font-weight:700;font-size:14px;opacity:0;transition:.25s;pointer-events:none;z-index:30}
+  .toast.on{opacity:1;transform:translateX(-50%)}
+  footer{border-top:1px solid var(--line);margin-top:34px;padding:20px 0 40px;color:var(--muted);font-size:13px;line-height:1.6}
+  footer a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom:6px}
+  .seg{display:grid;grid-template-columns:1fr 1fr;background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:4px;gap:4px;margin-bottom:12px}
+  .seg button{border:0;background:transparent;color:var(--muted);font:inherit;font-weight:700;padding:10px;border-radius:9px;cursor:pointer;font-size:14px}
+  .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+  .live{font-size:13px;color:var(--muted);margin-top:12px}.live b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .verdict{border-radius:16px;padding:14px 16px;margin:18px 0 10px;border:1px solid var(--line);background:var(--card)}
+  .verdict .big{font-size:20px;font-weight:800;margin-bottom:4px}
+  .verdict p{margin:0;color:var(--muted);line-height:1.5;font-size:14px}
+  .verdict.ok{border-color:color-mix(in srgb,var(--up) 55%,var(--line))}.verdict.ok .big{color:var(--up)}
+  .verdict.mid{border-color:color-mix(in srgb,var(--gold) 60%,var(--line))}.verdict.mid .big{color:var(--gold)}
+  .verdict.bad{border-color:color-mix(in srgb,var(--down) 55%,var(--line))}.verdict.bad .big{color:var(--down)}
+  .rows{background:var(--card);border:1px solid var(--line);border-radius:16px;overflow:hidden}
+  .rows div{display:flex;justify-content:space-between;gap:12px;padding:11px 14px;border-bottom:1px solid var(--line);font-size:15px}
+  .rows div:last-child{border-bottom:0}
+  .rows span{color:var(--muted)} .rows b{font-variant-numeric:tabular-nums;text-align:right}
+  .scale{position:relative;height:8px;border-radius:8px;margin:14px 0 4px;background:linear-gradient(90deg,var(--up) 0 33%,var(--gold) 33% 66%,var(--down) 66% 100%);opacity:.85}
+  .scale i{position:absolute;top:-5px;width:4px;height:18px;border-radius:3px;background:var(--ink);transform:translateX(-2px);transition:left .3s}
+  .scale-l{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+</style>
+<style>
+  .items{display:grid;gap:8px}
+  .it{display:grid;grid-template-columns:1fr auto;align-items:center;gap:10px;background:var(--card2);border:1px solid var(--line);border-radius:14px;padding:10px 12px}
+  .it .nm{font-weight:800;font-size:15px}
+  .it .nm small{display:block;font-weight:600;color:var(--muted);font-size:12px;margin-top:2px}
+  .stp{display:flex;align-items:center;gap:6px}
+  .stp button{width:38px;height:38px;border-radius:11px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit;font-size:20px;font-weight:800;cursor:pointer;line-height:1}
+  .stp input{width:76px;text-align:center;padding:9px 6px;font-weight:800;font-variant-numeric:tabular-nums}
+  .it.on{border-color:color-mix(in srgb,var(--gold) 55%,var(--line))}
+  .total{border-radius:18px;padding:16px;margin:18px 0 10px;border:1px solid color-mix(in srgb,var(--gold) 60%,var(--line));background:var(--card)}
+  .total .lab{font-size:13px;font-weight:700;color:var(--muted)}
+  .total .big{font-size:clamp(28px,7vw,38px);font-weight:800;color:var(--gold);font-variant-numeric:tabular-nums;margin:4px 0 6px}
+  .total p{margin:0;color:var(--muted);font-size:14px;line-height:1.5}
+  .total p b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .rows div b small{display:block;font-weight:600;color:var(--muted);font-size:12px}
+  .lnk{display:inline-block;margin-top:10px;font-size:13px;font-weight:700;color:var(--muted);background:none;border:0;cursor:pointer;padding:0;text-decoration:underline}
+</style>
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"FAQPage","mainEntity":[
+{"@type":"Question","name":"Düğün altınlarının değeri nasıl hesaplanır?","acceptedAnswer":{"@type":"Answer","text":"Her altının içindeki saf altın miktarı bulunur ve güncel gram altın fiyatıyla çarpılır. Çeyrek ziynet altın 1,754 gram ve 22 ayardır, yani yaklaşık 1,61 gram saf altın içerir. Tüm altınların değerleri toplanınca toplam has değer bulunur."}},
+{"@type":"Question","name":"Kuyumcu düğün altınına ne kadar verir?","acceptedAnswer":{"@type":"Answer","text":"Kuyumcular altın alırken genellikle has değerin biraz altında teklif verir. Çeyrek, yarım ve tam altında bu fark genelde birkaç yüzde ile sınırlıdır. Bilezikte alırken ödenen işçilik satarken geri alınmaz. En iyi fiyat için birkaç kuyumcudan teklif almak gerekir."}},
+{"@type":"Question","name":"Bir çeyrek altında kaç gram saf altın vardır?","acceptedAnswer":{"@type":"Answer","text":"Darphane'nin bastığı çeyrek ziynet altın 1,754 gram ve 22 ayardır (916 milyem). İçinde yaklaşık 1,61 gram saf altın bulunur."}}
+]}</script>
+<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4295900331301338" crossorigin="anonymous"></script>
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-M419M3965F"></script>
+<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-M419M3965F");gtag("config","G-LP1EQD8PHJ");</script>
+</head>
+<body>
+<header><div class="wrap bar"><a class="brand" href="/"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0e1726"/><path d="M10 40 L22 30 L32 36 L46 20 L54 24" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>Piyasa Nabzı</a><a class="btn" href="/">Canlı fiyatlar</a></div></header>
+<!--nav--><style>.pn-nav{border-bottom:1px solid var(--line,#1f2b40);background:var(--bg,#0b111c)}.pn-nav .in{padding-top:8px;padding-bottom:8px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;-webkit-overflow-scrolling:touch}.pn-nav .in::-webkit-scrollbar{display:none}.pn-nav a{flex:none;font:600 13.5px/1 Inter,system-ui,sans-serif;color:var(--muted,#8e9bb3);text-decoration:none;padding:9px 13px;border-radius:999px;border:1px solid var(--line,#1f2b40);background:var(--card,#121b2b);white-space:nowrap}.pn-nav a:hover{color:var(--ink,#eef2f8)}.pn-nav a[aria-current]{color:#1a1200;background:var(--gold,#f2c14e);border-color:var(--gold,#f2c14e)}@media (prefers-color-scheme: light){.pn-nav a[aria-current]{color:#fff}}</style><nav class="pn-nav" aria-label="Site menüsü"><div class="wrap in"><a href="/">Canlı fiyatlar</a><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/dugun-altini-hesaplama.html" aria-current="page">Düğün altını</a><a href="/kuyumcu-fiyat-hesaplama.html">Kuyumcu hesabı</a><a href="/gecmis-yatirim.html">Geçmiş yatırım</a><a href="/hakkimizda.html">Hakkımızda</a></div></nav><!--/nav-->
+
+<main class="wrap">
+  <div class="crumb"><a href="/">Ana sayfa</a> › Düğün altını hesaplama</div>
+  <h1>Düğün altınların bugün kaç TL?</h1>
+  <p class="lead">Takılan çeyrek, yarım, tam altın ve bileziklerin sayısını yaz. Bugünkü toplam değerini ve kuyumcudan bekleyebileceğin yaklaşık teklifi canlı fiyatla gör.</p>
+
+  <div class="panel">
+    <div class="items" id="items"></div>
+    <button type="button" class="lnk" id="reset">Hepsini sıfırla</button>
+    <div class="live" id="live">Güncel altın fiyatı yükleniyor…</div>
+  </div>
+
+  <div id="out"></div>
+
+  <div class="share" id="share" hidden>
+    <a class="pbtn" id="wa" target="_blank" rel="noopener">WhatsApp'ta paylaş</a>
+    <button type="button" class="sbtn" id="copy">Bağlantıyı kopyala</button>
+  </div>
+
+  <div class="note">Değerler, Kapalıçarşı has altın gösterge fiyatı ve Darphane'nin açıkladığı ağırlık ve ayarlarla hesaplanır. "Kuyumcunun yaklaşık teklifi" kaba bir tahmindir; gerçek teklifler kuyumcuya, güne ve ürünün durumuna göre değişir. Yatırım tavsiyesi değildir.</div>
+
+  <h2>Nasıl hesaplanıyor?</h2>
+  <article>
+    <p>Her altının içinde belirli miktarda <b>saf (24 ayar) altın</b> vardır. Örneğin çeyrek ziynet altın 1,754 gram ve 22 ayardır, yani yaklaşık 1,61 gram saf altın içerir. Bu miktar güncel gram altın fiyatıyla çarpılınca altının <b>has değeri</b> bulunur. Araç, yazdığın tüm altınlar için bunu yapıp toplar.</p>
+    <p>Kuyumcu altın alırken genellikle has değerin biraz altında teklif verir. Çeyrek, yarım ve tam altında bu fark azdır. Bilezik ve takılarda alırken ödenen işçilik satışta geri gelmez. Bozdurmayı düşünüyorsan önce <a href="/rehber/dugun-altini-nasil-bozdurulur.html">düğün altını nasıl bozdurulur</a> rehberimize göz at. Kuyumcunun verdiği teklifi kontrol etmek için <a href="/kuyumcu-fiyat-hesaplama.html?mod=sell">kuyumcu fiyatı hesaplama</a> aracını kullanabilirsin.</p>
+  </article>
+
+  <h2>Altınların ağırlıkları</h2>
+  <article>
+    <table><tr><th>Altın</th><th>Ağırlık</th><th>Ayar</th><th>Saf altın</th></tr>
+    <tr><td>Çeyrek</td><td>1,754 g</td><td>22 (916)</td><td>≈ 1,61 g</td></tr>
+    <tr><td>Yarım</td><td>3,508 g</td><td>22 (916)</td><td>≈ 3,21 g</td></tr>
+    <tr><td>Tam</td><td>7,016 g</td><td>22 (916)</td><td>≈ 6,43 g</td></tr>
+    <tr><td>Cumhuriyet (Ata)</td><td>7,216 g</td><td>22 (916)</td><td>≈ 6,61 g</td></tr>
+    <tr><td>İkibuçukluk</td><td>17,54 g</td><td>22 (916)</td><td>≈ 16,07 g</td></tr>
+    <tr><td>Beşlik</td><td>35,08 g</td><td>22 (916)</td><td>≈ 32,13 g</td></tr></table>
+    <p class="muted" style="font-size:13px">Kaynak: Darphane ve Damga Matbaası Genel Müdürlüğü. Ayrıntılar: <a href="/rehber/ceyrek-altin-kac-gram.html">çeyrek altın kaç gram?</a></p>
+  </article>
+
+  <h2>Sık sorulan sorular</h2>
+  <details><summary>Bilezikte gramı nereden bileceğim?</summary><p>Bileziği alırken verilen faturada gramı yazar. Fatura yoksa ev tipi hassas bir mutfak terazisiyle yaklaşık ağırlığı bulabilirsin; kesin ağırlık için kuyumcuda tartılması gerekir. Bileziklerin çoğu 22 ayardır, iç kısmındaki 916 damgasından kontrol edebilirsin.</p></details>
+  <details><summary>Kuyumcu neden hesaplanan değerden az veriyor?</summary><p>Kuyumcu, aldığı altını tekrar satana ya da eritene kadar fiyat riski taşır ve bir kâr payı ekler. Bu yüzden alış fiyatı has değerin biraz altındadır. Birkaç kuyumcudan teklif almak, en iyi fiyatı bulmanın en kolay yoludur.</p></details>
+  <details><summary>Eski tarihli çeyrekler daha mı az eder?</summary><p>Darphane'ye göre basım yılı ağırlığı ve ayarı değiştirmez. Ancak bazı kuyumcular eski ya da yıpranmış çeyreklere daha düşük fiyat verebilir. Böyle bir durumda başka bir kuyumcudan da teklif almak faydalıdır.</p></details>
+  <details><summary>Girdiğim bilgiler kaydediliyor mu?</summary><p>Hayır. Hesaplama tamamen tarayıcında yapılır. Yazdığın sayılar yalnızca bağlantıyı paylaşmak istersen sayfa adresine eklenir.</p></details>
+</main>
+<div class="toast" id="toast"></div>
+<footer><div class="wrap"><a href="/">Canlı fiyatlar</a><a href="/kuyumcu-fiyat-hesaplama.html">Kuyumcu hesabı</a><a href="/gecmis-yatirim.html">Geçmişte alsaydım</a><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
+<div style="margin-top:8px">Has altın fiyatı Kapalıçarşı (Harem Altın) yayınından, alınamazsa xaus.com ve Binance üzerinden hesaplanır. © Piyasa Nabzı</div></div></footer>
+
+<script>
+(function(){
+  const $=id=>document.getElementById(id);
+  const OZ=31.1034768, K22=0.916;
+  const fTL=(v,d=0)=>new Intl.NumberFormat("tr-TR",{style:"currency",currency:"TRY",minimumFractionDigits:d,maximumFractionDigits:d}).format(v);
+  const fN=(v,d)=>new Intl.NumberFormat("tr-TR",{maximumFractionDigits:d}).format(v);
+  function num(v){ v=String(v||"").trim().replace(/\s/g,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); return parseFloat(v); }
+
+  // pure: adet ya da gram başına saf altın; cut: kuyumcunun alışta kestiği tahmini pay [en az, en çok] %
+  const P=[
+    {k:"c",n:"Çeyrek altın",d:"1,754 g · 22 ayar",u:"adet",pure:1.754*K22,cut:[2,5]},
+    {k:"y",n:"Yarım altın",d:"3,508 g · 22 ayar",u:"adet",pure:3.508*K22,cut:[2,5]},
+    {k:"t",n:"Tam altın",d:"7,016 g · 22 ayar",u:"adet",pure:7.016*K22,cut:[2,5]},
+    {k:"a",n:"Cumhuriyet (Ata) altını",d:"7,216 g · 22 ayar",u:"adet",pure:7.216*K22,cut:[2,5]},
+    {k:"i",n:"İkibuçukluk",d:"17,54 g · 22 ayar",u:"adet",pure:17.54*K22,cut:[2,5]},
+    {k:"b5",n:"Beşlik",d:"35,08 g · 22 ayar",u:"adet",pure:35.08*K22,cut:[2,5]},
+    {k:"g",n:"Gram altın",d:"24 ayar · toplam gram",u:"gram",pure:1,cut:[2,4]},
+    {k:"bz",n:"22 ayar bilezik",d:"toplam gram",u:"gram",pure:K22,cut:[3,7]},
+    {k:"t14",n:"14 ayar takı",d:"kolye, küpe… toplam gram",u:"gram",pure:0.585,cut:[5,10]}
+  ];
+  const q=new URLSearchParams(location.search);
+  const box=$("items");
+  P.forEach(p=>{
+    const step=p.u==="adet"?1:0.5;
+    const d=document.createElement("div"); d.className="it"; d.id="r_"+p.k;
+    d.innerHTML=`<div class="nm">${p.n}<small>${p.d}</small></div>
+      <div class="stp"><button type="button" aria-label="${p.n} azalt">−</button>
+      <input id="q_${p.k}" inputmode="decimal" autocomplete="off" aria-label="${p.n} ${p.u==="adet"?"adet":"gram"}" placeholder="0">
+      <button type="button" aria-label="${p.n} artır">+</button></div>`;
+    box.appendChild(d);
+    const inp=d.querySelector("input"), [mi,pl]=d.querySelectorAll("button");
+    const v0=num(q.get(p.k)); if(v0>0) inp.value=fN(v0,2);
+    const bump=s=>{ const v=Math.max(0,(num(inp.value)||0)+s); inp.value=v?fN(v,2):""; run(); };
+    mi.onclick=()=>bump(-step); pl.onclick=()=>bump(step);
+    inp.addEventListener("input",run);
+  });
+  let gram=null, liveOK=false, when=null;
+
+  function vals(){ const o={}; P.forEach(p=>{ const v=num($("q_"+p.k).value); if(v>0) o[p.k]=v; }); return o; }
+  function run(){
+    $("live").innerHTML = gram ? `Güncel has altın (gram): <b>${fTL(gram,2)}</b>${when?` · ${when}`:""}${liveOK?"":" · canlı fiyat alınamadı"}` : (liveOK===null?"Canlı fiyat alınamadı. Lütfen biraz sonra tekrar dene.":"Güncel altın fiyatı yükleniyor…");
+    const v=vals(), out=$("out");
+    P.forEach(p=>$("r_"+p.k).classList.toggle("on",!!v[p.k]));
+    // adresi güncelle (paylaşım için)
+    const u=new URL(location.href); P.forEach(p=>u.searchParams.delete(p.k)); Object.entries(v).forEach(([k,x])=>u.searchParams.set(k,String(x)));
+    history.replaceState(null,"",u.pathname+(u.search||""));
+    out.innerHTML=""; $("share").hidden=true;
+    if(!gram) return;
+    const keys=Object.keys(v);
+    if(!keys.length){ out.innerHTML=`<div class="total"><div class="lab">Toplam değer</div><div class="big">${fTL(0)}</div><p>Yukarıdan altınlarının sayısını ya da gramını yaz.</p></div>`; return; }
+    let has=0, lo=0, hi=0, pureT=0; const rows=[];
+    P.forEach(p=>{ if(!v[p.k]) return;
+      const pg=p.pure*v[p.k], val=pg*gram; has+=val; pureT+=pg;
+      lo+=val*(1-p.cut[1]/100); hi+=val*(1-p.cut[0]/100);
+      rows.push([`${fN(v[p.k],2)} ${p.u==="adet"?"adet":"g"} ${p.n.toLowerCase()}`, `${fTL(val)}<small>${fN(pg,2)} g saf altın</small>`]);
+    });
+    out.innerHTML=`<div class="total"><div class="lab">Bugünkü toplam değer (has altın)</div><div class="big">${fTL(has)}</div>
+      <p>İçinde toplam <b>${fN(pureT,2)} gram</b> saf altın var. Kuyumcuya bozdurursan yaklaşık teklif: <b>${fTL(lo)} – ${fTL(hi)}</b></p></div>
+      <div class="rows">${rows.map(([a,b])=>`<div><span>${a}</span><b>${b}</b></div>`).join("")}</div>`;
+    const txt=`Düğün altınlarım bugün yaklaşık ${fTL(has)} ediyor. Sen de hesapla: ${location.href}`;
+    $("wa").href="https://wa.me/?text="+encodeURIComponent(txt); $("share").hidden=false;
+  }
+  $("reset").onclick=()=>{ P.forEach(p=>$("q_"+p.k).value=""); run(); };
+  function toast(m){ const t=$("toast"); t.textContent=m; t.classList.add("on"); setTimeout(()=>t.classList.remove("on"),1800); }
+  $("copy").onclick=async()=>{ try{ await navigator.clipboard.writeText(location.href); toast("Bağlantı kopyalandı"); }catch(e){ toast("Kopyalanamadı"); } };
+  $("wa").addEventListener("click",()=>{ try{ gtag("event","share",{method:"whatsapp",content_type:"dugun_altini"}); }catch(e){} });
+
+  async function j(url,ms=8000){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms); try{ const r=await fetch(url,{signal:c.signal,cache:"no-store"}); if(!r.ok) throw new Error(r.status); return await r.json(); } finally{ clearTimeout(t); } }
+  async function usdtry(){ for(const h of ["https://data-api.binance.vision","https://api.binance.com","https://api1.binance.com"]){ try{ const d=await j(h+"/api/v3/ticker/price?symbol=USDTTRY"); if(+d.price>0) return +d.price; }catch(e){} } return null; }
+  // Kapalıçarşı has altın fiyatı (Harem Altın yayını); alınamazsa uluslararası fiyattan hesap
+  function harem(){ return new Promise(res=>{ let w, done=false; const fin=v=>{ if(done) return; done=true; try{ w.close(); }catch(_){} res(v); };
+    try{ w=new WebSocket("wss://hrmsocketonly.haremaltin.com/socket.io/?EIO=4&transport=websocket"); }catch(e){ return res(null); }
+    w.onmessage=e=>{ const m=String(e.data); if(m==="2"){ w.send("3"); return; } if(m[0]==="0"){ w.send("40"); return; }
+      if(m.startsWith("42")){ try{ const [ev,p]=JSON.parse(m.slice(2)); const x=ev==="price_changed"&&p&&p.data&&p.data.ALTIN; if(x&&+x.satis>0) fin(+x.satis); }catch(_){} } };
+    w.onerror=()=>fin(null); setTimeout(()=>fin(null),8000); }); }
+  async function live(){
+    const [u,g,h]=await Promise.all([usdtry(), j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null), harem()]);
+    let v=null;
+    if(g&&+g.spot_usd_oz>0&&u) v=g.spot_usd_oz/OZ*u;
+    else if(g&&g.xau&&+g.xau.price>0) v = g.xau.unit==="gram" ? +g.xau.price : g.xau.price/OZ;
+    if(h && (!v || Math.abs(h/v-1)<0.15)) v=h;
+    if(v){ gram=v; liveOK=true; when=new Date().toLocaleTimeString("tr-TR",{hour:"2-digit",minute:"2-digit"}); } else if(!gram) liveOK=null;
+    run();
+  }
+  run(); live(); setInterval(live,60000);
+})();
+</script>
+</body>
+</html>

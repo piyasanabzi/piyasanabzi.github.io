@@ -118,6 +118,7 @@ urls.append(page("hakkimizda.html","Hakkımızda","Piyasa Nabzı nedir, fiyatlar
 <li>Son 24 saat ve 7 günlük grafikler, altın hesaplayıcı</li>
 <li><a href="/gecmis-yatirim.html">Geçmiş yatırım hesaplayıcısı</a>: geçmişte altın, dolar, euro ya da bitcoin alsaydın bugün ne olurdu?</li>
 <li><a href="/kuyumcu-fiyat-hesaplama.html">Kuyumcu fiyatı hesaplama</a>: kuyumcunun fiyatındaki işçilik ve farkı gör</li>
+<li><a href="/dugun-altini-hesaplama.html">Düğün altını hesaplama</a>: çeyrek, yarım, tam altın ve bileziklerinin bugünkü toplam değeri</li>
 <li>Seçtiğin fiyat hedefe ulaşınca haber veren fiyat alarmı</li>
 <li>Giriş yaparak varlıklarını ve borçlarını ekleyip kâr/zarar durumunu görebileceğin bir takip bölümü</li></ul>
 <h2>Fiyatlar nereden geliyor?</h2>
@@ -150,7 +151,8 @@ urls.append(page("iletisim.html","İletişim","Piyasa Nabzı ile iletişime geç
 <h2>Bize ne yazabilirsin?</h2>
 <ul><li>Fiyatlarda gördüğün bir hata veya gecikme</li><li>Sitede görmek istediğin yeni bir özellik</li><li>Rehber yazılarıyla ilgili soru ve öneriler</li><li>Reklam ve iş birliği talepleri</li></ul>
 <p class="note">Not: Kişisel yatırım tavsiyesi veremiyoruz. Hesabın ve varlık kayıtların yalnızca kendi cihazında saklandığı için, unutulan şifreleri sıfırlayamıyoruz.</p>""",article=False))
-urls[1:1]=[SITE+"/gecmis-yatirim.html",SITE+"/kuyumcu-fiyat-hesaplama.html"]  # elle yazılmış sayfalar (gecmis verisi: _kaynak/gecmis_veri.py)
+LM[SITE+"/dugun-altini-hesaplama.html"]="2026-11-26"
+urls[1:1]=[SITE+"/dugun-altini-hesaplama.html",SITE+"/gecmis-yatirim.html",SITE+"/kuyumcu-fiyat-hesaplama.html"]  # elle yazılmış sayfalar (gecmis verisi: _kaynak/gecmis_veri.py)
 exec(open(os.path.join(HERE,"takvim.py")).read())  # ekonomi-takvimi.html + takvim.js
 sm='<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n'+"".join(f"  <url><loc>{u}</loc><lastmod>{LM.get(u,TODAY)}</lastmod></url>\n" for u in urls)+"</urlset>\n"
 open(ROOT+"/sitemap.xml","w").write(sm)
