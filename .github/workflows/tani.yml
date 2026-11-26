@@ -5,20 +5,14 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - run: |
-          mkdir /tmp/n && cd /tmp/n && npm i -s socket.io-client@4 >/dev/null 2>&1
-          cat > s.js <<'JS'
-          const {io}=require("socket.io-client");
-          const org=process.argv[2];
-          const s=io("wss://hrmsocketonly.haremaltin.com:443",{transports:["websocket"],extraHeaders:{Origin:org}});
-          let done=false;
-          s.on("connect",()=>console.log(org,"CONNECTED"));
-          s.on("connect_error",e=>console.log(org,"ERR",e.message));
-          s.on("price_changed",d=>{ if(done) return; done=true; console.log("META",JSON.stringify(d.meta)); for(const k in d.data){ const x=d.data[k]; console.log(k, x.alis, x.satis, x.tarih||"", JSON.stringify(x).slice(0,160)); } });
-          setTimeout(()=>process.exit(0),12000);
-          JS
-          node s.js https://piyasanabzi.site
-          node s.js https://www.haremaltin.com
-          echo "=== TRUNCGIL"
-          curl -sS "https://finans.truncgil.com/v4/today.json?t=$(date +%s)" | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('Update_Date'));[print(k,d[k]['Buying'],d[k]['Selling']) for k in ['USD','EUR','GBP','GRA','HAS','CEYREKALTIN','YARIMALTIN','TAMALTIN','CUMHURIYETALTINI','ATAALTIN','GUMUS','14AYARALTIN'] if k in d]"
-          echo "=== XAUS"; curl -sS "https://xaus.com/api/v1/spot" | head -c 120; echo
-          echo "=== BINANCE"; curl -sS "https://data-api.binance.vision/api/v3/ticker/price?symbols=%5B%22USDTTRY%22,%22EURUSDT%22%5D"; echo
+          UA="Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124 Mobile Safari/537.36"
+          curl -sS -A "$UA" https://www.haremaltin.com/ -o /tmp/h.html
+          python3 - <<'PY'
+          import re,html
+          s=open('/tmp/h.html',encoding='utf-8',errors='ignore').read()
+          for code in ['ALTIN','KULCEALTIN','CEYREK_YENI','TEK_YENI','ATA_YENI','USDTRY','GUMUSTRY','AYAR22']:
+              for m in list(re.finditer(r'%s'%code,s))[:3]:
+                  seg=s[max(0,m.start()-400):m.start()+100]
+                  t=re.sub(r'<[^>]+>',' ',seg); t=re.sub(r'\s+',' ',html.unescape(t))
+                  print(code,'::',t[-260:])
+          PY
