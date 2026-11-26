@@ -7,18 +7,7 @@ jobs:
       - run: |
           UA="Mozilla/5.0 (Linux; Android 14) AppleWebKit/537.36 Chrome/124 Mobile Safari/537.36"
           curl -sS -A "$UA" https://www.haremaltin.com/ -o /tmp/h.html
-          echo "=== JS ctx"; grep -n -A25 "function fiyat_baglan\|fiyat_baglan *=" /tmp/h.html | head -60
-          grep -o 'src="[^"]*\.js[^"]*"' /tmp/h.html | head -20
-          mkdir /tmp/n && cd /tmp/n && npm i -s socket.io-client@4 >/dev/null 2>&1
-          cat > s.js <<'JS'
-          const {io}=require("socket.io-client");
-          const s=io("https://socketonly.haremaltin.com",{transports:["websocket"],extraHeaders:{Origin:"https://www.haremaltin.com"}});
-          let n=0;
-          s.on("connect",()=>console.log("CONNECTED"));
-          s.on("connect_error",e=>console.log("ERR",e.message));
-          s.onAny((ev,...a)=>{ if(n++<3) console.log("EV",ev,JSON.stringify(a).slice(0,6000)); });
-          setTimeout(()=>process.exit(0),15000);
-          JS
-          node s.js
-          echo "=== TRUNCGIL"
-          curl -sS "https://finans.truncgil.com/v4/today.json?t=$(date +%s)" | python3 -c "import json,sys;d=json.load(sys.stdin);print(d.get('Update_Date'));[print(k,d[k]['Buying'],d[k]['Selling']) for k in ['USD','EUR','GBP','GRA','HAS','CEYREKALTIN','YARIMALTIN','TAMALTIN','CUMHURIYETALTINI','GUMUS'] if k in d]"
+          curl -sS -A "$UA" https://www.haremaltin.com/assets/js/functions.js -o /tmp/f.js
+          echo "=== HTML socket ctx"; grep -n -B3 -A20 "socketonly\|fiyat_baglan" /tmp/h.html | cut -c1-300 | head -80
+          echo "=== F.JS"; grep -n -B3 -A25 "socket\|io(" /tmp/f.js | cut -c1-300 | head -120
+          echo "=== socket.io version"; curl -sS -A "$UA" https://www.haremaltin.com/assets/js/socket.io/dist/socket.io.js | head -c 300
