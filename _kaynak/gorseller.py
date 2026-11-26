@@ -149,6 +149,15 @@ _g("tcmb-faiz-karari-nedir", "TCMB faiz artırırsa genelde…",
    + _t(200, 184, "→", 32, _INK, 800, "middle") + _t(400, 184, "→", 32, _INK, 800, "middle")
    + _t(300, 300, "Faiz indiriminde çoğu zaman tersi olur.", 21, _INK, 700, "middle"),
    "TCMB faiz artırınca TL mevduatının cazipleştiğini ve dolar talebinin azalabileceğini gösteren akış", "Kararlar genellikle saat 14:00'te açıklanır; asıl etki beklentiden farklı kararlarda görülür.")
+_g("dugun-altini-nasil-bozdurulur", "Bozdurmadan önce",
+   _check(["Önce hesapla", "Teklif topla", "Alış fiyatına bak", "Hafta içi git", "Kimliğini al", "Parayı say"]),
+   "Düğün altını bozdururken yapılması gereken altı adım", "Önce değeri hesapla, birkaç kuyumcudan teklif al; bilezikte işçilik geri gelmez.")
+_g("hurda-altin-nedir", "Hurda altının değeri",
+   _formula([("Ağırlık", "gram"), ("Milyem", "÷ 1000"), ("Has altın", "₺ / g")], ["×", "×"], "= Has değer (₺)"),
+   "Hurda altın değeri: ağırlık çarpı milyem bölü bin çarpı has altın fiyatı", "Örnek: 10 g 14 ayar (585) hurda ≈ 5,85 g saf altın içerir. Kuyumcu teklifi genelde biraz altındadır.")
+_g("altin-nasil-saklanir", "Evde mi, bankada mı?",
+   _compare(("Evde", ["Her an elinde", "Ek ücret yok", "Hırsızlık riski", "Sigortayı kontrol et"]), ("Bankada", ["Kiralık kasa", "Yıllık ücret", "Saat kısıtı", "Sözleşmeyi oku"]), _BLUE),
+   "Altını evde saklamak ile banka kiralık kasasında saklamayı karşılaştıran iki kart", "Hangisini seçersen seç, faturaları ve ambalajları sakla, altınlarının listesini tut.")
 def gorsel_ekle(slug, html):
     if slug not in GORSEL: return html
     alt, cap = GORSEL[slug]

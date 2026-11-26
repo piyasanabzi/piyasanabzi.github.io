@@ -69,5 +69,46 @@ def fmt(d):
     y,m,g=d.split("-"); ay=["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
     return f"{int(g)} {ay[int(m)-1]} {y}"
 CTA='<div class="box gold"><b>Güncel fiyatlar:</b> Gram, çeyrek, yarım ve tam altının anlık fiyatlarını ana sayfada saniye saniye takip edebilirsin.<br><a class="cta" href="/">Canlı altın fiyatlarına git →</a></div>'
-def more(skip):
-    return '<h2>Diğer rehberler</h2><div class="more">'+"".join(f'<a href="/rehber/{a[0]}.html">{a[1]}</a>' for a in ARTS[::-1] if a[0]!=skip)+'</div>'
+# İlgili rehberler: her yazının konu etiketleri. Ortak etiketi en çok olan 4 yazı gösterilir.
+# Yeni yazı eklerken buraya da bir satır ekle (yoksa son eklenen yazılar gösterilir).
+KONU={
+ "ceyrek-altin-kac-gram":{"altin","sarrafiye"},
+ "gram-altin-nasil-hesaplanir":{"altin","hesap"},
+ "22-ayar-24-ayar-farki":{"altin","ayar","hesap"},
+ "gram-altin-mi-ceyrek-altin-mi":{"altin","sarrafiye","birikim"},
+ "altin-alirken-dikkat-edilmesi-gerekenler":{"altin","kuyumcu"},
+ "ons-altin-nedir":{"altin","hesap","piyasa"},
+ "dolar-kuru-neden-yukselir":{"doviz","makro"},
+ "gumus-nedir-gram-gumus":{"gumus","birikim","hesap"},
+ "bilezik-alirken-iscilik":{"altin","kuyumcu","ayar"},
+ "bitcoin-nedir":{"kripto","birikim"},
+ "euro-dolar-paritesi-nedir":{"doviz","piyasa"},
+ "altin-hesabi-mi-fiziki-altin-mi":{"altin","birikim","saklama"},
+ "enflasyon-nedir":{"makro","birikim"},
+ "brent-ve-wti-petrol-farki":{"piyasa","makro"},
+ "kuyumcu-alis-satis-farki":{"altin","kuyumcu","sarrafiye"},
+ "dolar-mi-altin-mi":{"doviz","altin","birikim"},
+ "fed-faiz-karari-nedir":{"makro","faiz","doviz"},
+ "altin-fiyati-hafta-sonu":{"altin","piyasa","kuyumcu"},
+ "borsa-nedir":{"borsa","birikim"},
+ "tcmb-faiz-karari-nedir":{"makro","faiz","doviz"},
+ "dugun-altini-nasil-bozdurulur":{"altin","kuyumcu","sarrafiye","dugun"},
+ "hurda-altin-nedir":{"altin","kuyumcu","ayar"},
+ "altin-nasil-saklanir":{"altin","saklama","birikim","dugun"},
+}
+ARACLAR=[  # (etiketler, adres, ad, kısa açıklama)
+ ({"dugun","sarrafiye","saklama"},"/dugun-altini-hesaplama.html","Düğün altını hesaplama","Çeyrek, yarım, tam ve bileziklerinin bugünkü değeri"),
+ ({"kuyumcu","ayar","sarrafiye"},"/kuyumcu-fiyat-hesaplama.html","Kuyumcu fiyatı hesaplama","Kuyumcunun fiyatı uygun mu, işçilik ne kadar?"),
+ ({"birikim","doviz","kripto","gumus","makro","borsa"},"/gecmis-yatirim.html","Geçmişte alsaydım ne olurdu?","Altın, dolar, euro ve bitcoin için geçmiş getiri"),
+ ({"faiz","makro"},"/ekonomi-takvimi.html","Ekonomi takvimi","Faiz kararı ve enflasyon açıklama tarihleri"),
+]
+def more(skip, n=4):
+    k=KONU.get(skip,set()); sira={a[0]:i for i,a in enumerate(ARTS)}
+    aday=[a for a in ARTS if a[0]!=skip]
+    aday.sort(key=lambda a:(-len(k & KONU.get(a[0],set())), -sira[a[0]]))
+    ilgili="".join(f'<a href="/rehber/{a[0]}.html">{a[1]}</a>' for a in aday[:n])
+    araclar=[t for t in ARACLAR if k & t[0]][:2]
+    ar="".join(f'<a href="{u}">{ad}<div class="note" style="font-weight:400;margin-top:4px">{acik}</div></a>' for _,u,ad,acik in araclar)
+    s='<h2>İlgili rehberler</h2><div class="more">'+ilgili+'</div>'
+    if ar: s+='<h2>Hesaplama araçları</h2><div class="more">'+ar+'</div>'
+    return s+f'<p><a href="/rehber/">Tüm rehberleri gör ({len(ARTS)}) →</a></p>'

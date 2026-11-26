@@ -8,6 +8,7 @@ ve ana sayfadaki "Rehberler" listesi bu klasördeki betikle üretilir.
    Örnek için `yazilar/02-bilezik-bitcoin-parite.py` dosyasına bak:
    - `ARTS += [("slug","Başlık","Açıklama (meta description)","YYYY-AA-GG")]`
    - `A["slug"]="""<p>...</p>...""" + CTA + """<p class="note">... yatırım tavsiyesi değildir.</p>"""`
+   - `build.py` içindeki `KONU` sözlüğüne yazının konu etiketlerini ekle; yazının altındaki "İlgili rehberler" ve "Hesaplama araçları" bu etiketlere göre seçilir.
 2. Depo kökünde çalıştır: `python3 _kaynak/content.py`
 3. Mevcut slug'ları ve sayfa adreslerini asla değiştirme (Google sıralaması bozulur).
 4. `index.html` içindeki canlı fiyat kodunu bu betik değiştirmez; yalnızca "Rehberler" listesini günceller.
@@ -23,3 +24,6 @@ Ayda bir, depo kökünde çalıştır: `python3 _kaynak/gecmis_veri.py` (yeni bi
 ## Menü ve görseller
 - `nav.py`: Tüm sayfalarda `</header>` sonrasına üst menü ekler (`<!--nav-->` blokları). Menü öğeleri `MENU` listesinde.
 - `gorseller.py`: Her rehber için `rehber/img/<slug>.svg` görselini çizer ve yazının ilk paragrafından sonra ekler. Yeni yazıya görsel eklemek için `_g(...)` satırı ekle.
+
+## Düğün altını hesaplama (`dugun-altini-hesaplama.html`)
+Sayfa elle yazılmıştır (kuyumcu hesabıyla aynı stil ve canlı fiyat kodu). Girilen değerler paylaşım için adres satırına eklenir (`?c=10&bz=40` gibi).
