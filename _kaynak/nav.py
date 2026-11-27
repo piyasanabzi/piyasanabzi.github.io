@@ -7,6 +7,7 @@ MENU = [
     ("/rehber/", "Rehberler"),
     ("/ekonomi-takvimi.html", "Ekonomi takvimi"),
     ("/kuyumcu-fiyat-hesaplama.html", "Kuyumcu hesabı"),
+    ("/kuyumcu-pazari/", "Kuyumcu Pazarı"),
     ("/gecmis-yatirim.html", "Geçmiş yatırım"),
     ("/hakkimizda.html", "Hakkımızda"),
 ]
@@ -23,6 +24,7 @@ def _aktif(rel):
     rel = rel.replace(os.sep, "/")
     if rel == "index.html": return "/"
     if rel.startswith("rehber/"): return "/rehber/"
+    if rel.startswith("kuyumcu-pazari/"): return "/kuyumcu-pazari/"
     return "/" + rel
 
 
@@ -34,7 +36,7 @@ def nav_html(rel):
 
 def uygula(root):
     n = 0
-    for p in sorted(glob.glob(os.path.join(root, "*.html")) + glob.glob(os.path.join(root, "rehber", "*.html"))):
+    for p in sorted(glob.glob(os.path.join(root, "*.html")) + glob.glob(os.path.join(root, "rehber", "*.html")) + glob.glob(os.path.join(root, "kuyumcu-pazari", "**", "*.html"), recursive=True)):
         rel = os.path.relpath(p, root)
         if os.path.basename(p).startswith("google"): continue
         s = open(p, encoding="utf-8").read()

@@ -36,7 +36,7 @@ FOOT='''<footer><div class="wrap">
 <a href="/">Canlı fiyatlar</a><a href="/rehber/">Rehberler</a><a href="/ekonomi-takvimi.html">Ekonomi takvimi</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
 <div style="margin-top:8px">Bu sitedeki bilgiler genel bilgilendirme amaçlıdır, yatırım tavsiyesi değildir. © Piyasa Nabzı</div></div></footer>'''
 ARTS=[]
-def page(path,title,desc,body,crumb=None,article=True,date=TODAY):
+def page(path,title,desc,body,crumb=None,article=True,date=TODAY,head="",h1=None):
     url=SITE+"/"+path.replace("index.html","")
     cr=""
     if crumb: cr='<div class="crumb"><a href="/">Ana sayfa</a> › '+crumb+'</div>'
@@ -52,13 +52,13 @@ def page(path,title,desc,body,crumb=None,article=True,date=TODAY):
 <meta property="og:title" content="{html.escape(title)}"><meta property="og:description" content="{html.escape(desc)}"><meta property="og:url" content="{url}"><meta property="og:type" content="{'article' if article else 'website'}"><meta property="og:site_name" content="Piyasa Nabzı">
 <meta name="theme-color" content="#0b111c">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%230e1726'/%3E%3Cpath d='M10 40 L22 30 L32 36 L46 20 L54 24' fill='none' stroke='%23f2c14e' stroke-width='6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
-<style>{CSS}</style>{ld}
+<style>{CSS}</style>{ld}{head}
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-M419M3965F"></script>
 <script>window.dataLayer=window.dataLayer||[];function gtag(){{dataLayer.push(arguments);}}gtag("js",new Date());gtag("config","G-M419M3965F");gtag("config","G-LP1EQD8PHJ");</script>
 <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4295900331301338" crossorigin="anonymous"></script>
 </head><body>
 <header><div class="wrap bar"><a class="brand" href="/">{LOGO}Piyasa Nabzı</a><a class="btn" href="/">Canlı fiyatlar</a></div></header>
-<main class="wrap">{cr}<h1>{html.escape(title)}</h1>{meta}<article>{body}</article></main>
+<main class="wrap">{cr}<h1>{html.escape(h1 or title)}</h1>{meta}<article>{body}</article></main>
 {FOOT}</body></html>'''
     p=os.path.join(ROOT,path); os.makedirs(os.path.dirname(p),exist_ok=True)
     open(p,"w").write(h)
