@@ -15,15 +15,17 @@ jobs:
       - name: Yerel Supabase yapilandir
         run: |
           supabase --version
-          mkdir -p /tmp/sb && cd /tmp/sb && supabase init --force >/dev/null 2>&1 || supabase init
+          mkdir -p /tmp/sb && cd /tmp/sb && git init -q
+          supabase --workdir /tmp/sb init < /dev/null || true
+          ls -la /tmp/sb /tmp/sb/supabase
           cp -r $GITHUB_WORKSPACE/supabase/migrations supabase/
           mkdir -p supabase/templates && cp $GITHUB_WORKSPACE/supabase/templates/*.html supabase/templates/
           python3 $GITHUB_WORKSPACE/_test/sb_ayar.py supabase/config.toml
       - name: Supabase baslat
         run: |
           cd /tmp/sb
-          supabase start -x realtime,studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
-          supabase status -o env > /tmp/sb.env
+          supabase --workdir /tmp/sb start -x realtime,studio,imgproxy,edge-runtime,logflare,vector,supavisor,postgres-meta
+          supabase --workdir /tmp/sb status -o env > /tmp/sb.env
           sed -E 's/(KEY|SECRET|JWT)[A-Z_]*="?([^"]{0,6})[^"]*"?/\1=\2.../' /tmp/sb.env
       - run: pip install -q playwright && python3 -m playwright install --with-deps chromium >/dev/null
       - name: Veritabani guvenlik testleri (gercek Supabase)
@@ -31,7 +33,7 @@ jobs:
           set -a; . /tmp/sb.env; set +a
           python3 _test/rls_test.py "$DB_URL" supabase/migrations
       - name: Veritabanini sifirla
-        run: cd /tmp/sb && supabase db reset
+        run: cd /tmp/sb && supabase --workdir /tmp/sb db reset
       - name: Uctan uca test
         run: |
           set -a; . /tmp/sb.env; set +a
@@ -47,5 +49,5 @@ jobs:
         run: |
           git checkout -- kuyumcu-pazari/ayar.js kuyumcu-pazari/panel/index.html kuyumcu-pazari/yonetim/index.html
           git checkout -- _kaynak/kuyumcu kuyumcu-pazari sitemap.xml 2>/dev/null || true
-          git clean -fdq kuyumcu-pazari
+          git clean -fdq kuyumcu-pazari supabase/.temp
           cd _kaynak && python3 content.py >/dev/null && python3 nav.py >/dev/null && cd .. && git status --short && test -z "$(git status --short)" && echo "build tekrar uretilebilir, fark yok"
