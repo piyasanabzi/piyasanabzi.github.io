@@ -20,7 +20,7 @@ jobs:
           ls -la /tmp/sb /tmp/sb/supabase
           cp -r $GITHUB_WORKSPACE/supabase/migrations supabase/
           mkdir -p supabase/templates && cp $GITHUB_WORKSPACE/supabase/templates/*.html supabase/templates/
-          python3 $GITHUB_WORKSPACE/_test/sb_ayar.py supabase/config.toml
+          cat supabase/config.jsonc 2>/dev/null | grep -v '^\s*//' | head -400; python3 $GITHUB_WORKSPACE/_test/sb_ayar.py supabase
       - name: Supabase baslat
         run: |
           cd /tmp/sb
