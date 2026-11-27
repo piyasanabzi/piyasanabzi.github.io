@@ -5,6 +5,7 @@ BASE="http://localhost:8765"
 FAKE=["42,31","4.085,40","91.250","Önizleme"]
 res=[]
 def rec(n,ok,d=""): res.append((n,ok,d)); print(("GEÇTİ " if ok else "KALDI ")+n+(" — "+str(d)[:400] if d else ""),flush=True)
+ALT="""(n)=>{ const c=[...document.querySelectorAll('.c')].find(e=>e.querySelector('.n span').textContent===n); const a=c&&c.querySelector('.alt'); return a&&!a.hidden ? a.innerText.replace(/\\n/g,' | ') : ''; }"""
 CARD="""(n)=>{ const c=[...document.querySelectorAll('.c')].find(e=>e.querySelector('.n span').textContent===n); if(!c) return null; return {p:c.querySelector('.p').textContent, ab:(c.querySelector('.ab')||{}).textContent||'', ch:c.querySelector('.ch').textContent, upd:c.querySelector('.upd').innerText.replace(/\\n/g,' | '), fb:c.classList.contains('fb'), eski:c.classList.contains('eski')}; }"""
 BAN="(()=>{const b=document.getElementById('durum');return b.hidden?'':b.textContent})()"
 NO_HAREM="(()=>{const RW=window.WebSocket; window.WebSocket=function(u,p){ if(String(u).includes('haremaltin')) throw new Error('engellendi'); return new RW(u,p); }; window.WebSocket.prototype=RW.prototype; Object.assign(window.WebSocket,RW);})();"
@@ -47,16 +48,17 @@ async def main():
         await pg.route("**/*",kes); await ctx.add_init_script("(()=>{const RW=window.WebSocket; window.WebSocket=function(){ throw new Error('kapali'); };})();")
         await pg.reload(); await pg.wait_for_timeout(11000)
         g=await pg.evaluate(CARD,"Gram altın")
-        rec("Gerçek ağ / kaynaklar kapalı + önbellek: son doğrulanmış", "Son doğrulanmış" in g["upd"] and g["eski"], g)
+        rec("Gerçek ağ / kaynaklar kapalı + önbellek: son alınan Kapalıçarşı fiyatı", "Son alınan Kapalıçarşı fiyatı" in g["upd"] and g["eski"] and "%" not in g["ch"], g)
         rec("Gerçek ağ / kaynaklar kapalı + önbellek: uyarı", "son doğrulanmış" in await pg.evaluate(BAN), await pg.evaluate(BAN))
         rec("Gerçek ağ / kaynaklar kapalı: JS hatası yok", not errs, errs)
         await pg.screenshot(path="ss_onbellek.png"); await ctx.close()
         # 4) Harem engelli → yedek kaynak
         ctx,pg,errs=await yeni(br,init=NO_HAREM)
         await pg.goto(BASE+"/index.html"); await pg.wait_for_timeout(15000)
-        g=await pg.evaluate(CARD,"Gram altın"); u=await pg.evaluate(CARD,"Dolar"); b=await pg.evaluate(BAN)
-        rec("Gerçek ağ / Harem yok: gram yedek kaynak + turuncu", g and g["fb"] and "Harem" not in g["upd"], g)
-        rec("Gerçek ağ / Harem yok: dolar yedek kaynak", u and u["fb"], u)
+        g=await pg.evaluate(CARD,"Gram altın"); u=await pg.evaluate(CARD,"Dolar"); b=await pg.evaluate(BAN); ga=await pg.evaluate(ALT,"Gram altın"); ua=await pg.evaluate(ALT,"Dolar")
+        rec("Gerçek ağ / Harem yok: gram ana değeri farklı piyasayla doldurulmadı", g and g["p"]=="—" and "Kapalıçarşı fiyatı şu an mevcut değil" in g["ch"], g)
+        rec("Gerçek ağ / Harem yok: gram alternatifi ayrı satırda", "Alternatif kaynak" in ga and "%" not in ga, ga)
+        rec("Gerçek ağ / Harem yok: dolar alternatifi ayrı satırda", u and u["p"]=="—" and "Alternatif kaynak" in ua, ua)
         rec("Gerçek ağ / Harem yok: uyarı şeridi", "Harem" in b, b)
         rec("Gerçek ağ / Harem yok: JS hatası yok", not errs, errs)
         await pg.screenshot(path="ss_harem_yok.png"); await ctx.close()
