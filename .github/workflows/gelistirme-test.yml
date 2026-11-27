@@ -1,0 +1,20 @@
+name: Gelistirme dali gercek ag testi
+on:
+  push:
+    branches: [gelistirme-test]
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with: { ref: gelistirme-test }
+      - run: pip install -q playwright
+      - name: Siteyi yerelde sun ve test et
+        run: |
+          python3 -m http.server 8765 >/dev/null 2>&1 &
+          sleep 2
+          cd _test && python3 gercek_ag.py
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with: { name: ekran-goruntuleri, path: "_test/*.png" }
