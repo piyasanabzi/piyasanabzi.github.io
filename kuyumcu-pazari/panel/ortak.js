@@ -78,7 +78,7 @@
     return z ? z.ad : slug;
   }
 
-  var GUNLER = [["pzt", "Pazartesi"], ["sal", "Salı"], ["car", "Çarşamba"], ["per", "Perşembe"], ["cum", "Cuma"], ["cmt", "Cumartesi"], ["paz", "Pazar"]];
+  var GUNLER = [["pzt", "Pazartesi", "Pzt"], ["sal", "Salı", "Sal"], ["car", "Çarşamba", "Çar"], ["per", "Perşembe", "Per"], ["cum", "Cuma", "Cum"], ["cmt", "Cumartesi", "Cmt"], ["paz", "Pazar", "Paz"]];
   // Çalışma saatleri düzenleyici: her gün için açılış-kapanış ya da kapalı
   function saatEditoru(deger) {
     deger = deger || {};
@@ -172,7 +172,7 @@
       ek || null));
   }
 
-  window.KP = { h: h, bosalt: bosalt, bildirim: bildirim, islem: islem, tl: tl, zaman: zaman, saatOnce: saatOnce,
+  window.KP = { h: h, ekle: ekle, bosalt: bosalt, bildirim: bildirim, islem: islem, tl: tl, zaman: zaman, saatOnce: saatOnce,
     iller: iller, ilIlceSec: ilIlceSec, ilAd: ilAd, ilceAd: ilceAd, GUNLER: GUNLER, saatEditoru: saatEditoru,
     tel: tel, fotoHazirla: fotoHazirla, girisEkrani: girisEkrani, baglantiYok: baglantiYok,
     AYDINLATMA_SURUMU: "kp-panel-aydinlatma-2026-11-27", FIYAT_IZNI_SURUMU: "kp-fiyat-izni-2026-11-27" };

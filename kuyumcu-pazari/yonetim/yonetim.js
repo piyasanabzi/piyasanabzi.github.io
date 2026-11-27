@@ -26,6 +26,13 @@
   function hata(e) { KP.bosalt(kok).appendChild(h("div", { class: "kp-bos" }, h("b", { text: "Hata" }), h("p", { text: e.message }), cikisBtn())); }
   function cikisBtn() { var b = h("button", { type: "button", class: "ikincil kucuk", text: "Çıkış" }); b.addEventListener("click", async function () { await PN.cikis(); basla(); }); return b; }
 
+  // GoTrue QR kodunu kodlanmamış SVG olarak döndürür ('#' karakterleri adresi bozar)
+  function qrUrl(q) {
+    q = String(q || "");
+    var i = q.indexOf("<svg");
+    return i < 0 ? q : "data:image/svg+xml;charset=utf-8," + encodeURIComponent(q.slice(i));
+  }
+
   async function ikiAdim() {
     KP.bosalt(kok);
     var u = await PN.kullanici();
@@ -41,11 +48,11 @@
       for (var i = 0; i < (u.factors || []).length; i++) if (u.factors[i].status !== "verified") { try { await PN.totpSil(u.factors[i].id); } catch (e) {} }
       var yeni = await PN.totpOlustur();
       faktor = yeni;
-      kutu.append(h("p", { text: "Yönetim paneli için iki adımlı doğrulama zorunludur. Telefonunuzdaki doğrulama uygulamasıyla (Google Authenticator, Microsoft Authenticator vb.) bu kodu okutun ya da anahtarı elle girin:" }),
-        h("img", { class: "kp-qr", src: yeni.totp.qr_code, alt: "Doğrulama uygulaması için QR kodu", width: "200", height: "200" }),
-        h("p", null, "Anahtar: ", h("code", { class: "kp-anahtar", text: yeni.totp.secret })));
+      KP.ekle(kutu, [h("p", { text: "Yönetim paneli için iki adımlı doğrulama zorunludur. Telefonunuzdaki doğrulama uygulamasıyla (Google Authenticator, Microsoft Authenticator vb.) bu kodu okutun ya da anahtarı elle girin:" }),
+        h("img", { class: "kp-qr", src: qrUrl(yeni.totp.qr_code), alt: "Doğrulama uygulaması için QR kodu", width: "200", height: "200" }),
+        h("p", null, "Anahtar: ", h("code", { class: "kp-anahtar", text: yeni.totp.secret }))]);
     }
-    kutu.append(f, cikisBtn());
+    KP.ekle(kutu, [f, cikisBtn()]);
     f.addEventListener("submit", KP.islem(b, async function () {
       await PN.totpDogrula(faktor.id, kod.value.replace(/\D/g, ""));
       KP.bildirim("Doğrulandı"); basla();
@@ -106,7 +113,7 @@
     var sat = function (a, b) { return h("tr", null, h("th", { text: a }), h("td", { text: b === null || b === undefined || b === "" ? "—" : String(b) })); };
     el.appendChild(h("table", null, h("tbody", null,
       sat("Yetkili", x.yetkili_ad), sat("Adres", x.adres), sat("Telefon", x.telefon), sat("WhatsApp", x.whatsapp), sat("E-posta", x.eposta),
-      sat("Açıklama", x.aciklama), sat("Saatler", KP.GUNLER.map(function (g) { return g[1].slice(0, 3) + " " + (x.saatler[g[0]] === "kapali" ? "kapalı" : x.saatler[g[0]]); }).join(" · ")),
+      sat("Açıklama", x.aciklama), sat("Saatler", KP.GUNLER.map(function (g) { return g[2] + " " + (x.saatler[g[0]] === "kapali" ? "kapalı" : x.saatler[g[0]]); }).join(" · ")),
       sat("Paket", x.paket), sat("Başvuru", KP.zaman(x.basvuru_at)), sat("Doğrulandı", KP.zaman(x.dogrulandi_at)), sat("Not", x.durum_notu),
       sat("Silme talebi", x.silme_talebi ? KP.zaman(x.silme_talebi) : null))));
     el.appendChild(h("p", { class: "note" }, "Telefonla teyit için: ", h("a", { href: "tel:" + x.telefon, text: x.telefon })));
@@ -148,13 +155,13 @@
       if (fo.length) { try { await PN.depoSil(fo.map(function (f) { return f.yol; })); } catch (e) {} }
       await PN.rpc("yonetici_isletme_sil", { p_id: x.id });
     }, "tehlike");
-    el.append(h("h3", { text: "Karar" }), not, dugmeler);
+    KP.ekle(el, [h("h3", { text: "Karar" }), not, dugmeler]);
 
     var pk = await PN.sec("paketler", { select: "kod,ad,satista", order: "kod" });
     var sec = h("select", null, pk.map(function (p) { return h("option", { value: p.kod, text: p.ad + (p.satista ? "" : " (satışta değil)"), selected: p.kod === x.paket, disabled: !p.satista }); }));
     var pb = h("button", { type: "button", class: "ikincil kucuk", text: "Paketi ata" });
     pb.addEventListener("click", KP.islem(pb, async function () { await PN.rpc("yonetici_paket_ata", { p_id: x.id, p_kod: sec.value }); KP.bildirim("Paket atandı"); }));
-    el.append(h("h3", { text: "Paket" }), h("div", { class: "kp-satir" }, sec, pb));
+    KP.ekle(el, [h("h3", { text: "Paket" }), h("div", { class: "kp-satir" }, sec, pb)]);
   }
 
   async function degisiklikler(el) {
