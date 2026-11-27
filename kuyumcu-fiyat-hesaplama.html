@@ -133,7 +133,7 @@
   <h2>Sık sorulan sorular</h2>
   <details><summary>Fark ne kadar olursa normaldir?</summary><p>Kesin bir kural yoktur; kuyumcudan kuyumcuya ve şehirden şehire değişir. Kabaca, sarrafiye (çeyrek, yarım, tam) ve gram altında birkaç yüzdelik fark olağandır. Burma bilezikte biraz daha, desenli bilezik ve takılarda çok daha yüksek fark görülebilir. Sayfadaki yorum yalnızca kaba bir yol göstericidir.</p></details>
   <details><summary>Altın satarken işçilik geri alınır mı?</summary><p>Genellikle hayır. Kuyumcu altını satın alırken çoğunlukla yalnızca içindeki altının değerini öder, hatta biraz altında teklif verir. Alırken ödediğin işçilik satışta geri gelmez.</p></details>
-  <details><summary>Kuyumcunun fiyatı neden sitedeki değerden düşük olabilir?</summary><p>Sitedeki fiyatlar uluslararası piyasadan hesaplanan gösterge değerlerdir. Kuyumcunun kendi alış maliyeti, kurdaki anlık oynamalar ve stok durumu nedeniyle küçük farklar olabilir. Fiyat has değerin belirgin şekilde altındaysa ürünün ayarını, damgasını ve faturasını mutlaka kontrol et.</p></details>
+  <details><summary>Kuyumcunun fiyatı neden sitedeki değerden düşük olabilir?</summary><p>Bu sayfadaki has altın fiyatı Kapalıçarşı gösterge fiyatıdır (Harem Altın yayını); bu yayına ulaşılamazsa uluslararası fiyattan hesaplanır ve fiyatın altında hangi kaynağın kullanıldığı yazar. Kuyumcunun kendi alış maliyeti, kurdaki anlık oynamalar ve stok durumu nedeniyle küçük farklar olabilir. Fiyat has değerin belirgin şekilde altındaysa ürünün ayarını, damgasını ve faturasını mutlaka kontrol et.</p></details>
 </main>
 <div class="toast" id="toast"></div>
 <footer><div class="wrap"><a href="/">Canlı fiyatlar</a><a href="/gecmis-yatirim.html">Geçmişte alsaydım</a><a href="/rehber/">Rehberler</a><a href="/hakkimizda.html">Hakkımızda</a><a href="/gizlilik.html">Gizlilik Politikası</a><a href="/iletisim.html">İletişim</a>
@@ -160,7 +160,12 @@
     {k:"a14",n:"14 ayar takı",u:"gram",pure:0.585,buy:[20,40],sell:[5,10]}
   ];
   P.forEach(p=>{ const o=document.createElement("option"); o.value=p.k; o.textContent=p.n; $("type").appendChild(o); });
-  let mode="buy", gram=null, liveOK=false;
+  let mode="buy", gram=null, liveOK=false, src=null, srcAt=0, cached=false;
+  // son doğrulanmış has altın fiyatı (yalnızca bu cihazda)
+  try{ const c=JSON.parse(localStorage.getItem("pn-son-kuy")||"null"); if(c&&c.v>0&&Date.now()-c.at<14*24*3600e3){ gram=c.v; src=c.s; srcAt=c.at; cached=true; } }catch(e){}
+  const SRCN={harem:"Harem Altın · Kapalıçarşı has altın",intl:"xaus.com ons × Binance USDT/TRY · uluslararası fiyattan hesaplanan (yedek kaynak, Kapalıçarşı fiyatından farklı olabilir)",xaus:"xaus.com · uluslararası fiyat (yedek kaynak, Kapalıçarşı fiyatından farklı olabilir)"};
+  const fdt=t=>new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(t);
+  const ftm=t=>new Intl.DateTimeFormat("tr-TR",{hour:"2-digit",minute:"2-digit"}).format(t);
 
   const q=new URLSearchParams(location.search);
   if(P.some(p=>p.k===q.get("urun"))) $("type").value=q.get("urun");
@@ -173,7 +178,10 @@
   function run(){
     const p=P.find(x=>x.k===$("type").value);
     $("qtyL").textContent= p.u==="adet" ? "Adet" : "Ağırlık (gram)";
-    $("live").innerHTML = gram ? `Güncel gram altın (24 ayar): <b>${fTL(gram)}</b>${liveOK?"":" · canlı fiyat alınamadı"}` : (liveOK===null?"Canlı fiyat alınamadı. Lütfen biraz sonra tekrar dene.":"Güncel altın fiyatı yükleniyor…");
+    const lv=$("live");
+    if(gram&&!cached){ lv.innerHTML=`Güncel has altın (24 ayar, gram): <b></b><br><small></small>`; lv.querySelector("b").textContent=fTL(gram); lv.querySelector("small").textContent="Canlı · "+ftm(srcAt)+" · "+SRCN[src]; }
+    else if(gram&&cached){ lv.innerHTML=(liveOK===null?"Canlı fiyata şu an ulaşılamıyor. ":"Canlı fiyat yükleniyor… ")+`Son doğrulanmış has altın fiyatı: <b></b><br><small></small>`; lv.querySelector("b").textContent=fTL(gram); lv.querySelector("small").textContent=fdt(srcAt)+" · "+SRCN[src]+" · Hesap bu fiyatla yapıldı."; }
+    else lv.textContent = liveOK===null ? "Altın fiyatı şu an mevcut değil: canlı kaynaklara ulaşılamadı ve bu cihazda kaydedilmiş fiyat yok. Lütfen biraz sonra tekrar dene." : "Güncel altın fiyatı yükleniyor…";
     const qty=num($("qty").value), price=num($("price").value), out=$("out");
     out.innerHTML="";
     if(!gram) return;
@@ -229,15 +237,20 @@
   function harem(){ return new Promise(res=>{ let w, done=false; const fin=v=>{ if(done) return; done=true; try{ w.close(); }catch(_){} res(v); };
     try{ w=new WebSocket("wss://hrmsocketonly.haremaltin.com/socket.io/?EIO=4&transport=websocket"); }catch(e){ return res(null); }
     w.onmessage=e=>{ const m=String(e.data); if(m==="2"){ w.send("3"); return; } if(m[0]==="0"){ w.send("40"); return; }
-      if(m.startsWith("42")){ try{ const [ev,p]=JSON.parse(m.slice(2)); const x=ev==="price_changed"&&p&&p.data&&p.data.ALTIN; if(x&&+x.satis>0) fin(+x.satis); }catch(_){} } };
+      if(m.startsWith("42")){ try{ const [ev,p]=JSON.parse(m.slice(2)); const d=ev==="price_changed"&&p&&p.data; const x=d&&d.ALTIN;
+        if(x&&+x.satis>0) fin({v:+x.satis, ons:d.ONS&&+d.ONS.satis, usd:d.USDTRY&&+d.USDTRY.satis}); }catch(_){} } };
     w.onerror=()=>fin(null); setTimeout(()=>fin(null),8000); }); }
   async function live(){
     const [u,g,h]=await Promise.all([usdtry(), j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null), harem()]);
-    let v=null;
-    if(g&&+g.spot_usd_oz>0&&u) v=g.spot_usd_oz/OZ*u;           // ana sayfayla aynı yöntem
-    else if(g&&g.xau&&+g.xau.price>0) v = g.xau.unit==="gram" ? +g.xau.price : g.xau.price/OZ;
-    if(h && (!v || Math.abs(h/v-1)<0.15)) v=h;
-    if(v){ gram=v; liveOK=true; } else if(!gram) liveOK=null;
+    let v=null, s=null;
+    if(g&&+g.spot_usd_oz>0&&u){ v=g.spot_usd_oz/OZ*u; s="intl"; }           // ana sayfayla aynı yöntem
+    else if(g&&g.xau&&+g.xau.price>0&&g.xau.unit==="gram"){ v=+g.xau.price; s="xaus"; }
+    // Harem fiyatı, uluslararası değerden %15'ten fazla sapmıyorsa kullanılır.
+    // Dış referans yoksa yayının kendi ons × dolar değeriyle tutarlılığı kontrol edilir; ikisi de yoksa kullanılmaz.
+    const ref = v || (h&&h.ons>0&&h.usd>0 ? h.ons*h.usd/OZ : null);
+    if(h && ref && Math.abs(h.v/ref-1)<0.15){ v=h.v; s="harem"; }
+    if(v){ gram=v; src=s; srcAt=Date.now(); cached=false; liveOK=true; try{ localStorage.setItem("pn-son-kuy",JSON.stringify({v,s,at:srcAt})); }catch(e){} }
+    else { liveOK=null; if(gram) cached=true; }   // canlı alınamadı: elde kalan değer artık "son doğrulanmış"
     run();
   }
   paintMode(); run(); live(); setInterval(live,60000);

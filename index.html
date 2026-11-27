@@ -56,6 +56,18 @@
   .flash-down{background:color-mix(in srgb,var(--down) 14%,var(--card))!important}
   .upd{font-size:11px;color:var(--muted);margin-top:4px}
   .ab{font-size:12px;color:var(--muted);margin-top:4px;font-variant-numeric:tabular-nums}
+  .upd .st{display:inline-block;width:7px;height:7px;border-radius:50%;margin-right:5px;background:var(--muted);vertical-align:1px}
+  .upd .st.canli{background:var(--up)} .upd .st.gec{background:#f59e0b} .upd .st.eski{background:var(--muted)} .upd .st.yok{background:var(--down)}
+  .upd .us{display:block;margin-top:1px;line-height:1.35}
+  .c.fb .upd .us{color:#d97706;font-weight:700}
+  .c.eski .p{opacity:.72}
+  .demo.bilgi{background:#3b2f0b;color:#ffe2a6} .demo.kesik{background:#5a1d1d;color:#ffd6d6}
+  @media (prefers-color-scheme: light){ .demo.bilgi{background:#fff4d6;color:#5a3b00} .demo.kesik{background:#fde2e2;color:#7a1414} }
+  .bk{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+  .pbtn.ghost{background:var(--card2);color:var(--ink);border:1px solid var(--line);font-size:14px;padding:11px}
+  .bkask{margin-top:10px;padding:12px;border:1px solid var(--line);border-radius:14px;background:var(--card2)}
+  .bkask .bk{grid-template-columns:1fr 1fr}
+  .cihaz{font-size:12px;line-height:1.5;color:var(--muted);background:var(--card2);border:1px solid var(--line);border-radius:12px;padding:9px 11px;margin:10px 0 0;text-align:left}
   .ab:empty{display:none}
   .panel{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:16px}
   .tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
@@ -145,7 +157,7 @@
 <script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag("js",new Date());gtag("config","G-M419M3965F");gtag("config","G-LP1EQD8PHJ");</script>
 </head>
 <body>
-<div class="demo" id="demo" hidden>Önizleme: Bu ekranda canlı veriye erişilemiyor, örnek değerler gösteriliyor.</div>
+<div class="demo" id="durum" role="status" hidden></div>
 <header>
   <div class="wrap bar">
     <div class="brand"><svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="16" fill="#0e1726"/><path d="M10 40 L22 30 L32 36 L46 20 L54 24" fill="none" stroke="#f2c14e" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>Piyasa Nabzı</div>
@@ -158,7 +170,7 @@
 
 <main class="wrap">
   <h1>Canlı altın ve döviz fiyatları</h1>
-  <p class="lead">Dolar, euro, sterlin ve diğer kurlar, bitcoin anlık; altın ve gümüş her dakika, petrol saatte bir güncellenir.</p>
+  <p class="lead">Altın ve döviz Kapalıçarşı'dan anlık, bitcoin anlık, petrol saatte bir güncellenir. Her fiyatın altında kaynağı, güncellenme saati ve canlı olup olmadığı yazar.</p>
 
   <h2>Altın</h2>
   <div class="grid" id="gGold"></div>
@@ -166,7 +178,7 @@
   <div class="grid" id="gFx"></div>
   <h2>Diğer kurlar</h2>
   <div class="grid" id="gFx2"></div>
-  <div class="upd" style="margin-top:6px">Diğer kurlar, günlük çapraz kur ile anlık dolar kurundan hesaplanır.</div>
+  <div class="upd" style="margin-top:6px">Sterlin, İsviçre frangı, Suudi riyali, Japon yeni, Kanada ve Avustralya doları ile Kuveyt dinarı Kapalıçarşı'dan anlık gelir. Diğerleri günlük çapraz kur ile dolar kurundan hesaplanır ve "Günlük kur" olarak işaretlenir.</div>
   <h2>Emtia ve kripto</h2>
   <div class="grid" id="gCom"></div>
 
@@ -195,6 +207,7 @@
     <div class="chart-head"><span class="muted" id="cTitle"></span><b id="cLast"></b></div>
     <svg id="chart" viewBox="0 0 600 220" preserveAspectRatio="none" role="img" aria-label="Fiyat grafiği"></svg>
     <div class="muted" id="cRange"></div>
+    <div class="muted" id="cSrc" style="font-size:12px;margin-top:4px"></div>
   </div>
 
   <h2>Hesaplayıcı</h2>
@@ -205,6 +218,7 @@
     </div>
     <div class="muted">Güncel değeri</div>
     <div class="res" id="calcRes">—</div>
+    <div class="muted" id="calcNot" style="font-size:12px"></div>
   </div>
   <a class="promo" href="/gecmis-yatirim.html"><span><b>Geçmişte alsaydım ne olurdu?</b><span class="muted">2005'ten bugüne istediğin ayda altın, dolar, euro ya da bitcoin alsaydın paran bugün kaç TL olurdu, hesapla.</span></span><span class="go">Hesapla →</span></a>
 
@@ -219,7 +233,7 @@
       <button class="pbtn" type="submit">🔔 Alarm kur</button>
     </form>
     <div id="alList"></div>
-    <div class="muted" id="alInfo" style="font-size:12px;margin-top:10px;line-height:1.5">Hedef fiyata ulaşıldığında bildirim gönderilir. Alarm, bu sayfa bir sekmede açık kaldığı sürece çalışır; alarmların yalnızca bu cihazda saklanır.</div>
+    <div class="muted" id="alInfo" style="font-size:12px;margin-top:10px;line-height:1.5">Hedef fiyata ulaşıldığında bildirim gönderilir. Alarm, bu sayfa bir sekmede açık kaldığı sürece ve yalnızca canlı veriyle çalışır; kurulduğu kaynaktan (ör. Kapalıçarşı) farklı bir yedek kaynağın fiyatıyla tetiklenmez. Alarmların yalnızca bu cihazda saklanır.</div>
   </div>
 
   <h2 id="varliklarim">Varlıklarım ve borçlarım</h2>
@@ -238,7 +252,7 @@
     <a href="/rehber/" style="color:var(--gold)">Tüm rehberler →</a>
   </div>
 
-  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için Kapalıçarşı'daki <b>alış ve satış</b> fiyatları anlık gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu veri alınamazsa değerler uluslararası fiyattan hesaplanır ve "tahmini" olarak işaretlenir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar ve euro da Kapalıçarşı kuruyla gösterilir. Yatırım tavsiyesi değildir.</div>
+  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için Kapalıçarşı'daki <b>alış ve satış</b> fiyatları anlık gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu veri alınamazsa yedek kaynağa geçilir; o durumda sayfanın üstünde uyarı çıkar ve kartta kullanılan kaynak turuncu renkle yazılır. Hiçbir kaynağa ulaşılamazsa son doğrulanmış fiyat, kaynağı ve tarihiyle gösterilir; o da yoksa fiyat "mevcut değil" olarak belirtilir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar ve euro da Kapalıçarşı kuruyla gösterilir. Yatırım tavsiyesi değildir.</div>
 </main>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="box">
@@ -251,7 +265,7 @@
     <button class="pbtn" id="mGo" type="button">Giriş yap</button>
     <button class="linkbtn" id="mSwitch" type="button">Hesabın yok mu? Hesap oluştur</button>
     <button class="linkbtn" id="mClose" type="button" style="color:var(--muted)">Vazgeç</button>
-    <div class="muted" style="font-size:12px;margin:6px 0 0">Hesabın ve varlıkların yalnızca bu cihazda, bu tarayıcıda saklanır; hiçbir sunucuya gönderilmez.</div>
+    <div class="cihaz"><b>Bu bir bulut hesabı değildir.</b> Hesabın ve varlıkların yalnızca bu cihazdaki bu tarayıcıda saklanır, hiçbir sunucuya gönderilmez. Başka telefonda ya da tarayıcıda görünmez; tarayıcı verisini silersen kaybolur. Varlıklarım bölümünden yedek indirebilirsin. Şifre yalnızca bu cihazda ekranı kilitler.</div>
   </div>
 </div>
 <div class="toast" id="toast"></div>
@@ -271,11 +285,14 @@
   const S = {
     usdtry:null, usdtry24:null, eurusd:null, eurusd24:null, btc:null, btc24:null,
     goldOz:null, goldOz24:null, silverOz:null, brent:null, brentCh:null, wti:null, wtiCh:null, ng:null, ngCh:null,
-    t:{fx:null, gold:null, oil:null, kc:null}, x:{}, x24:{}, r24:{}, tg:null, hr:null, usdtRaw:null, usdtRaw24:null, usdAdj:1
+    t:{fx:null, gold:null, oil:null, kc:null}, x:{}, x24:{}, r24:{}, tg:null, hr:null, usdtRaw:null, usdtRaw24:null,
+    hrMsgAt:0, hrOK:false, usdSrc:null, usdAt:0, usdXaus:null, usdXausAt:0, xAt:0, eurAt:0, eurSrc:"bin", btcAt:0, btcSrc:"bin", offline:navigator.onLine===false
   };
   const eurtry=()=> hrf("EURTRY") ? hrf("EURTRY").s : (S.eurusd&&S.usdtry ? S.eurusd*S.usdtry : null);
+  // ons: xaus.com taze ise o; değilse Harem'in ons fiyatı; o da yoksa son xaus değeri
+  const goldOzNow=()=>{ if(S.goldOz>0&&S.t.gold&&Date.now()-S.t.gold<10*60e3) return S.goldOz; const h=hrf("ONS"); if(h) return h.s; return S.goldOz>0?S.goldOz:null; };
   const eurtry24=()=> S.eurusd24&&S.usdtry24 ? S.eurusd24*S.usdtry24 : null;
-  const gramTL=()=> S.goldOz&&S.usdtry ? S.goldOz/OZ*S.usdtry : null;
+  const gramTL=()=> goldOzNow()&&S.usdtry ? goldOzNow()/OZ*S.usdtry : null;
   const gramTL24=()=> S.goldOz24&&S.usdtry24 ? S.goldOz24/OZ*S.usdtry24 : null;
   const gold24=()=> gramTL()&&gramTL24() ? (gramTL()/gramTL24()-1)*100 : null;
 
@@ -284,9 +301,12 @@
   // Piyasa (kuyumcu) alış-satış fiyatları: finans.truncgil.com. Yoksa uluslararası fiyattan hesaplanan değere düşülür.
   const TG_KEYS=["ceyrek","yarim","tam","ata"];
   // Kapalıçarşı canlı fiyatları (Harem Altın yayını) öncelikli; yoksa Truncgil
-  const HMAP={gram:"KULCEALTIN",ceyrek:"CEYREK_YENI",yarim:"YARIM_YENI",tam:"TEK_YENI",ata:"ATA_YENI",gumus:"GUMUSTRY",usd:"USDTRY",eur:"EURTRY",
+  const HMAP={b22:"AYAR22",a14:"AYAR14",gram:"KULCEALTIN",ceyrek:"CEYREK_YENI",yarim:"YARIM_YENI",tam:"TEK_YENI",ata:"ATA_YENI",gumus:"GUMUSTRY",usd:"USDTRY",eur:"EURTRY",
     gbp:"GBPTRY",chf:"CHFTRY",sar:"SARTRY",jpy:"JPYTRY",cad:"CADTRY",aud:"AUDTRY",kwd:"KWDTRY"};
-  const hrf=c=>{ const x=S.hr&&S.hr[c]; return x&&x.s>0&&Date.now()-x.at<10*60e3 ? x : null; };
+  // Harem yayını değişen kalemleri gönderir: bağlantı canlıyken değişmeyen kalem de geçerlidir
+  const hLive=()=> !!(hws && hws.readyState===1 && Date.now()-S.hrMsgAt<60e3 && !S.offline);
+  const hrf=c=>{ const x=S.hr&&S.hr[c]; return x&&x.s>0&&S.hrOK&&(Date.now()-x.at<10*60e3||hLive()) ? x : null; };
+  const tgOnly=k=> (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null;
   const tgf=k=>{ const h=HMAP[k]&&hrf(HMAP[k]); if(h) return h; return (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null; };
   const gramSat=()=> tgf("gram")? tgf("gram").s : gramTL();
   const gramAl =()=> tgf("gram")? tgf("gram").a : gramTL();
@@ -330,6 +350,95 @@
   });
   const ALL=Object.values(CARDS).flat();
 
+  // ---------- kaynak, güncellik ve son doğrulanmış fiyatlar ----------
+  // n: kaynak adı, m: piyasa; fb: yedek kaynak (ana kaynaktan farklı piyasa olabilir)
+  const SRC={
+    harem:{n:"Harem Altın",m:"Kapalıçarşı",stream:1},
+    tg:{n:"Truncgil Finans",m:"yedek kaynak",fb:1},
+    intl:{n:"xaus.com ons × dolar",m:"uluslararası fiyattan hesaplanan",fb:1},
+    intlc:{n:"xaus.com ons × dolar",m:"uluslararası hesap, işçiliksiz",fb:1},
+    xaus:{n:"xaus.com",m:"uluslararası spot"},
+    hons:{n:"Harem Altın",m:"ons, yedek kaynak",fb:1,stream:1},
+    binusd:{n:"Binance USDT/TRY",m:"kripto borsası kuru, yaklaşık",fb:1,stream:1},
+    xausfx:{n:"xaus.com",m:"uluslararası kur, yedek",fb:1},
+    eurcalc:{n:"Binance EUR/USD × dolar",m:"hesaplanan, yedek",fb:1,stream:1},
+    bin:{n:"Binance",m:"EUR/USDT, BTC/USDT",stream:1},
+    binc:{n:"Binance × dolar kuru",m:"hesaplanan",stream:1},
+    cross:{n:"currency-api × dolar",m:"günlük çapraz kur",daily:1},
+    oil:{n:"OilPriceAPI",m:"saatlik veri",hourly:1}
+  };
+  // dolar kuru: Harem → Truncgil → Binance USDT/TRY → xaus.com
+  function syncUsd(){
+    const h=hrf("USDTRY"), t=tgOnly("usd");
+    if(h){ S.usdtry=h.s; S.usdSrc="harem"; S.usdAt=h.at; }
+    else if(t){ S.usdtry=t.s; S.usdSrc="tg"; S.usdAt=S.tg.at; }
+    else if(S.usdtRaw>0){ S.usdtry=S.usdtRaw; S.usdSrc="binusd"; S.usdAt=+S.t.fx||Date.now(); }
+    else if(S.usdXaus>0){ S.usdtry=S.usdXaus; S.usdSrc="xausfx"; S.usdAt=S.usdXausAt; }
+    else { S.usdtry=null; S.usdSrc=null; }
+    // 24 saatlik referans: Binance açılış/kapanış oranı aynı kura uygulanır
+    S.usdtry24 = (S.usdtry&&S.usdtRaw>0&&S.usdtRaw24>0) ? S.usdtRaw24*(S.usdtry/S.usdtRaw) : null;
+  }
+  const at0=(...a)=>{ const v=a.map(x=>+x||0).filter(x=>x>0); return v.length?Math.min(...v):0; };
+  function qGold(hk,tk,calc,calcSrc){
+    const h=hrf(hk); if(h) return {v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at};
+    const t=tgOnly(tk); if(t) return {v:t.s,a:t.a,s:"tg",at:S.tg.at};
+    const v=calc(); if(v>0) return {v,s:calcSrc||"intl",at:at0(S.t.gold,S.usdAt)};
+    return null;
+  }
+  function qUsd(){ return S.usdtry>0 ? {v:S.usdtry,a:(hrf("USDTRY")||tgOnly("usd")||{}).a,ch:(hrf("USDTRY")||{}).ch,s:S.usdSrc,at:S.usdAt} : null; }
+  const QF={
+    gram:()=>qGold("KULCEALTIN","gram",gramTL),
+    ons:()=>{ if(S.goldOz>0&&S.t.gold&&Date.now()-S.t.gold<10*60e3) return {v:S.goldOz,s:"xaus",at:+S.t.gold};
+              const h=hrf("ONS"); if(h) return {v:h.s,ch:h.ch,s:"hons",at:h.at};
+              return S.goldOz>0?{v:S.goldOz,s:"xaus",at:+S.t.gold}:null; },
+    ag:()=>qGold("GUMUSTRY","gumus",()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry),
+    usd:qUsd,
+    eur:()=>{ const h=hrf("EURTRY"); if(h) return {v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at};
+              return S.eurusd&&S.usdtry ? {v:S.eurusd*S.usdtry,s:"eurcalc",at:at0(S.eurAt,S.usdAt)} : null; },
+    parite:()=> S.eurusd>0 ? {v:S.eurusd,s:S.eurSrc==="xaus"?"xausfx":"bin",at:S.eurAt} : null,
+    usd100:()=>{ const q=qUsd(); return q?{v:q.v*100,ch:q.ch,s:q.s,at:q.at}:null; },
+    brent:()=> S.brent>0 ? {v:S.brent,s:"oil",at:+S.t.oil} : null,
+    wti:()=> S.wti>0 ? {v:S.wti,s:"oil",at:+S.t.oil} : null,
+    btc:()=> S.btc>0 ? {v:S.btc,s:S.btcSrc==="xaus"?"xausfx":"bin",at:S.btcAt} : null,
+    btctl:()=> S.btc>0&&S.usdtry>0 ? {v:S.btc*S.usdtry,s:"binc",at:at0(S.btcAt,S.usdAt)} : null
+  };
+  COINS.forEach(([n,g],i)=>{ QF["coin"+i]=()=>qGold(HMAP[TG_KEYS[i]],TG_KEYS[i],()=>gramTL()&&gramTL()*g,"intlc"); });
+  XC.forEach(([k])=>{ QF["x_"+k]=()=>{ const h=HMAP[k]&&hrf(HMAP[k]); if(h) return {v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at};
+    return S.x[k]>0&&S.usdtry>0 ? {v:S.usdtry/S.x[k],s:"cross",at:S.xAt} : null; }; });
+
+  // son doğrulanmış fiyatlar: yalnızca gerçek kaynaktan gelen ve kontrolden geçen değerler saklanır
+  const SON_KEY="pn-son", SON_MAX=14*24*3600e3;
+  let SON={}; try{ SON=JSON.parse(localStorage.getItem(SON_KEY)||"{}")||{}; }catch(e){ SON={}; }
+  let sonDirty=false, sonSaved=0;
+  function sonSave(force){ if(!sonDirty) return; if(!force&&Date.now()-sonSaved<30e3) return; try{ localStorage.setItem(SON_KEY,JSON.stringify(SON)); sonDirty=false; sonSaved=Date.now(); }catch(e){} }
+  const QS={};   // her kartın şu an gösterilen değeri: {v,a,s,at,st,cached}
+  function stOf(q){
+    if(q.cached) return "eski";
+    const sr=SRC[q.s]||{};
+    if(S.offline) return "gec";
+    if(sr.daily||sr.hourly) return "gec";
+    const age=Date.now()-(q.at||0);
+    if(q.s==="harem"||q.s==="hons") return hLive()||age<90e3 ? "canli" : "gec";
+    return age <= (sr.stream?90e3:5*60e3) ? "canli" : "gec";
+  }
+  const fdt=t=>new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(t);
+  function zaman(at,st){ if(!at) return ""; return (st==="canli"||Date.now()-at<12*3600e3&&st!=="eski") ? tm(at) : fdt(at); }
+  function stTxt(q){ const sr=SRC[q.s]||{}; if(q.st==="canli") return "Canlı"; if(q.st==="eski") return "Son doğrulanmış"; if(sr.daily) return "Günlük kur"; if(sr.hourly) return "Saatlik"; return "Gecikmeli"; }
+  function resolve(c){
+    let q=null; try{ q=QF[c.k]?QF[c.k]():null; }catch(e){ q=null; }
+    if(q&&q.v>0&&isFinite(q.v)&&q.s&&SRC[q.s]){
+      q.st=stOf(q); q.cached=false;
+      const ok = (q.s!=="harem"&&q.s!=="hons") || S.hrOK;
+      if(ok && (!SON[c.k] || SON[c.k].at!==q.at || SON[c.k].v!==q.v)){ SON[c.k]={v:q.v,a:q.a||null,s:q.s,at:q.at||Date.now()}; sonDirty=true; }
+      return q;
+    }
+    const o=SON[c.k];
+    if(o&&o.v>0&&SRC[o.s]&&Date.now()-o.at<SON_MAX) return {v:o.v,a:o.a,s:o.s,at:o.at,st:"eski",cached:true};
+    return null;
+  }
+  const qv=(k,f)=>{ const q=QS[k]; if(!q) return null; return f==="a"&&q.a>0 ? q.a : q.v; };
+  const bootAt=Date.now();
+
   // 24s değişim için yedek: Binance/intraday alınamazsa dünkü günlük kurları kullan
   function fill24(){
     const r=S.r24||{};
@@ -339,44 +448,87 @@
     if(!(S.goldOz24>0) && r.xau>0) S.goldOz24=1/r.xau;
   }
   function render(){
-    fill24();
+    syncUsd(); fill24();
     ALL.forEach(c=>{
-      const v=c.v(), el=EL[c.k];
-      if(v==null||!isFinite(v)) return;
-      const p=el.querySelector(".p"); const txt=c.f(v);
+      const el=EL[c.k], q=resolve(c); QS[c.k]=q;
+      const p=el.querySelector(".p"), chEl=el.querySelector(".ch"), upd=el.querySelector(".upd");
+      el.classList.toggle("eski",!!(q&&q.cached));
+      el.classList.toggle("fb",!!(q&&SRC[q.s].fb));
+      if(!q){
+        p.textContent="—"; LAST[c.k]=null;
+        const bekle=Date.now()-bootAt<8000&&!S.offline;
+        chEl.textContent=bekle?"\u00a0":"Veri şu an mevcut değil"; chEl.className="ch";
+        upd.innerHTML='<span class="st yok"></span><span class="ut"></span>'; upd.querySelector(".ut").textContent=bekle?"Yükleniyor…":"Bağlantı bekleniyor";
+        if(c.tg){ el.querySelector(".ab").textContent=""; }
+        return;
+      }
+      const v=q.v, txt=c.f(v);
       if(p.textContent!==txt){
-        if(LAST[c.k]!=null && v!==LAST[c.k]){ const cls=v>LAST[c.k]?"flash-up":"flash-down"; el.classList.remove("flash-up","flash-down"); void el.offsetWidth; el.classList.add(cls); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove(cls),700); }
+        if(LAST[c.k]!=null && v!==LAST[c.k] && !q.cached){ const cls=v>LAST[c.k]?"flash-up":"flash-down"; el.classList.remove("flash-up","flash-down"); void el.offsetWidth; el.classList.add(cls); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove(cls),700); }
         p.textContent=txt; LAST[c.k]=v;
       }
-      let ch=null, chL=" (24s)"; const tq=c.tg&&tgf(c.tg);
-      if(tq && tq.src==="h" && tq.ch!=null && isFinite(tq.ch)){ ch=tq.ch; chL=" (gün)"; }
-      else if(c.c24) ch=c.c24();
-      else if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
-      if((ch==null||!isFinite(ch)) && tq && isFinite(tq.ch) && tq.ch!==0){ ch=tq.ch; chL=" (gün)"; }
-      const chEl=el.querySelector(".ch");
+      // değişim: aynı kaynağın kendi referansıyla; eski (önbellek) değerde gösterilmez
+      let ch=null, chL=" (24s)";
+      if(!q.cached){
+        if(q.ch!=null&&isFinite(q.ch)){ ch=q.ch; chL=" (gün)"; }
+        else if(c.c24) ch=c.c24();
+        else if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
+      }
       if(ch!=null&&isFinite(ch)){ chEl.textContent=pct(ch)+chL; chEl.className="ch "+(ch>=0?"up":"down"); }
+      else { chEl.textContent= q.cached ? "Canlı veri alınamıyor" : "\u00a0"; chEl.className="ch"; }
       if(c.tg){
         const ab=el.querySelector(".ab"), sm=el.querySelector(".n small");
-        if(tq){ ab.textContent = c.big ? "Alış "+c.f(tq.a)+" · Satış "+c.f(tq.s) : "Alış "+c.f(tq.a); if(c.k.startsWith("coin")) sm.textContent="satış"; }
-        else { ab.textContent=""; if(c.k.startsWith("coin")) sm.textContent="tahmini"; }
+        if(q.a>0){ ab.textContent = c.big ? "Alış "+c.f(q.a)+" · Satış "+c.f(v) : "Alış "+c.f(q.a); }
+        else ab.textContent="";
+        if(c.k.startsWith("coin")) sm.textContent = q.s==="intlc" ? "işçiliksiz tahmin" : "satış";
       }
-      const t=(tq&&S.t.kc)||S.t[c.t]; if(t) el.querySelector(".upd").textContent="Güncelleme "+tm(t);
+      const sr=SRC[q.s];
+      upd.innerHTML='<span class="st"></span><span class="ut"></span><span class="us"></span>';
+      upd.querySelector(".st").className="st "+q.st;
+      upd.querySelector(".ut").textContent=stTxt(q)+(q.at?" · "+zaman(q.at,q.st):"");
+      upd.querySelector(".us").textContent=sr.n+" · "+sr.m;
     });
+    sonSave(false);
+    durum();
     // tape
-    const items=[["Gram altın",gramSat(),v=>fTL(v)],["Çeyrek",coinSat(0),v=>fTL(v,0)],["Dolar",S.usdtry,v=>fN(v,4)],["Euro",eurtry(),v=>fN(v,4)],["Sterlin",xtry("gbp"),v=>fN(v,4)],["Ons",S.goldOz,v=>fUSD(v)],["Gümüş",agTL(),v=>fTL(v)],["Brent",S.brent,v=>fUSD(v)],["Bitcoin",S.btc,v=>fUSD(v,0)]].filter(x=>x[1]);
+    const items=[["Gram altın","gram",v=>fTL(v)],["Çeyrek","coin0",v=>fTL(v,0)],["Dolar","usd",v=>fN(v,4)],["Euro","eur",v=>fN(v,4)],["Sterlin","x_gbp",v=>fN(v,4)],["Ons","ons",v=>fUSD(v)],["Gümüş","ag",v=>fTL(v)],["Brent","brent",v=>fUSD(v)],["Bitcoin","btc",v=>fUSD(v,0)]].map(([n,k,f])=>[n+(QS[k]&&QS[k].cached?" (son bilinen)":""),qv(k),f]).filter(x=>x[1]);
     const html=items.map(([n,v,f])=>`<span>${n}<b>${f(v)}</b></span>`).join("");
     $("tape").innerHTML=html+html;
     calc();
     pfTick();
     alarmTick();
   }
+  function durum(){
+    const qs=ALL.map(c=>QS[c.k]).filter(Boolean);
+    const canli=qs.filter(q=>q.st==="canli").length, eski=qs.filter(q=>q.cached).length;
+    const erken=Date.now()-bootAt<8000;
+    const bar=$("durum"); let msg="", cls="bilgi";
+    if(S.offline){ msg="İnternet bağlantın yok. Gösterilen fiyatlar son alınan ya da son doğrulanmış değerlerdir; her fiyatın altında kaynağı ve tarihi yazıyor."; cls="kesik"; }
+    else if(!erken && canli===0 && eski>0){ msg="Canlı fiyat kaynaklarına şu an ulaşılamıyor. Gösterilen fiyatlar son doğrulanmış değerlerdir; her fiyatın altında kaynağı ve tarihi yazıyor. Bağlantı gelince kendiliğinden güncellenecek."; cls="kesik"; }
+    else if(!erken && qs.length===0){ msg="Canlı fiyat kaynaklarına şu an ulaşılamıyor ve bu cihazda daha önce kaydedilmiş fiyat yok. Fiyat bilgisi şu an mevcut değil; bağlantı gelince kendiliğinden güncellenecek."; cls="kesik"; }
+    else if(!erken){
+      const g=QS.gram, u=QS.usd;
+      const yedek=[g,u].some(q=>q&&!q.cached&&q.s!=="harem");
+      if(yedek){ const ad=g&&g.s==="tg"||u&&u.s==="tg" ? "Truncgil Finans" : "uluslararası piyasa";
+        msg=`Kapalıçarşı (Harem Altın) fiyat yayınına şu an ulaşılamıyor. Altın ve döviz fiyatları yedek kaynaktan (${ad}) gösteriliyor ve kuyumcu fiyatlarından farklı olabilir. Kullanılan kaynak her kartın altında turuncu yazıyla belirtilir.`; }
+      else if(eski>0) msg="Bazı fiyatlar şu an alınamıyor; bu fiyatlar son doğrulanmış değerleriyle, tarihleri belirtilerek gösteriliyor.";
+    }
+    if(bar.textContent!==msg) bar.textContent=msg;
+    bar.className="demo "+cls; bar.hidden=!msg;
+    if(canli>0) setLive(true,"Canlı");
+    else if(qs.length&&!eski) setLive(false,"Gecikmeli");
+    else if(eski) setLive(false,"Son bilinen");
+    else setLive(false, erken?"Bağlanıyor…":"Bağlantı yok");
+  }
   let rq=false; const schedule=()=>{ if(rq) return; rq=true; requestAnimationFrame(()=>{ rq=false; render(); }); };
 
   // ---------- calculator ----------
-  const UNITS=[["gram","Gram altın",()=>gramAl()],...COINS.map(([n,g],i)=>["coin"+i,n,()=>coinAl(i)]),["ag","Gram gümüş",()=>agAl()],["usd","Dolar",()=>S.usdtry],["eur","Euro",eurtry],["gbp","Sterlin",()=>xtry("gbp")],["chf","İsviçre frangı",()=>xtry("chf")],["sar","Suudi riyali",()=>xtry("sar")],["btc","Bitcoin",()=>S.btc&&S.usdtry&&S.btc*S.usdtry]];
+  const UNITS=[["gram","Gram altın","gram","a"],...COINS.map(([n,g],i)=>["coin"+i,n,"coin"+i,"a"]),["ag","Gram gümüş","ag","a"],["usd","Dolar","usd","v"],["eur","Euro","eur","v"],["gbp","Sterlin","x_gbp","v"],["chf","İsviçre frangı","x_chf","v"],["sar","Suudi riyali","x_sar","v"],["btc","Bitcoin","btctl","v"]];
   UNITS.forEach(([k,n])=>{ const o=document.createElement("option"); o.value=k; o.textContent=n; $("unit").appendChild(o); });
   function num(v){ v=String(v||"").trim().replace(/\s/g,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); else if(/^\d{1,3}(\.\d{3})+$/.test(v)) v=v.replace(/\./g,""); return parseFloat(v); }
-  function calc(){ const q=num($("qty").value), u=UNITS.find(x=>x[0]===$("unit").value), p=u&&u[2](); $("calcRes").textContent=(q>=0&&p)?fTL(q*p):"—"; }
+  function calc(){ const q=num($("qty").value), u=UNITS.find(x=>x[0]===$("unit").value), p=u&&qv(u[2],u[3]), o=u&&QS[u[2]];
+    $("calcRes").textContent=(q>=0&&p)?fTL(q*p):"—";
+    const n=$("calcNot"); if(n) n.textContent = !p ? "Bu fiyat şu an mevcut değil." : (o.cached ? "Son doğrulanmış fiyatla hesaplandı: "+SRC[o.s].n+", "+fdt(o.at) : SRC[o.s].n+" · "+SRC[o.s].m+(SRC[o.s].fb?" (yedek kaynak)":"")); }
   $("qty").addEventListener("input",calc); $("unit").addEventListener("change",calc);
 
   // ---------- data sources ----------
@@ -403,18 +555,20 @@
     binanceOK=true;
   }
   function applyTick(sym,last,open){
-    if(sym==="USDTTRY"){ S.usdtRaw=last; S.usdtRaw24=open; S.usdtry=last*S.usdAdj; S.usdtry24=open*S.usdAdj; }
-    else if(sym==="EURUSDT"){ S.eurusd=last; S.eurusd24=open; }
-    else if(sym==="BTCUSDT"){ S.btc=last; S.btc24=open; }
+    if(!(last>0)) return;
+    if(sym==="USDTTRY"){ S.usdtRaw=last; S.usdtRaw24=open; }
+    else if(sym==="EURUSDT"){ S.eurusd=last; S.eurusd24=open; S.eurAt=Date.now(); S.eurSrc="bin"; }
+    else if(sym==="BTCUSDT"){ S.btc=last; S.btc24=open; S.btcAt=Date.now(); S.btcSrc="bin"; }
     S.t.fx=new Date(); gotAny=true; schedule();
   }
   let ws=null, wsTry=0;
   function connectWS(){
+    if(ws && ws.readyState<2) return;
     let opened=false;
     try{ ws=new WebSocket(WS_HOSTS[wsHost]+WS_PATH); }catch(e){ wsHost=(wsHost+1)%WS_HOSTS.length; setTimeout(connectWS,2000); return; }
-    ws.onopen=()=>{ opened=true; wsTry=0; binanceOK=true; setLive(true,"Canlı"); };
+    ws.onopen=()=>{ opened=true; wsTry=0; binanceOK=true; };
     ws.onmessage=e=>{ try{ const m=JSON.parse(e.data).data; applyTick(m.s, +m.c, +m.o); }catch(_){} };
-    ws.onclose=()=>{ if(!opened) wsHost=(wsHost+1)%WS_HOSTS.length; if(gotAny) setLive(true,"Güncel"); else setLive(false,"Bağlanıyor…"); const w=Math.min(30000,1000*Math.pow(2,Math.floor(wsTry++/WS_HOSTS.length))); setTimeout(connectWS,w); };
+    ws.onclose=()=>{ if(!opened) wsHost=(wsHost+1)%WS_HOSTS.length; schedule(); const w=Math.min(30000,1000*Math.pow(2,Math.floor(wsTry++/WS_HOSTS.length))); setTimeout(connectWS,w); };
     ws.onerror=()=>{ try{ ws.close(); }catch(_){} };
   }
 
@@ -425,9 +579,9 @@
       const r=d.fx_rates||{}; const rate=k=>{ const v=r[k]; return +(v&&typeof v==="object"?(v.rate||v.value):v); };
       let tr=rate("TRY"); if(!(tr>0) && +d.fx_rate>0) tr=+d.fx_rate;
       if(!(tr>0) && d.xau && +d.xau.price>0 && +d.spot_usd_oz>0) tr = d.xau.unit==="gram" ? d.xau.price/(d.spot_usd_oz/OZ) : d.xau.price/d.spot_usd_oz;
-      if(tr>0 && !tgf("usd")){ S.usdtry=tr; S.t.fx=new Date(); }
-      const eu=rate("EUR"); if(eu>0) S.eurusd=1/eu;
-      if(+d.btc_usd>0) S.btc=+d.btc_usd;
+      if(tr>0){ S.usdXaus=tr; S.usdXausAt=Date.now(); }
+      const eu=rate("EUR"); if(eu>0&&!(S.eurAt&&Date.now()-S.eurAt<5*60e3)){ S.eurusd=1/eu; S.eurAt=Date.now(); S.eurSrc="xaus"; }
+      if(+d.btc_usd>0&&!(S.btcAt&&Date.now()-S.btcAt<5*60e3)){ S.btc=+d.btc_usd; S.btcAt=Date.now(); S.btcSrc="xaus"; }
       fxFromXaus=true;
     }
     if(+d.silver_usd_oz>0) S.silverOz=+d.silver_usd_oz;
@@ -448,7 +602,7 @@
     }
     goldTried=true;
     if(pts.length>=2){
-      goldSeries=pts;
+      goldSeries=pts; goldAt=Date.now();
       if(!goldSrc){
         const target=Date.now()-24*3600*1000; let ref=pts[0];
         for(const p of pts){ if(Math.abs(p.t-target)<Math.abs(ref.t-target)) ref=p; }
@@ -479,13 +633,13 @@
   const FXU=d=>[`https://cdn.jsdelivr.net/npm/@fawazahmed0/currency-api@${d}/v1/currencies/usd.min.json`,`https://${d}.currency-api.pages.dev/v1/currencies/usd.min.json`];
   async function fx2(){
     const c=LS.get("pn-fx3",null);
-    if(c&&Date.now()-c.at<3*3600e3&&c.x&&Object.keys(c.x).length){ S.x=c.x; S.x24=c.x24||{}; S.r24=c.r24||{}; schedule(); return; }
+    if(c&&Date.now()-c.at<3*3600e3&&c.x&&Object.keys(c.x).length){ S.x=c.x; S.x24=c.x24||{}; S.r24=c.r24||{}; S.xAt=c.at; schedule(); return; }
     let x={}, x24={}, r24={}, date=null;
     try{ const d=await first(FXU("latest")); x=pick(d.usd||{}); date=d.date; }catch(e){}
     if(!Object.keys(x).length){ try{ const d=await j("https://open.er-api.com/v6/latest/USD",8000); x=pick(d.rates||{}); }catch(e){} }
     if(!Object.keys(x).length) throw new Error("fx2");
     if(date){ try{ const y=new Date(date+"T12:00:00Z"); y.setUTCDate(y.getUTCDate()-1); const d=await first(FXU(y.toISOString().slice(0,10))); x24=pick(d.usd||{}); const u=d.usd||{}; r24={}; ["try","eur","btc","xau","xag"].forEach(k=>{ if(+u[k]>0) r24[k]=+u[k]; }); }catch(e){} }
-    S.x=x; S.x24=x24; S.r24=r24; LS.set("pn-fx3",{at:Date.now(),x,x24,r24}); schedule();
+    S.x=x; S.x24=x24; S.r24=r24; S.xAt=Date.now(); LS.set("pn-fx3",{at:S.xAt,x,x24,r24}); schedule();
   }
 
   // ---------- piyasa (kuyumcu) alış-satış fiyatları ----------
@@ -501,15 +655,10 @@
     const tg={gram:g("GRA","gram-altin"), ceyrek:g("CEYREKALTIN","ceyrek-altin"), yarim:g("YARIMALTIN","yarim-altin"), tam:g("TAMALTIN","tam-altin"),
       ata:g("CUMHURIYETALTINI","cumhuriyet-altini")||g("ATAALTIN","ata-altin"), a14:g("14AYARALTIN","14-ayar-altin"), b22:g("22AYARBILEZIK","22-ayar-bilezik"), gumus:g("GUMUS","gumus"), usd:g("USD","USD"), at:Date.now()};
     // makullük kontrolü: gram altın uluslararası değerden %15'ten fazla sapıyorsa kullanma
-    const ref=(S.goldOz>0&&tg.usd)? S.goldOz*tg.usd.s/OZ : gramTL();
+    const oz=goldOzNow(), ref=(oz>0&&tg.usd)? oz*tg.usd.s/OZ : gramTL();
     if(tg.gram && ref && Math.abs(tg.gram.s/ref-1)>0.15) throw new Error("kc sapma");
     if(!tg.gram) throw new Error("kc veri yok");
     S.tg=tg; S.t.kc=new Date();
-    // dolar: Binance anlık hareketini koru, seviyeyi piyasa kuruna hizala
-    if(tg.usd && !hrf("USDTRY")){
-      if(S.usdtRaw>0){ const adj=tg.usd.s/S.usdtRaw; if(adj>0.95&&adj<1.05){ S.usdAdj=adj; S.usdtry=S.usdtRaw*adj; if(S.usdtRaw24>0) S.usdtry24=S.usdtRaw24*adj; } }
-      else { S.usdtry=tg.usd.s; S.t.fx=new Date(); }
-    }
     gotAny=true; schedule();
   }
 
@@ -521,13 +670,18 @@
       const a=+x.alis, s_=+x.satis, k=+x.kapanis;
       if(a>0&&s_>0&&s_>=a*0.8&&s_<a*1.5) hr[code]={a, s:s_, ch:k>0?(s_/k-1)*100:null, src:"h", at:now};
     }
-    // makullük: gram altın uluslararası değerden %15'ten fazla saparsa yayını kullanma
-    const g=hr.KULCEALTIN, ref=gramTL();
-    if(g && ref && Math.abs(g.s/ref-1)>0.15) return;
-    S.hr=hr; S.t.kc=new Date();
-    const u=hr.USDTRY;
-    if(u&&u.at===now){ if(S.usdtRaw>0){ const adj=u.s/S.usdtRaw; if(adj>0.95&&adj<1.05) S.usdAdj=adj; } S.usdtry=u.s; S.t.fx=new Date(); }
-    gotAny=true; schedule();
+    // makullük: gram altın, uluslararası ons × dolar değerinden %15'ten fazla saparsa yayını kullanma.
+    // Dış referans yoksa yayının kendi ons × dolar değeriyle tutarlılığı kontrol edilir.
+    // Yayın yalnızca değişen kalemleri gönderir; kalemler biriktirilir, kontrol gram altın gelince yapılır.
+    S.hr=hr; S.hrMsgAt=now;
+    const g=hr.KULCEALTIN;
+    if(g){
+      let ref=null; const oz=(S.goldOz>0&&S.t.gold&&now-S.t.gold<30*60e3)?S.goldOz:null, ud=S.usdtRaw>0?S.usdtRaw:(tgOnly("usd")||{}).s;
+      if(oz&&ud) ref=oz*ud/OZ; else if(hr.ONS&&hr.USDTRY) ref=hr.ONS.s*hr.USDTRY.s/OZ;
+      S.hrOK = !!(ref && Math.abs(g.s/ref-1)<=0.15);
+    }
+    if(S.hrOK){ S.t.kc=new Date(); gotAny=true; }
+    schedule();
   }
   function harem(){
     if(hws && hws.readyState<2) return;
@@ -538,26 +692,33 @@
       if(m.startsWith("42")){ try{ const [ev,p]=JSON.parse(m.slice(2)); if(ev==="price_changed"&&p&&p.data){ hFail=0; hIn(p.data); } }catch(_){} }
     };
     hws.onerror=()=>{ try{ hws.close(); }catch(_){} };
-    hws.onclose=()=>{ hFail++; setTimeout(harem, hFail<4?5000:120000); };
+    hws.onclose=()=>{ hFail++; schedule(); setTimeout(harem, hFail<4?5000:120000); };
   }
   document.addEventListener("visibilitychange",()=>{ if(!document.hidden && (!hws||hws.readyState>1)) harem(); });
 
   // ---------- chart ----------
   let chartKey="gold";
   const series={};
+  // grafik verisi 10 dakika önbellekte tutulur, sonra yeniden alınır
   async function klines(sym){
-    if(series[sym]) return series[sym];
-    if(sym==="EURTRY"){ const [a,b]=await Promise.all([klines("EURUSDT"),klines("USDTTRY")]); const n=Math.min(a.length,b.length); return series[sym]=a.slice(-n).map((p,i)=>({t:p.t,p:p.p*b.slice(-n)[i].p})); }
-    const d=await bj(`/klines?symbol=${sym}&interval=1h&limit=168`);
-    return series[sym]=d.map(k=>({t:k[0],p:+k[4]}));
+    const c=series[sym]; if(c&&Date.now()-c.at<10*60e3) return c.pts;
+    let pts;
+    if(sym==="EURTRY"){ const [a,b]=await Promise.all([klines("EURUSDT"),klines("USDTTRY")]); const n=Math.min(a.length,b.length); pts=a.slice(-n).map((p,i)=>({t:p.t,p:p.p*b.slice(-n)[i].p})); }
+    else { const d=await bj(`/klines?symbol=${sym}&interval=1h&limit=168`); pts=d.map(k=>({t:k[0],p:+k[4]})).filter(p=>p.p>0); }
+    series[sym]={at:Date.now(),pts}; return pts;
   }
+  let chartOK=false, chartAt=0, goldAt=0;
+  const CSRC={gold:()=>goldSrc==="PAXG"?"Binance PAXG/USDT (altına endeksli token, yedek kaynak)":"xaus.com (uluslararası spot)",
+    USDTTRY:()=>"Binance USDT/TRY (kripto borsası kuru; Kapalıçarşı kurundan farklı olabilir)",
+    EURTRY:()=>"Binance EUR/USDT × USDT/TRY (hesaplanan; Kapalıçarşı kurundan farklı olabilir)",
+    BTCUSDT:()=>"Binance BTC/USDT"};
   async function drawChart(){
     const svg=$("chart"); const titles={gold:"Ons altın (USD), son 24 saat",USDTTRY:"Dolar (TL), son 7 gün",EURTRY:"Euro (TL), son 7 gün",BTCUSDT:"Bitcoin (USD), son 7 gün"};
     if(chartKey==="gold"&&goldSrc) titles.gold = goldSrc==="PAXG" ? "Ons altın (USD), son 24 saat · PAXG" : "Ons altın (USD), son işlem saatleri (piyasa kapalı)";
     $("cTitle").textContent=titles[chartKey];
     let pts=null, hata=false;
     try{ pts = chartKey==="gold" ? goldSeries : await klines(chartKey); }catch(e){ pts=null; hata=true; }
-    if(!pts||pts.length<2){
+    if(!pts||pts.length<2){ chartOK=false; $("cSrc").textContent="";
       const msg = (hata || (chartKey==="gold" && goldTried)) ? "Grafik şu an alınamıyor, birazdan tekrar denenecek" : "Grafik verisi yükleniyor…";
       svg.setAttribute("preserveAspectRatio","xMidYMid meet"); svg.innerHTML=`<text x="300" y="115" text-anchor="middle" fill="currentColor" opacity=".55" font-size="26">${msg}</text>`; $("cLast").textContent=""; $("cRange").textContent=""; return; }
     svg.setAttribute("preserveAspectRatio","none");
@@ -571,36 +732,28 @@
     const ch=(ps[ps.length-1]/ps[0]-1)*100;
     $("cLast").innerHTML=`${fmt(ps[ps.length-1])} <span class="${up?"up":"down"}" style="font-size:13px">${pct(ch)}</span>`;
     $("cRange").textContent=`En düşük ${fmt(mn)} · En yüksek ${fmt(mx)}`;
+    chartOK=true; chartAt=Date.now();
+    const sa = chartKey==="gold" ? goldAt : (series[chartKey]&&series[chartKey].at);
+    $("cSrc").textContent="Kaynak: "+CSRC[chartKey]()+(sa?" · Güncelleme "+tm(sa):"");
   }
   document.querySelectorAll("#ctabs button").forEach(b=>b.addEventListener("click",()=>{ chartKey=b.dataset.k; document.querySelectorAll("#ctabs button").forEach(x=>x.setAttribute("aria-pressed",x===b)); drawChart(); }));
 
-  // ---------- demo fallback (when the page cannot reach the internet, e.g. preview) ----------
-  function demo(){
-    if(gotAny) return;
-    $("demo").hidden=false; setLive(false,"Önizleme");
-    Object.assign(S,{usdtry:42.31,usdtry24:42.18,eurusd:1.158,eurusd24:1.161,btc:91250,btc24:89900,goldOz:4085.4,goldOz24:4061.2,x:{gbp:0.76,chf:0.80,sar:3.75,aed:3.6725,jpy:155,cny:7.1,rub:80,azn:1.7,cad:1.40,aud:1.53,kwd:0.307,qar:3.64},x24:{gbp:0.761,chf:0.801,sar:3.75,aed:3.6725,jpy:154.6,cny:7.1,rub:80.4,azn:1.7,cad:1.401,aud:1.532,kwd:0.307,qar:3.64},silverOz:51.3,brent:63.8,brentCh:-0.6,wti:60.1,wtiCh:-0.4});
-    const now=Date.now(); S.t={fx:new Date(),gold:new Date(),oil:new Date()};
-    goldSeries=Array.from({length:60},(_,i)=>({t:now-(60-i)*24*6e4,p:4061+Math.sin(i/6)*12+i*0.4}));
-    ["USDTTRY","BTCUSDT","EURUSDT"].forEach((s,k)=>{ const base=[42.0,88000,1.16][k]; series[s]=Array.from({length:168},(_,i)=>({t:now-(168-i)*36e5,p:base*(1+Math.sin(i/14)*0.004+i*0.00002*(k===1?20:1))})); });
-    schedule(); drawChart();
-  }
-
   // ---------- portfolio (on this device) ----------
   const ATYPES=[
-    {k:"gram",n:"Gram altın (24 ayar)",u:"gram",e:"🥇",p:()=>gramAl()},
-    {k:"ceyrek",n:"Çeyrek altın",u:"adet",e:"🥇",p:()=>coinAl(0)},
-    {k:"yarim",n:"Yarım altın",u:"adet",e:"🥇",p:()=>coinAl(1)},
-    {k:"tam",n:"Tam altın",u:"adet",e:"🥇",p:()=>coinAl(2)},
-    {k:"ata",n:"Cumhuriyet altını",u:"adet",e:"🥇",p:()=>coinAl(3)},
-    {k:"a22",n:"22 ayar altın (bilezik)",u:"gram",e:"🥇",p:()=>tgf("b22")?tgf("b22").a:(gramTL()&&gramTL()*0.916)},
-    {k:"a14",n:"14 ayar altın",u:"gram",e:"🥇",p:()=>tgf("a14")?tgf("a14").a:(gramTL()&&gramTL()*0.585)},
-    {k:"gumus",n:"Gümüş",u:"gram",e:"🥈",p:()=>agAl()},
-    {k:"usd",n:"Dolar",u:"$",e:"💵",p:()=>S.usdtry},
-    {k:"eur",n:"Euro",u:"€",e:"💶",p:eurtry},
-    {k:"gbp",n:"Sterlin",u:"£",e:"💷",p:()=>xtry("gbp")},
-    {k:"chf",n:"İsviçre frangı",u:"CHF",e:"💴",p:()=>xtry("chf")},
-    {k:"sar",n:"Suudi riyali",u:"SAR",e:"💴",p:()=>xtry("sar")},
-    {k:"btc",n:"Bitcoin",u:"BTC",e:"🪙",p:()=>S.btc&&S.usdtry&&S.btc*S.usdtry}
+    {k:"gram",n:"Gram altın (24 ayar)",u:"gram",e:"🥇",c:"gram",p:()=>qv("gram","a")},
+    {k:"ceyrek",n:"Çeyrek altın",u:"adet",e:"🥇",c:"coin0",p:()=>qv("coin0","a")},
+    {k:"yarim",n:"Yarım altın",u:"adet",e:"🥇",c:"coin1",p:()=>qv("coin1","a")},
+    {k:"tam",n:"Tam altın",u:"adet",e:"🥇",c:"coin2",p:()=>qv("coin2","a")},
+    {k:"ata",n:"Cumhuriyet altını",u:"adet",e:"🥇",c:"coin3",p:()=>qv("coin3","a")},
+    {k:"a22",n:"22 ayar altın (bilezik)",u:"gram",e:"🥇",c:"gram",p:()=>tgf("b22")?tgf("b22").a:(qv("gram","a")&&qv("gram","a")*0.916)},
+    {k:"a14",n:"14 ayar altın",u:"gram",e:"🥇",c:"gram",p:()=>tgf("a14")?tgf("a14").a:(qv("gram","a")&&qv("gram","a")*0.585)},
+    {k:"gumus",n:"Gümüş",u:"gram",e:"🥈",c:"ag",p:()=>qv("ag","a")},
+    {k:"usd",n:"Dolar",u:"$",e:"💵",c:"usd",p:()=>qv("usd")},
+    {k:"eur",n:"Euro",u:"€",e:"💶",c:"eur",p:()=>qv("eur")},
+    {k:"gbp",n:"Sterlin",u:"£",e:"💷",c:"x_gbp",p:()=>qv("x_gbp")},
+    {k:"chf",n:"İsviçre frangı",u:"CHF",e:"💴",c:"x_chf",p:()=>qv("x_chf")},
+    {k:"sar",n:"Suudi riyali",u:"SAR",e:"💴",c:"x_sar",p:()=>qv("x_sar")},
+    {k:"btc",n:"Bitcoin",u:"BTC",e:"🪙",c:"btctl",p:()=>qv("btctl")}
   ];
   const AT=Object.fromEntries(ATYPES.map(a=>[a.k,a]));
   const LS={ get(k,d){ try{ const v=localStorage.getItem(k); return v==null?d:JSON.parse(v); }catch(e){ return d; } }, set(k,v){ try{ localStorage.setItem(k,JSON.stringify(v)); return true; }catch(e){ return false; } } };
@@ -616,16 +769,16 @@
     $("hUser").textContent = user ? "👤 "+((LS.get("pn-users",{})[user]||{}).name||user) : "Giriş yap";
     const box=$("pf");
     if(!user){
-      box.innerHTML=`<div class="lock"><div class="big">🔒</div><b>Altınlarını ve borçlarını takip et</b><div class="muted">Elindeki altın, döviz ve borçlarını ekle; güncel değerini, kârını ve zararını canlı gör.</div><div style="display:grid;gap:8px;max-width:320px;margin:14px auto 0"><button class="pbtn" type="button" id="pLogin">Giriş yap / Hesap oluştur</button></div></div>`;
+      box.innerHTML=`<div class="lock"><div class="big">🔒</div><b>Altınlarını ve borçlarını takip et</b><div class="muted">Elindeki altın, döviz ve borçlarını ekle; güncel değerini, kârını ve zararını canlı gör.</div><div style="display:grid;gap:8px;max-width:320px;margin:14px auto 0"><button class="pbtn" type="button" id="pLogin">Giriş yap / Hesap oluştur</button></div><div class="cihaz">Hesap ve varlıklar <b>yalnızca bu cihazdaki bu tarayıcıda</b> saklanır; başka cihazda görünmez, tarayıcı verisi silinirse kaybolur. Yedek alıp geri yükleyebilirsin.</div></div>`;
       $("pLogin").onclick=()=>openModal("login");
       return;
     }
     const draft = $("aType") ? {type:$("aType").value, qty:$("aQty").value, cost:$("aCost").value, note:$("aNote").value} : null;
-    let tv=0,td=0,pl=0,plKnown=false,missing=false;
+    let tv=0,td=0,pl=0,plKnown=false,missing=false,eskiF=false;
     const rows={varlik:[],borc:[]};
     items.forEach(it=>{
       const t=AT[it.type]; if(!t) return; const up=t.p(); const val=up!=null&&isFinite(up)?up*it.qty:null;
-      if(val==null) missing=true;
+      if(val==null) missing=true; else if(QS[t.c]&&QS[t.c].cached) eskiF=true;
       if(val!=null){ if(it.side==="borc") td+=val; else tv+=val; }
       let itPL=null;
       if(val!=null && it.cost>0){ itPL = it.side==="borc" ? it.cost-val : val-it.cost; pl+=itPL; plKnown=true; }
@@ -639,6 +792,7 @@
         <div class="tile"><div class="l">Net durum</div><div class="v ${net<0?"down":""}">${dash(net)}</div></div>
         <div class="tile"><div class="l">Kâr / zarar</div><div class="v ${plKnown?(pl>=0?"up":"down"):""}">${plKnown?fPL(pl):"—"}</div><div class="s muted">${plKnown?"alış tutarı girilenler":"alış tutarı gir"}</div></div>
       </div>
+      ${eskiF?'<div class="cihaz" style="margin:0 0 6px">Bazı değerler canlı veri alınamadığı için <b>son doğrulanmış fiyatlarla</b> hesaplandı.</div>':''}${missing&&items.length?'<div class="cihaz" style="margin:0 0 6px">Bazı varlıkların fiyatı şu an mevcut değil; toplamlara eklenmedi.</div>':''}
       <div class="sec">Varlıklarım</div><div id="lV"></div>
       <div class="sec">Borçlarım</div><div id="lB"></div>
       <form class="form" id="aForm" autocomplete="off">
@@ -650,6 +804,11 @@
         <button class="pbtn" type="submit">${side==="borc"?"Borcu ekle":"Varlığı ekle"}</button>
         <div class="muted" style="font-size:12px">Alış tutarını yazarsan kâr ve zararın hesaplanır. Borçta, borcu aldığın gün bunun kaç TL ettiğini yaz: altın yükselirse borcun büyür ve zarar görünür.</div>
       </form>
+      <div class="sec">Yedekleme</div>
+      <div class="cihaz" style="margin-top:0">Bu hesap bir bulut hesabı değildir: varlıkların yalnızca <b>bu cihazdaki bu tarayıcıda</b> saklanır. Telefon değiştirirsen ya da tarayıcı verisini silersen kaybolur. Düzenli yedek indir; yedek dosyasını başka bir cihazda geri yükleyebilirsin.</div>
+      <div class="bk"><button class="pbtn ghost" type="button" id="bkDown">⬇ Yedeği indir</button><button class="pbtn ghost" type="button" id="bkUp">⬆ Geri yükle</button></div>
+      <input type="file" id="bkFile" accept="application/json,.json" hidden>
+      <div id="bkAsk"></div>
       <button class="linkbtn" id="logout" type="button" style="color:var(--muted);margin-top:8px">Çıkış yap</button>`;
     const draw=(arr,el,empty)=>{
       el.innerHTML = arr.length ? "" : `<div class="empty">${empty}</div>`;
@@ -679,6 +838,61 @@
       save(); $("aQty").value=""; $("aCost").value=""; $("aNote").value=""; renderPF(); toast(side==="borc"?"Borç eklendi":"Varlık eklendi");
     };
     $("logout").onclick=()=>{ try{ sessionStorage.removeItem("pn-session"); localStorage.removeItem("pn-remember"); }catch(e){} user=null; items=[]; renderPF(); toast("Çıkış yapıldı"); };
+    $("bkDown").onclick=bkDownload;
+    $("bkUp").onclick=()=>$("bkFile").click();
+    $("bkFile").onchange=e=>{ const f=e.target.files&&e.target.files[0]; e.target.value=""; if(f) bkRead(f); };
+    if(bkPending) bkShow();
+  }
+
+  // ---------- yedekleme ve geri yükleme (yalnızca bu cihaz) ----------
+  let bkPending=null;
+  function bkDownload(){
+    const data={uygulama:"Piyasa Nabzı",tur:"varlik-yedegi",surum:1,olusturma:new Date().toISOString(),
+      kullanici:(LS.get("pn-users",{})[user]||{}).name||user, varliklar:items, alarmlar:alarms};
+    try{
+      const blob=new Blob([JSON.stringify(data,null,1)],{type:"application/json"});
+      const a=document.createElement("a"); a.href=URL.createObjectURL(blob);
+      a.download="piyasa-nabzi-yedek-"+String(user).replace(/[^\p{L}\p{N}_.-]/gu,"_")+"-"+new Date().toISOString().slice(0,10)+".json";
+      document.body.appendChild(a); a.click(); setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); },1500);
+      toast("Yedek indirildi ("+items.length+" kayıt)");
+    }catch(e){ toast("Yedek oluşturulamadı"); }
+  }
+  // yedek dosyası doğrulanır; tanınmayan alanlar atılır
+  function bkCheck(d){
+    if(!d||typeof d!=="object"||d.uygulama!=="Piyasa Nabzı"||d.tur!=="varlik-yedegi"||!Array.isArray(d.varliklar)) return null;
+    if(d.varliklar.length>1000) return null;
+    const out=[];
+    for(const x of d.varliklar){
+      if(!x||typeof x!=="object") return null;
+      const side=x.side==="borc"?"borc":(x.side==="varlik"?"varlik":null), q=+x.qty, c=x.cost==null?0:+x.cost;
+      if(!side||!AT[x.type]||!(q>0)||q>1e9||!isFinite(c)||c<0||c>1e13) return null;
+      if(AT[x.type].u==="adet"&&q!==Math.floor(q)) return null;
+      const id=typeof x.id==="string"&&/^[a-z0-9]{4,40}$/i.test(x.id)?x.id:Date.now().toString(36)+Math.random().toString(36).slice(2,8);
+      out.push({id,side,type:x.type,qty:q,cost:c,note:typeof x.note==="string"?x.note.slice(0,40):"",t:+x.t>0?+x.t:Date.now()});
+    }
+    const al=Array.isArray(d.alarmlar)?d.alarmlar.filter(a=>a&&ALK[a.k]&&+a.t>0&&(a.dir==="up"||a.dir==="down")&&typeof a.id==="string").slice(0,50)
+      .map(a=>({id:a.id.slice(0,40),k:a.k,t:+a.t,dir:a.dir,at:+a.at||Date.now(),hit:+a.hit||null,hv:+a.hv||undefined,m:typeof a.m==="string"?a.m.slice(0,12):undefined})):[];
+    return {items:out,alarms:al,tarih:typeof d.olusturma==="string"?d.olusturma.slice(0,10):""};
+  }
+  function bkRead(f){
+    if(f.size>1024*1024){ toast("Dosya çok büyük"); return; }
+    const r=new FileReader();
+    r.onload=()=>{ let d=null; try{ d=JSON.parse(String(r.result)); }catch(e){}
+      const b=bkCheck(d); if(!b){ bkPending=null; toast("Bu dosya geçerli bir Piyasa Nabzı yedeği değil"); renderPF(); return; }
+      bkPending=b; bkShow(); };
+    r.onerror=()=>toast("Dosya okunamadı");
+    r.readAsText(f);
+  }
+  function bkShow(){
+    const el=$("bkAsk"); if(!el||!bkPending) return;
+    el.innerHTML=`<div class="bkask"><b></b><div class="muted" style="font-size:12px;margin:4px 0 8px">Mevcutlara ekle: aynı kayıtlar iki kez eklenmez. Yerine koy: bu cihazdaki varlık ve borç listen yedektekiyle değiştirilir.</div><div class="bk"><button class="pbtn ghost" type="button" id="bkMerge">Mevcutlara ekle</button><button class="pbtn ghost" type="button" id="bkReplace">Yerine koy</button></div><button class="linkbtn" type="button" id="bkCancel" style="color:var(--muted)">Vazgeç</button></div>`;
+    el.querySelector("b").textContent=`Yedekte ${bkPending.items.length} varlık/borç ve ${bkPending.alarms.length} alarm var${bkPending.tarih?" ("+bkPending.tarih+")":""}.`;
+    const done=(msg)=>{ bkPending=null; save(); alSave(); renderPF(); renderAl(); toast(msg); };
+    $("bkMerge").onclick=()=>{ const ids=new Set(items.map(x=>x.id)); let n=0; bkPending.items.forEach(x=>{ if(!ids.has(x.id)){ items.push(x); n++; } });
+      const aids=new Set(alarms.map(a=>a.id)); bkPending.alarms.forEach(a=>{ if(!aids.has(a.id)) alarms.push(a); }); done(n+" kayıt eklendi"); };
+    $("bkReplace").onclick=()=>{ if(!$("bkReplace").dataset.sure){ $("bkReplace").dataset.sure="1"; $("bkReplace").textContent="Emin misin? Tekrar dokun"; return; }
+      items=bkPending.items.slice(); const aids=new Set(alarms.map(a=>a.id)); bkPending.alarms.forEach(a=>{ if(!aids.has(a.id)) alarms.push(a); }); done("Varlıklar yedekten geri yüklendi"); };
+    $("bkCancel").onclick=()=>{ bkPending=null; el.innerHTML=""; };
   }
   function save(){ if(!LS.set("pn-data-"+user,items)) toast("Kaydedilemedi: tarayıcı depolamaya izin vermiyor"); }
   // live values refresh the portfolio at most every 2 seconds, and not while the person is typing
@@ -736,10 +950,15 @@
     {k:"brent",n:"Brent petrol (USD)",v:()=>S.brent,f:v=>fUSD(v)}
   ];
   const ALK=Object.fromEntries(ALA.map(a=>[a.k,a]));
+  const ALC={gram:"gram",ceyrek:"coin0",ons:"ons",ag:"ag",usd:"usd",eur:"eur",gbp:"x_gbp",btc:"btc",brent:"brent"};
+  // piyasa grubu: aynı alarm farklı piyasanın fiyatıyla tetiklenmez (ör. Kapalıçarşı ↔ uluslararası)
+  const mkt=q=> q.s==="harem"||q.s==="hons" ? "kc" : q.s;
   ALA.forEach(a=>{ const o=document.createElement("option"); o.value=a.k; o.textContent=a.n; $("alType").appendChild(o); });
   let alarms=LS.get("pn-alarms",[]).filter(a=>ALK[a.k]), alPend=null, alT=0, beepCtx=null;
   const alSave=()=>LS.set("pn-alarms",alarms);
-  const alCur=k=>{ if(!$("demo").hidden) return null; const v=ALK[k].v(); return v!=null&&isFinite(v)&&v>0?v:null; };
+  // alarm yalnızca canlı ya da gecikmeli gerçek veriyle çalışır; son doğrulanmış (önbellek) değerle tetiklenmez
+  const alQ=k=>{ const q=QS[ALC[k]]; return q&&!q.cached&&q.v>0&&isFinite(q.v) ? q : null; };
+  const alCur=(k,a)=>{ const q=alQ(k); if(!q) return null; if(a&&a.m&&a.m!==mkt(q)) return null; return q.v; };
   const dt=t=>new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(t);
   function beep(){ try{ beepCtx=beepCtx||new (window.AudioContext||window.webkitAudioContext)(); const o=beepCtx.createOscillator(), g=beepCtx.createGain(); o.frequency.value=880; g.gain.setValueAtTime(.001,beepCtx.currentTime); g.gain.exponentialRampToValueAtTime(.2,beepCtx.currentTime+.02); g.gain.exponentialRampToValueAtTime(.001,beepCtx.currentTime+.6); o.connect(g); g.connect(beepCtx.destination); o.start(); o.stop(beepCtx.currentTime+.6); }catch(e){} }
   let titleT=null; const baseTitle=document.title;
@@ -752,22 +971,23 @@
   }
   function alarmTick(){
     let changed=false;
-    alarms.forEach(a=>{ if(a.hit) return; const v=alCur(a.k); if(v==null) return; if(a.dir==="up"?v>=a.t:v<=a.t){ a.hit=Date.now(); a.hv=v; changed=true; alFire(a,v); } });
+    alarms.forEach(a=>{ if(a.hit) return; const q0=alQ(a.k); if(q0&&!a.m){ a.m=mkt(q0); changed=true; } const v=alCur(a.k,a); if(v==null) return; if(a.dir==="up"?v>=a.t:v<=a.t){ a.hit=Date.now(); a.hv=v; changed=true; alFire(a,v); } });
     if(changed){ alSave(); renderAl(); }
-    const v=alCur($("alType").value); $("alNow").textContent=v!=null?"Şu an: "+ALK[$("alType").value].f(v):"Fiyat yükleniyor…";
+    const k0=$("alType").value, q1=alQ(k0), qx=QS[ALC[k0]];
+    $("alNow").textContent = q1 ? "Şu an: "+ALK[k0].f(q1.v)+" · "+SRC[q1.s].n+(q1.st==="canli"?" (canlı)":" (gecikmeli)") : (qx&&qx.cached ? "Canlı fiyat alınamıyor (son doğrulanmış: "+ALK[k0].f(qx.v)+", "+fdt(qx.at)+"). Alarm için canlı veri gerekir." : (Date.now()-bootAt<8000?"Fiyat yükleniyor…":"Bu fiyat şu an mevcut değil."));
     if(Date.now()-alT>2000) renderAl();
   }
   function renderAl(){
     alT=Date.now(); const el=$("alList"); el.innerHTML="";
     alarms.forEach(a=>{
-      const t=ALK[a.k], v=alCur(a.k), d=document.createElement("div"); d.className="asset"+(a.hit?" hit":"");
+      const t=ALK[a.k], v=alCur(a.k,a), q2=alQ(a.k), d=document.createElement("div"); d.className="asset"+(a.hit?" hit":"");
       d.innerHTML=`<div class="ico">${a.hit?"✅":"🔔"}</div><div><div class="t"></div><div class="sub"></div></div><div><div class="val"></div><div class="pl"></div></div><button class="del" type="button">Sil</button>`;
       d.querySelector(".t").textContent=t.n;
       d.querySelector(".sub").textContent=`${t.f(a.t)} ${a.dir==="up"?"üstüne çıkınca":"altına düşünce"}`;
       const val=d.querySelector(".val"), pl=d.querySelector(".pl");
       if(a.hit){ val.textContent="Ulaştı"; val.className="val up"; pl.textContent=dt(a.hit)+" · "+t.f(a.hv); pl.className="pl muted"; }
       else if(v!=null){ val.textContent=t.f(v); const dist=Math.abs(a.t/v-1)*100; pl.textContent="%"+fN(dist,dist<1?2:1)+" uzakta"; pl.className="pl muted"; }
-      else val.textContent="—";
+      else { val.textContent="—"; pl.className="pl muted"; pl.textContent = q2&&a.m&&a.m!==mkt(q2) ? "Beklemede: fiyat şu an farklı bir kaynaktan geliyor" : "Beklemede: canlı veri yok"; }
       const del=d.querySelector(".del");
       if(alPend===a.id){ del.classList.add("sure"); del.textContent="Emin misin?"; }
       del.onclick=()=>{ if(alPend!==a.id){ alPend=a.id; renderAl(); setTimeout(()=>{ if(alPend===a.id){ alPend=null; renderAl(); } },3000); return; } alPend=null; alarms=alarms.filter(x=>x.id!==a.id); alSave(); renderAl(); toast("Alarm silindi"); };
@@ -777,12 +997,12 @@
   $("alType").addEventListener("change",()=>{ $("alErr").textContent=""; alarmTick(); });
   $("alForm").onsubmit=async e=>{
     e.preventDefault(); $("alErr").textContent="";
-    const k=$("alType").value, v=alCur(k), t=num($("alT").value);
-    if(v==null){ $("alErr").textContent="Bu fiyat henüz yüklenmedi, birkaç saniye sonra tekrar dene."; return; }
+    const k=$("alType").value, q=alQ(k), v=q&&q.v, t=num($("alT").value);
+    if(!q){ $("alErr").textContent="Bu fiyat için şu an canlı veri yok; alarm, gerçek ve güncel fiyatla kurulabilir. Birazdan tekrar dene."; return; }
     if(!(t>0)){ $("alErr").textContent="Geçerli bir hedef fiyat yaz."; return; }
     if(Math.abs(t/v-1)<0.0005){ $("alErr").textContent="Hedef, şu anki fiyata çok yakın."; return; }
     if(alarms.filter(a=>!a.hit).length>=20){ $("alErr").textContent="En fazla 20 aktif alarm kurabilirsin."; return; }
-    alarms.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),k,t,dir:t>v?"up":"down",at:Date.now(),hit:null});
+    alarms.push({id:Date.now().toString(36)+Math.random().toString(36).slice(2,6),k,t,dir:t>v?"up":"down",at:Date.now(),hit:null,m:mkt(q)});
     if(!alSave()){ $("alErr").textContent="Bu tarayıcı kayıt yapmaya izin vermiyor."; alarms.pop(); return; }
     $("alT").value=""; renderAl();
     try{ beepCtx=beepCtx||new (window.AudioContext||window.webkitAudioContext)(); beepCtx.resume(); }catch(_){}
@@ -796,7 +1016,7 @@
 
   // ---------- start ----------
   const safe=fn=>fn().catch(()=>{});
-  safe(binanceRest).then(()=>{ if(gotAny) setLive(true,"Canlı"); });
+  safe(binanceRest);
   connectWS();
   safe(gold); safe(goldIntraday); safe(oil); safe(fx2); safe(kc); harem();
   setInterval(()=>safe(kc),60e3);
@@ -806,8 +1026,16 @@
   setInterval(()=>safe(oil),60*60000);
   setInterval(()=>{ if(!ws||ws.readyState!==1) safe(binanceRest); },15000);
   setTimeout(()=>{ drawChart(); },1500);
-  setTimeout(demo,6000);
-  setInterval(()=>{ if(!gotAny) return; ALL.forEach(c=>{ const v=c.v(); if(v==null||!isFinite(v)){ const el=EL[c.k]; el.querySelector(".ch").textContent="Şu an alınamıyor"; el.querySelector(".ch").className="ch"; el.querySelector(".upd").textContent="Tekrar deneniyor…"; } }); },12000);
+  // durumlar (canlı / gecikmeli) yeni veri gelmese de güncellensin
+  setInterval(schedule,5000);
+  setTimeout(schedule,8200);
+  // grafik alınamadıysa dakikada bir yeniden dene; aksi halde 10 dakikada bir yenile
+  setInterval(()=>{ if(!chartOK||Date.now()-chartAt>10*60e3) drawChart(); },60e3);
+  function hepsiniYenile(){ safe(binanceRest); safe(gold); safe(goldIntraday); safe(kc); safe(fx2); safe(oil); harem(); if(!ws||ws.readyState>1) connectWS(); setTimeout(drawChart,2500); }
+  window.addEventListener("online",()=>{ S.offline=false; schedule(); hepsiniYenile(); });
+  window.addEventListener("offline",()=>{ S.offline=true; schedule(); });
+  document.addEventListener("visibilitychange",()=>{ if(document.hidden) sonSave(true); else if(!chartOK) drawChart(); });
+  window.addEventListener("pagehide",()=>sonSave(true));
   render();
   renderPF();
 })();

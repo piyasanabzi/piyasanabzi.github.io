@@ -144,7 +144,7 @@
   const last=D[D.length-1];
 
   // bugünkü fiyatlar: önce son ay verisi, sonra canlı veri gelince güncellenir
-  const NOW={g:last[1],u:last[2],e:last[3],b:last[4],live:false};
+  const NOW={g:last[1],u:last[2],e:last[3],b:last[4],live:false,src:{g:null,u:null,e:null,b:null},at:0};
   // her varlık için: o aydaki 1 birimin TL fiyatı
   const A=[
     {k:"gold",n:"Gram altın",unit:"gram",dq:2,p:x=>x.g/OZ*x.u},
@@ -227,10 +227,16 @@
   $("amt").addEventListener("blur",()=>{ const v=num($("amt").value); if(v>0) $("amt").value=fQ(v,2); });
 
   const lastLabel=AYLAR[+last[0].slice(5)-1]+" "+last[0].slice(0,4);
+  // her değerin kaynağı ayrı ayrı yazılır: canlı olanlar saatiyle, alınamayanlar son ay ortalamasıyla
   function srcNote(){
-    $("src").textContent = NOW.live
-      ? "Bugünkü değerler canlı fiyatlarla (altın xaus.com, döviz ve bitcoin Binance) hesaplanır. Geçmiş fiyatlar aylık ortalamadır. İşçilik, komisyon ve vergi dahil değildir."
-      : `Canlı fiyatlara ulaşılamadı; bugünkü değerler ${lastLabel} ortalamasıyla hesaplandı. Geçmiş fiyatlar aylık ortalamadır. İşçilik, komisyon ve vergi dahil değildir.`;
+    const ad={g:"ons altın",u:"dolar",e:"euro/dolar",b:"bitcoin"}, kn={g:"xaus.com",u:"Binance USDT/TRY",e:"Binance EUR/USDT",b:"Binance BTC/USDT",bx:"xaus.com"};
+    const canli=Object.keys(ad).filter(k=>NOW.src[k]), ort=Object.keys(ad).filter(k=>!NOW.src[k]);
+    const saat=NOW.at?new Intl.DateTimeFormat("tr-TR",{hour:"2-digit",minute:"2-digit"}).format(NOW.at):"";
+    let t="";
+    if(canli.length) t+="Bugünkü değerler canlı fiyatlarla hesaplandı ("+saat+"): "+canli.map(k=>ad[k]+" "+kn[NOW.src[k]]).join(", ")+". ";
+    if(ort.length) t+=(canli.length?"Şu an alınamayan ":"Canlı fiyatlara ulaşılamadı; ")+ort.map(k=>ad[k]).join(", ")+" için "+lastLabel+" ortalaması (doğrulanmış geçmiş veri) kullanıldı. ";
+    t+="Bu sayfa uluslararası fiyatlarla hesaplar; Kapalıçarşı fiyatlarından farklı olabilir. Geçmiş fiyatlar aylık ortalamadır. İşçilik, komisyon ve vergi dahil değildir.";
+    $("src").textContent=t;
   }
 
   async function j(url,ms=8000){ const c=new AbortController(); const t=setTimeout(()=>c.abort(),ms); try{ const r=await fetch(url,{signal:c.signal,cache:"no-store"}); if(!r.ok) throw new Error(r.status); return await r.json(); } finally{ clearTimeout(t); } }
@@ -240,8 +246,9 @@
     const bin=(async()=>{ for(const h of hosts){ try{ return await j(h+"/api/v3/ticker/price?symbols="+syms); }catch(e){} } return null; })();
     const [b,gd]=await Promise.all([bin, j("https://xaus.com/api/v1/spot?currency=TRY").catch(()=>null)]);
     let n=0;
-    if(b){ b.forEach(x=>{ const p=+x.price; if(!(p>0)) return; if(x.symbol==="USDTTRY"){NOW.u=p;n++;} if(x.symbol==="EURUSDT"){NOW.e=p;n++;} if(x.symbol==="BTCUSDT"){NOW.b=p;n++;} }); }
-    if(gd&&+gd.spot_usd_oz>0){ NOW.g=+gd.spot_usd_oz; n++; if(!b&&+gd.btc_usd>0) NOW.b=+gd.btc_usd; }
+    if(b){ b.forEach(x=>{ const p=+x.price; if(!(p>0)) return; if(x.symbol==="USDTTRY"){NOW.u=p;n++;NOW.src.u="u";} if(x.symbol==="EURUSDT"){NOW.e=p;n++;NOW.src.e="e";} if(x.symbol==="BTCUSDT"){NOW.b=p;n++;NOW.src.b="b";} }); }
+    if(gd&&+gd.spot_usd_oz>0){ NOW.g=+gd.spot_usd_oz; n++; NOW.src.g="g"; if(!b&&+gd.btc_usd>0){ NOW.b=+gd.btc_usd; NOW.src.b="bx"; } }
+    if(n) NOW.at=Date.now();
     NOW.live = n>=4;
     srcNote(); run();
   }
