@@ -158,7 +158,10 @@ def calis():
         t("fiyat girildi (Türkçe sayı biçimi)", sql("select gram_satis || '|' || ceyrek_alis from public.fiyatlar") == "5750.50|9300.00")
         ekran(k, "5_kuyumcu_fiyat")
         k.click("button[role=tab]:has-text('Fotoğraflar')"); k.wait_for_selector("input[type=file]")
-        subprocess.run(["convert", "-size", "1200x900", "gradient:gold-orange", "/tmp/foto.jpg"], check=True)
+        veri = k.evaluate("""() => { const c = document.createElement('canvas'); c.width = 1200; c.height = 900; const g = c.getContext('2d');
+              const r = g.createLinearGradient(0, 0, 1200, 900); r.addColorStop(0, '#f2c14e'); r.addColorStop(1, '#b7861b'); g.fillStyle = r; g.fillRect(0, 0, 1200, 900);
+              return c.toDataURL('image/jpeg', 0.9).split(',')[1]; }""")
+        open("/tmp/foto.jpg", "wb").write(base64.b64decode(veri))
         k.set_input_files("input[type=file]", "/tmp/foto.jpg"); k.fill("input[placeholder='Ör. Dükkân vitrini']", "Test vitrini")
         k.click("button:has-text('Fotoğrafı yükle')"); k.wait_for_selector("text=Onay bekliyor", timeout=20000)
         t("fotoğraf depoya yüklendi ve onaya düştü", sql("select count(*) from storage.objects where bucket_id='isletme-fotolari'") == "1" and sql("select durum from public.fotograflar") == "bekliyor")
