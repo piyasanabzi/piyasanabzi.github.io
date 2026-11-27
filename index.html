@@ -60,6 +60,9 @@
   .upd .st.canli{background:var(--up)} .upd .st.gec{background:#f59e0b} .upd .st.eski{background:var(--muted)} .upd .st.yok{background:var(--down)}
   .upd .us{display:block;margin-top:1px;line-height:1.35}
   .c.fb .upd .us{color:#d97706;font-weight:700}
+  .alt{margin-top:6px;padding:5px 8px;border-left:3px solid #d97706;border-radius:6px;background:var(--card2);font-size:11px;line-height:1.4;color:var(--muted)}
+  .alt b{color:var(--ink);font-variant-numeric:tabular-nums}
+  .alt .at{color:#d97706;font-weight:700;display:block}
   .c.eski .p{opacity:.72}
   .demo.bilgi{background:#3b2f0b;color:#ffe2a6} .demo.kesik{background:#5a1d1d;color:#ffd6d6}
   @media (prefers-color-scheme: light){ .demo.bilgi{background:#fff4d6;color:#5a3b00} .demo.kesik{background:#fde2e2;color:#7a1414} }
@@ -233,7 +236,7 @@
       <button class="pbtn" type="submit">🔔 Alarm kur</button>
     </form>
     <div id="alList"></div>
-    <div class="muted" id="alInfo" style="font-size:12px;margin-top:10px;line-height:1.5">Hedef fiyata ulaşıldığında bildirim gönderilir. Alarm, bu sayfa bir sekmede açık kaldığı sürece ve yalnızca canlı veriyle çalışır; kurulduğu kaynaktan (ör. Kapalıçarşı) farklı bir yedek kaynağın fiyatıyla tetiklenmez. Alarmların yalnızca bu cihazda saklanır.</div>
+    <div class="muted" id="alInfo" style="font-size:12px;margin-top:10px;line-height:1.5">Hedef fiyata ulaşıldığında bildirim gönderilir. Alarm, bu sayfa bir sekmede açık kaldığı sürece ve yalnızca canlı veriyle çalışır; son alınan (eski) fiyatlarla ya da alternatif kaynakların fiyatıyla tetiklenmez. Alarmların yalnızca bu cihazda saklanır.</div>
   </div>
 
   <h2 id="varliklarim">Varlıklarım ve borçlarım</h2>
@@ -252,7 +255,7 @@
     <a href="/rehber/" style="color:var(--gold)">Tüm rehberler →</a>
   </div>
 
-  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için Kapalıçarşı'daki <b>alış ve satış</b> fiyatları anlık gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu veri alınamazsa yedek kaynağa geçilir; o durumda sayfanın üstünde uyarı çıkar ve kartta kullanılan kaynak turuncu renkle yazılır. Hiçbir kaynağa ulaşılamazsa son doğrulanmış fiyat, kaynağı ve tarihiyle gösterilir; o da yoksa fiyat "mevcut değil" olarak belirtilir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar ve euro da Kapalıçarşı kuruyla gösterilir. Yatırım tavsiyesi değildir.</div>
+  <div class="note">Gram, çeyrek, yarım, tam ve Cumhuriyet altını ile gümüş için Kapalıçarşı'daki <b>alış ve satış</b> fiyatları anlık gösterilir (büyük rakam satış fiyatıdır); kuyumcular arasında küçük farklar olabilir. Bu yayın kesilirse kartlarda son alınan Kapalıçarşı fiyatı tarih ve saatiyle gösterilir; başka kaynakların fiyatları farklı piyasaya ait olduğu için ayrı bir satırda "Alternatif kaynak" etiketiyle yazılır ve hesaplamalarda kullanılmaz. Kaydedilmiş fiyat da yoksa fiyat "mevcut değil" olarak belirtilir. Hesaplayıcı ve Varlıklarım bölümü, altını bozdurduğunda alacağın <b>alış</b> fiyatını kullanır. Dolar ve euro da Kapalıçarşı kuruyla gösterilir. Yatırım tavsiyesi değildir.</div>
 </main>
 <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
   <div class="box">
@@ -308,12 +311,10 @@
   const hrf=c=>{ const x=S.hr&&S.hr[c]; return x&&x.s>0&&S.hrOK&&(Date.now()-x.at<10*60e3||hLive()) ? x : null; };
   const tgOnly=k=> (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null;
   const tgf=k=>{ const h=HMAP[k]&&hrf(HMAP[k]); if(h) return h; return (S.tg && S.tg[k] && S.tg[k].s>0 && Date.now()-S.tg.at < 30*60e3) ? S.tg[k] : null; };
-  const gramSat=()=> tgf("gram")? tgf("gram").s : gramTL();
-  const gramAl =()=> tgf("gram")? tgf("gram").a : gramTL();
-  const coinSat=i=> tgf(TG_KEYS[i])? tgf(TG_KEYS[i]).s : (gramTL()&&gramTL()*COINS[i][1]);
-  const coinAl =i=> tgf(TG_KEYS[i])? tgf(TG_KEYS[i]).a : (gramTL()&&gramTL()*COINS[i][1]);
-  const agTL=()=> tgf("gumus")? tgf("gumus").s : (S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry);
-  const agAl=()=> tgf("gumus")? tgf("gumus").a : (S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry);
+  // gösterilen (ana kaynak) değerler; farklı piyasaların fiyatı birbirinin yerine kullanılmaz
+  const gramSat=()=> qv("gram"), gramAl=()=> qv("gram","a");
+  const coinSat=i=> qv("coin"+i), coinAl=i=> qv("coin"+i,"a");
+  const agTL=()=> qv("ag"), agAl=()=> qv("ag","a");
 
   const XC=[["gbp","Sterlin","GBP/TRY"],["chf","İsviçre frangı","CHF/TRY"],["sar","Suudi riyali","SAR/TRY"],["aed","BAE dirhemi","AED/TRY"],["jpy","Japon yeni","JPY/TRY"],["cny","Çin yuanı","CNY/TRY"],["rub","Rus rublesi","RUB/TRY"],["azn","Azerbaycan manatı","AZN/TRY"],["cad","Kanada doları","CAD/TRY"],["aud","Avustralya doları","AUD/TRY"],["kwd","Kuveyt dinarı","KWD/TRY"],["qar","Katar riyali","QAR/TRY"]];
   const xtry=k=> (HMAP[k]&&hrf(HMAP[k])) ? hrf(HMAP[k]).s : (S.x[k]>0&&S.usdtry ? S.usdtry/S.x[k] : null);
@@ -343,7 +344,7 @@
   Object.entries(CARDS).forEach(([gid,list])=>{
     list.forEach(c=>{
       const d=document.createElement("div"); d.className="c"+(c.big?" big":"")+(c.gold?" gold":"");
-      d.innerHTML=`<div class="n"><span></span><small></small></div><div class="p">—</div>${c.tg?'<div class="ab"></div>':''}<div class="ch">&nbsp;</div><div class="upd">&nbsp;</div>`;
+      d.innerHTML=`<div class="n"><span></span><small></small></div><div class="p">—</div>${c.tg?'<div class="ab"></div>':''}<div class="ch">&nbsp;</div><div class="upd">&nbsp;</div><div class="alt" hidden></div>`;
       d.querySelector(".n span").textContent=c.n; d.querySelector(".n small").textContent=c.s;
       $(gid).appendChild(d); EL[c.k]=d;
     });
@@ -358,7 +359,7 @@
     intl:{n:"xaus.com ons × dolar",m:"uluslararası fiyattan hesaplanan",fb:1},
     intlc:{n:"xaus.com ons × dolar",m:"uluslararası hesap, işçiliksiz",fb:1},
     xaus:{n:"xaus.com",m:"uluslararası spot"},
-    hons:{n:"Harem Altın",m:"ons, yedek kaynak",fb:1,stream:1},
+    hons:{n:"Harem Altın",m:"ons",fb:1,stream:1},
     binusd:{n:"Binance USDT/TRY",m:"kripto borsası kuru, yaklaşık",fb:1,stream:1},
     xausfx:{n:"xaus.com",m:"uluslararası kur, yedek",fb:1},
     eurcalc:{n:"Binance EUR/USD × dolar",m:"hesaplanan, yedek",fb:1,stream:1},
@@ -379,32 +380,34 @@
     S.usdtry24 = (S.usdtry&&S.usdtRaw>0&&S.usdtRaw24>0) ? S.usdtRaw24*(S.usdtry/S.usdtRaw) : null;
   }
   const at0=(...a)=>{ const v=a.map(x=>+x||0).filter(x=>x>0); return v.length?Math.min(...v):0; };
-  function qGold(hk,tk,calc,calcSrc){
-    const h=hrf(hk); if(h) return {v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at};
-    const t=tgOnly(tk); if(t) return {v:t.s,a:t.a,s:"tg",at:S.tg.at};
-    const v=calc(); if(v>0) return {v,s:calcSrc||"intl",at:at0(S.t.gold,S.usdAt)};
-    return null;
-  }
-  function qUsd(){ return S.usdtry>0 ? {v:S.usdtry,a:(hrf("USDTRY")||tgOnly("usd")||{}).a,ch:(hrf("USDTRY")||{}).ch,s:S.usdSrc,at:S.usdAt} : null; }
+  // Her kartın ANA kaynağı (piyasası) sabittir. Ana kaynak yoksa yerine başka piyasanın fiyatı konmaz:
+  // son alınan ana kaynak fiyatı gösterilir, alternatif kaynak fiyatı ayrı ve etiketli bir satırda yazılır.
+  const HQ=(code)=>{ const h=hrf(code); return h?{v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at}:null; };
+  const TQ=(k)=>{ const t=tgOnly(k); return t?{v:t.s,a:t.a,s:"tg",at:S.tg.at}:null; };
+  const IQ=(v,src)=> v>0 ? {v,s:src||"intl",at:at0(S.t.gold,S.usdAt)} : null;
+  function usdC(){ return [HQ("USDTRY"), TQ("usd"),
+    S.usdtRaw>0?{v:S.usdtRaw,s:"binusd",at:+S.t.fx||0}:null,
+    S.usdXaus>0?{v:S.usdXaus,s:"xausfx",at:S.usdXausAt}:null]; }
   const QF={
-    gram:()=>qGold("KULCEALTIN","gram",gramTL),
-    ons:()=>{ if(S.goldOz>0&&S.t.gold&&Date.now()-S.t.gold<10*60e3) return {v:S.goldOz,s:"xaus",at:+S.t.gold};
-              const h=hrf("ONS"); if(h) return {v:h.s,ch:h.ch,s:"hons",at:h.at};
-              return S.goldOz>0?{v:S.goldOz,s:"xaus",at:+S.t.gold}:null; },
-    ag:()=>qGold("GUMUSTRY","gumus",()=>S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry),
-    usd:qUsd,
-    eur:()=>{ const h=hrf("EURTRY"); if(h) return {v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at};
-              return S.eurusd&&S.usdtry ? {v:S.eurusd*S.usdtry,s:"eurcalc",at:at0(S.eurAt,S.usdAt)} : null; },
-    parite:()=> S.eurusd>0 ? {v:S.eurusd,s:S.eurSrc==="xaus"?"xausfx":"bin",at:S.eurAt} : null,
-    usd100:()=>{ const q=qUsd(); return q?{v:q.v*100,ch:q.ch,s:q.s,at:q.at}:null; },
-    brent:()=> S.brent>0 ? {v:S.brent,s:"oil",at:+S.t.oil} : null,
-    wti:()=> S.wti>0 ? {v:S.wti,s:"oil",at:+S.t.oil} : null,
-    btc:()=> S.btc>0 ? {v:S.btc,s:S.btcSrc==="xaus"?"xausfx":"bin",at:S.btcAt} : null,
-    btctl:()=> S.btc>0&&S.usdtry>0 ? {v:S.btc*S.usdtry,s:"binc",at:at0(S.btcAt,S.usdAt)} : null
+    gram:()=>[HQ("KULCEALTIN"), TQ("gram"), IQ(gramTL())],
+    ons:()=>[S.goldOz>0?{v:S.goldOz,s:"xaus",at:+S.t.gold}:null, (()=>{ const h=hrf("ONS"); return h?{v:h.s,s:"hons",at:h.at}:null; })()],
+    ag:()=>[HQ("GUMUSTRY"), TQ("gumus"), IQ(S.silverOz&&S.usdtry&&S.silverOz/OZ*S.usdtry)],
+    usd:usdC,
+    eur:()=>[HQ("EURTRY"), S.eurusd&&S.usdtry ? {v:S.eurusd*S.usdtry,s:"eurcalc",at:at0(S.eurAt,S.usdAt)} : null],
+    parite:()=>[S.eurusd>0 ? {v:S.eurusd,s:S.eurSrc==="xaus"?"xausfx":"bin",at:S.eurAt} : null],
+    usd100:()=>usdC().map(q=>q?{v:q.v*100,a:q.a?q.a*100:null,ch:q.ch,s:q.s,at:q.at}:null),
+    brent:()=>[S.brent>0 ? {v:S.brent,s:"oil",at:+S.t.oil} : null],
+    wti:()=>[S.wti>0 ? {v:S.wti,s:"oil",at:+S.t.oil} : null],
+    btc:()=>[S.btc>0 ? {v:S.btc,s:S.btcSrc==="xaus"?"xausfx":"bin",at:S.btcAt} : null],
+    btctl:()=>[S.btc>0&&S.usdtry>0 ? {v:S.btc*S.usdtry,s:"binc",at:at0(S.btcAt,S.usdAt)} : null]
   };
-  COINS.forEach(([n,g],i)=>{ QF["coin"+i]=()=>qGold(HMAP[TG_KEYS[i]],TG_KEYS[i],()=>gramTL()&&gramTL()*g,"intlc"); });
-  XC.forEach(([k])=>{ QF["x_"+k]=()=>{ const h=HMAP[k]&&hrf(HMAP[k]); if(h) return {v:h.s,a:h.a,ch:h.ch,s:"harem",at:h.at};
-    return S.x[k]>0&&S.usdtry>0 ? {v:S.usdtry/S.x[k],s:"cross",at:S.xAt} : null; }; });
+  // ana kaynaklar
+  const PRI={ons:["xaus"],parite:["bin"],brent:["oil"],wti:["oil"],btc:["bin"],btctl:["binc"]};
+  ["gram","ag","usd","eur","usd100"].forEach(k=>PRI[k]=["harem"]);
+  COINS.forEach(([n,g],i)=>{ PRI["coin"+i]=["harem"]; QF["coin"+i]=()=>[HQ(HMAP[TG_KEYS[i]]), TQ(TG_KEYS[i]), IQ(gramTL()&&gramTL()*g,"intlc")]; });
+  XC.forEach(([k])=>{ const cr=()=> S.x[k]>0&&S.usdtry>0 ? {v:S.usdtry/S.x[k],s:"cross",at:S.xAt} : null;
+    if(HMAP[k]){ PRI["x_"+k]=["harem"]; QF["x_"+k]=()=>[HQ(HMAP[k]), cr()]; } else { PRI["x_"+k]=["cross"]; QF["x_"+k]=()=>[cr()]; } });
+  const isKC=k=>PRI[k]&&PRI[k][0]==="harem";
 
   // son doğrulanmış fiyatlar: yalnızca gerçek kaynaktan gelen ve kontrolden geçen değerler saklanır
   const SON_KEY="pn-son", SON_MAX=14*24*3600e3;
@@ -422,29 +425,36 @@
     if(S.offline) return "gec";
     if(sr.daily||sr.hourly) return "gec";
     const age=Date.now()-(q.at||0);
-    if(q.s==="harem"||q.s==="hons") return hLive()||age<90e3 ? "canli" : "gec";
+    // Harem yayını: yalnızca bağlantı açıkken canlıdır; bağlantı koptuğu anda fiyat "son alınan" olur
+    if(q.s==="harem"||q.s==="hons") return hLive() ? "canli" : "gec";
     return age <= (sr.stream?90e3:5*60e3) ? "canli" : "gec";
   }
   const fdt=t=>new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(t);
   function zaman(at,st){ if(!at) return ""; return (st==="canli"||Date.now()-at<12*3600e3&&st!=="eski") ? tm(at) : fdt(at); }
   function stTxt(q){ const sr=SRC[q.s]||{}; if(q.st==="canli") return "Canlı"; if(q.st==="eski") return "Son doğrulanmış"; if(sr.daily) return "Günlük kur"; if(sr.hourly) return "Saatlik"; return "Gecikmeli"; }
+  const okQ=q=> q && q.v>0 && isFinite(q.v) && q.s && SRC[q.s];
   function resolve(c){
-    let q=null; try{ q=QF[c.k]?QF[c.k]():null; }catch(e){ q=null; }
-    // açılışın ilk saniyelerinde ana kaynak (Harem) beklenir: yedek kaynağın farklı piyasa fiyatı bir anlığına gösterilmez
-    const erken = Date.now()-bootAt<5000 && !S.hrOK && hFail===0 && !S.offline;
-    if(q && erken && SRC[q.s] && SRC[q.s].fb) q=null;
-    if(q&&q.v>0&&isFinite(q.v)&&q.s&&SRC[q.s]){
+    let list=[]; try{ list=(QF[c.k]?QF[c.k]():[]).filter(okQ); }catch(e){ list=[]; }
+    const P=PRI[c.k]||[];
+    let q=list.find(x=>P.includes(x.s))||null;
+    const alt=list.find(x=>!P.includes(x.s))||null;
+    if(alt){ alt.st=stOf(alt); }
+    if(q){
       q.st=stOf(q); q.cached=false;
-      const ok = (q.s!=="harem"&&q.s!=="hons") || S.hrOK;
+      const ok = (q.s!=="harem") || S.hrOK;
       if(ok && (!SON[c.k] || SON[c.k].at!==q.at || SON[c.k].v!==q.v)){ SON[c.k]={v:q.v,a:q.a||null,s:q.s,at:q.at||Date.now()}; sonDirty=true; }
-      return q;
+    } else {
+      // ana kaynak yok: yalnızca AYNI kaynağın son alınan fiyatı gösterilir
+      const o=SON[c.k];
+      if(o&&o.v>0&&P.includes(o.s)&&Date.now()-o.at<SON_MAX) q={v:o.v,a:o.a,s:o.s,at:o.at,st:"eski",cached:true};
     }
-    const o=SON[c.k];
-    if(o&&o.v>0&&SRC[o.s]&&Date.now()-o.at<SON_MAX) return {v:o.v,a:o.a,s:o.s,at:o.at,st:"eski",cached:true};
-    return null;
+    // alternatif kaynak, ana kaynak canlı değilken ayrı satırda gösterilir
+    const showAlt = alt && (!q || q.st!=="canli");
+    return {q, alt: showAlt?alt:null};
   }
   const qv=(k,f)=>{ const q=QS[k]; if(!q) return null; return f==="a"&&q.a>0 ? q.a : q.v; };
   const bootAt=Date.now();
+  const ALTQ={};   // kartlarda gösterilen alternatif kaynak fiyatları
 
   // 24s değişim için yedek: Binance/intraday alınamazsa dünkü günlük kurları kullan
   function fill24(){
@@ -457,14 +467,22 @@
   function render(){
     syncUsd(); fill24();
     ALL.forEach(c=>{
-      const el=EL[c.k], q=resolve(c); QS[c.k]=q;
-      const p=el.querySelector(".p"), chEl=el.querySelector(".ch"), upd=el.querySelector(".upd");
-      el.classList.toggle("eski",!!(q&&q.cached));
-      el.classList.toggle("fb",!!(q&&SRC[q.s].fb));
+      const el=EL[c.k], r=resolve(c), q=r.q; QS[c.k]=q; ALTQ[c.k]=r.alt;
+      const p=el.querySelector(".p"), chEl=el.querySelector(".ch"), upd=el.querySelector(".upd"), altEl=el.querySelector(".alt");
+      el.classList.toggle("eski",!!(q&&(q.cached||(q.st==="gec"&&isKC(c.k)))));
+      el.classList.remove("fb");
+      // alternatif kaynak satırı (ayrı piyasa; ana fiyatın yerine geçmez)
+      if(r.alt){ const a=r.alt, sa=SRC[a.s];
+        altEl.innerHTML='<span class="at"></span><b></b> <span class="ad"></span>';
+        altEl.querySelector(".at").textContent="Alternatif kaynak · farklı piyasa";
+        altEl.querySelector("b").textContent=c.f(a.v);
+        altEl.querySelector(".ad").textContent="· "+sa.n+" ("+sa.m+") · "+stTxt(a)+(a.at?" "+zaman(a.at,a.st):"");
+        altEl.hidden=false;
+      } else { altEl.hidden=true; altEl.textContent=""; }
       if(!q){
         p.textContent="—"; LAST[c.k]=null;
         const bekle=Date.now()-bootAt<8000&&!S.offline;
-        chEl.textContent=bekle?"\u00a0":"Veri şu an mevcut değil"; chEl.className="ch";
+        chEl.textContent=bekle?"\u00a0":(isKC(c.k)?"Kapalıçarşı fiyatı şu an mevcut değil":"Veri şu an mevcut değil"); chEl.className="ch";
         upd.innerHTML='<span class="st yok"></span><span class="ut"></span>'; upd.querySelector(".ut").textContent=bekle?"Yükleniyor…":"Bağlantı bekleniyor";
         if(c.tg){ el.querySelector(".ab").textContent=""; }
         return;
@@ -474,31 +492,33 @@
         if(LAST[c.k]!=null && v!==LAST[c.k] && !q.cached){ const cls=v>LAST[c.k]?"flash-up":"flash-down"; el.classList.remove("flash-up","flash-down"); void el.offsetWidth; el.classList.add(cls); clearTimeout(el._t); el._t=setTimeout(()=>el.classList.remove(cls),700); }
         p.textContent=txt; LAST[c.k]=v;
       }
-      // değişim: aynı kaynağın kendi referansıyla; eski (önbellek) değerde gösterilmez
+      // değişim yalnızca gösterilen fiyatın KENDİ kaynağının referansıyla hesaplanır:
+      // Kapalıçarşı → Harem'in önceki kapanışı (gün); diğerleri → aynı kaynağın 24 saat önceki değeri.
+      // Son alınan (önbellek) ya da gecikmeli Kapalıçarşı fiyatında yüzde gösterilmez.
       let ch=null, chL=" (24s)";
       if(!q.cached){
-        if(q.ch!=null&&isFinite(q.ch)){ ch=q.ch; chL=" (gün)"; }
-        else if(c.c24) ch=c.c24();
+        if(q.s==="harem"){ if(q.st==="canli"&&q.ch!=null&&isFinite(q.ch)){ ch=q.ch; chL=" (gün)"; } }
         else if(c.ch) ch=c.ch(); else if(c.v24){ const b=c.v24(); if(b) ch=(v/b-1)*100; }
       }
       if(ch!=null&&isFinite(ch)){ chEl.textContent=pct(ch)+chL; chEl.className="ch "+(ch>=0?"up":"down"); }
-      else { chEl.textContent= q.cached ? "Canlı veri alınamıyor" : "\u00a0"; chEl.className="ch"; }
+      else { chEl.textContent= q.cached||q.st==="gec"&&isKC(c.k) ? (isKC(c.k)?"Kapalıçarşı bağlantısı kesik":"Canlı veri alınamıyor") : "\u00a0"; chEl.className="ch"; }
       if(c.tg){
         const ab=el.querySelector(".ab"), sm=el.querySelector(".n small");
         if(q.a>0){ ab.textContent = c.big ? "Alış "+c.f(q.a)+" · Satış "+c.f(v) : "Alış "+c.f(q.a); }
         else ab.textContent="";
-        if(c.k.startsWith("coin")) sm.textContent = q.s==="intlc" ? "işçiliksiz tahmin" : "satış";
+        if(c.k.startsWith("coin")) sm.textContent = "satış";
       }
       const sr=SRC[q.s];
       upd.innerHTML='<span class="st"></span><span class="ut"></span><span class="us"></span>';
       upd.querySelector(".st").className="st "+q.st;
-      upd.querySelector(".ut").textContent=stTxt(q)+(q.at?" · "+zaman(q.at,q.st):"");
+      const sonKC = q.s==="harem" && q.st!=="canli";
+      upd.querySelector(".ut").textContent=(sonKC?"Son alınan Kapalıçarşı fiyatı":stTxt(q))+(q.at?" · "+(sonKC?fdt(q.at):zaman(q.at,q.st)):"");
       upd.querySelector(".us").textContent=sr.n+" · "+sr.m;
     });
     sonSave(false);
     durum();
     // tape
-    const items=[["Gram altın","gram",v=>fTL(v)],["Çeyrek","coin0",v=>fTL(v,0)],["Dolar","usd",v=>fN(v,4)],["Euro","eur",v=>fN(v,4)],["Sterlin","x_gbp",v=>fN(v,4)],["Ons","ons",v=>fUSD(v)],["Gümüş","ag",v=>fTL(v)],["Brent","brent",v=>fUSD(v)],["Bitcoin","btc",v=>fUSD(v,0)]].map(([n,k,f])=>[n+(QS[k]&&QS[k].cached?" (son bilinen)":""),qv(k),f]).filter(x=>x[1]);
+    const items=[["Gram altın","gram",v=>fTL(v)],["Çeyrek","coin0",v=>fTL(v,0)],["Dolar","usd",v=>fN(v,4)],["Euro","eur",v=>fN(v,4)],["Sterlin","x_gbp",v=>fN(v,4)],["Ons","ons",v=>fUSD(v)],["Gümüş","ag",v=>fTL(v)],["Brent","brent",v=>fUSD(v)],["Bitcoin","btc",v=>fUSD(v,0)]].map(([n,k,f])=>[n+(QS[k]&&(QS[k].cached||QS[k].st!=="canli"&&isKC(k))?" (son alınan)":""),qv(k),f]).filter(x=>x[1]);
     const html=items.map(([n,v,f])=>`<span>${n}<b>${f(v)}</b></span>`).join("");
     $("tape").innerHTML=html+html;
     calc();
@@ -514,10 +534,9 @@
     else if(!erken && canli===0 && eski>0){ msg="Canlı fiyat kaynaklarına şu an ulaşılamıyor. Gösterilen fiyatlar son doğrulanmış değerlerdir; her fiyatın altında kaynağı ve tarihi yazıyor. Bağlantı gelince kendiliğinden güncellenecek."; cls="kesik"; }
     else if(!erken && qs.length===0){ msg="Canlı fiyat kaynaklarına şu an ulaşılamıyor ve bu cihazda daha önce kaydedilmiş fiyat yok. Fiyat bilgisi şu an mevcut değil; bağlantı gelince kendiliğinden güncellenecek."; cls="kesik"; }
     else if(!erken){
-      const g=QS.gram, u=QS.usd;
-      const yedek=[g,u].some(q=>q&&!q.cached&&q.s!=="harem");
-      if(yedek){ const ad=g&&g.s==="tg"||u&&u.s==="tg" ? "Truncgil Finans" : "uluslararası piyasa";
-        msg=`Kapalıçarşı (Harem Altın) fiyat yayınına şu an ulaşılamıyor. Altın ve döviz fiyatları yedek kaynaktan (${ad}) gösteriliyor ve kuyumcu fiyatlarından farklı olabilir. Kullanılan kaynak her kartın altında turuncu yazıyla belirtilir.`; }
+      const kc=["gram","usd"].map(k=>QS[k]);
+      const kesik=kc.some(q=>!q||q.cached||q.st!=="canli");
+      if(kesik){ msg="Kapalıçarşı (Harem Altın) fiyat yayınına şu an ulaşılamıyor. Kartlarda son alınan Kapalıçarşı fiyatları tarih ve saatiyle gösteriliyor. Başka kaynakların fiyatları, farklı piyasaya ait oldukları için ayrı bir satırda \"Alternatif kaynak\" etiketiyle yazıyor."; }
       else if(eski>0) msg="Bazı fiyatlar şu an alınamıyor; bu fiyatlar son doğrulanmış değerleriyle, tarihleri belirtilerek gösteriliyor.";
     }
     if(bar.textContent!==msg) bar.textContent=msg;
@@ -535,7 +554,7 @@
   function num(v){ v=String(v||"").trim().replace(/\s/g,""); if(v.includes(",")) v=v.replace(/\./g,"").replace(",","."); else if(/^\d{1,3}(\.\d{3})+$/.test(v)) v=v.replace(/\./g,""); return parseFloat(v); }
   function calc(){ const q=num($("qty").value), u=UNITS.find(x=>x[0]===$("unit").value), p=u&&qv(u[2],u[3]), o=u&&QS[u[2]];
     $("calcRes").textContent=(q>=0&&p)?fTL(q*p):"—";
-    const n=$("calcNot"); if(n) n.textContent = !p ? "Bu fiyat şu an mevcut değil." : (o.cached ? "Son doğrulanmış fiyatla hesaplandı: "+SRC[o.s].n+", "+fdt(o.at) : SRC[o.s].n+" · "+SRC[o.s].m+(SRC[o.s].fb?" (yedek kaynak)":"")); }
+    const n=$("calcNot"); if(n) n.textContent = !p ? "Bu fiyat şu an mevcut değil; farklı piyasanın fiyatıyla hesap yapılmaz." : ((o.cached||o.st!=="canli") ? "Son alınan fiyatla hesaplandı: "+SRC[o.s].n+" · "+SRC[o.s].m+", "+fdt(o.at) : SRC[o.s].n+" · "+SRC[o.s].m); }
   $("qty").addEventListener("input",calc); $("unit").addEventListener("change",calc);
 
   // ---------- data sources ----------
@@ -752,8 +771,8 @@
     {k:"yarim",n:"Yarım altın",u:"adet",e:"🥇",c:"coin1",p:()=>qv("coin1","a")},
     {k:"tam",n:"Tam altın",u:"adet",e:"🥇",c:"coin2",p:()=>qv("coin2","a")},
     {k:"ata",n:"Cumhuriyet altını",u:"adet",e:"🥇",c:"coin3",p:()=>qv("coin3","a")},
-    {k:"a22",n:"22 ayar altın (bilezik)",u:"gram",e:"🥇",c:"gram",p:()=>tgf("b22")?tgf("b22").a:(qv("gram","a")&&qv("gram","a")*0.916)},
-    {k:"a14",n:"14 ayar altın",u:"gram",e:"🥇",c:"gram",p:()=>tgf("a14")?tgf("a14").a:(qv("gram","a")&&qv("gram","a")*0.585)},
+    {k:"a22",n:"22 ayar altın (bilezik)",u:"gram",e:"🥇",c:"gram",p:()=>hrf("AYAR22")?hrf("AYAR22").a:(qv("gram","a")&&qv("gram","a")*0.916)},
+    {k:"a14",n:"14 ayar altın",u:"gram",e:"🥇",c:"gram",p:()=>hrf("AYAR14")?hrf("AYAR14").a:(qv("gram","a")&&qv("gram","a")*0.585)},
     {k:"gumus",n:"Gümüş",u:"gram",e:"🥈",c:"ag",p:()=>qv("ag","a")},
     {k:"usd",n:"Dolar",u:"$",e:"💵",c:"usd",p:()=>qv("usd")},
     {k:"eur",n:"Euro",u:"€",e:"💶",c:"eur",p:()=>qv("eur")},
@@ -964,7 +983,9 @@
   let alarms=LS.get("pn-alarms",[]).filter(a=>ALK[a.k]), alPend=null, alT=0, beepCtx=null;
   const alSave=()=>LS.set("pn-alarms",alarms);
   // alarm yalnızca canlı ya da gecikmeli gerçek veriyle çalışır; son doğrulanmış (önbellek) değerle tetiklenmez
-  const alQ=k=>{ const q=QS[ALC[k]]; return q&&!q.cached&&q.v>0&&isFinite(q.v) ? q : null; };
+  // yalnızca canlı veri (saatlik petrol verisi için son 2 saat); son alınan / gecikmeli / alternatif fiyat alarm tetiklemez
+  const alQ=k=>{ const q=QS[ALC[k]]; if(!q||q.cached||!(q.v>0)||!isFinite(q.v)) return null;
+    if(q.st==="canli") return q; if(SRC[q.s]&&SRC[q.s].hourly&&!S.offline&&Date.now()-q.at<2*3600e3) return q; return null; };
   const alCur=(k,a)=>{ const q=alQ(k); if(!q) return null; if(a&&a.m&&a.m!==mkt(q)) return null; return q.v; };
   const dt=t=>new Intl.DateTimeFormat("tr-TR",{day:"numeric",month:"short",hour:"2-digit",minute:"2-digit"}).format(t);
   function beep(){ try{ beepCtx=beepCtx||new (window.AudioContext||window.webkitAudioContext)(); const o=beepCtx.createOscillator(), g=beepCtx.createGain(); o.frequency.value=880; g.gain.setValueAtTime(.001,beepCtx.currentTime); g.gain.exponentialRampToValueAtTime(.2,beepCtx.currentTime+.02); g.gain.exponentialRampToValueAtTime(.001,beepCtx.currentTime+.6); o.connect(g); g.connect(beepCtx.destination); o.start(); o.stop(beepCtx.currentTime+.6); }catch(e){} }
@@ -981,7 +1002,7 @@
     alarms.forEach(a=>{ if(a.hit) return; const q0=alQ(a.k); if(q0&&!a.m){ a.m=mkt(q0); changed=true; } const v=alCur(a.k,a); if(v==null) return; if(a.dir==="up"?v>=a.t:v<=a.t){ a.hit=Date.now(); a.hv=v; changed=true; alFire(a,v); } });
     if(changed){ alSave(); renderAl(); }
     const k0=$("alType").value, q1=alQ(k0), qx=QS[ALC[k0]];
-    $("alNow").textContent = q1 ? "Şu an: "+ALK[k0].f(q1.v)+" · "+SRC[q1.s].n+(q1.st==="canli"?" (canlı)":" (gecikmeli)") : (qx&&qx.cached ? "Canlı fiyat alınamıyor (son doğrulanmış: "+ALK[k0].f(qx.v)+", "+fdt(qx.at)+"). Alarm için canlı veri gerekir." : (Date.now()-bootAt<8000?"Fiyat yükleniyor…":"Bu fiyat şu an mevcut değil."));
+    $("alNow").textContent = q1 ? "Şu an: "+ALK[k0].f(q1.v)+" · "+SRC[q1.s].n+(q1.st==="canli"?" (canlı)":" (gecikmeli)") : (qx ? "Canlı fiyat alınamıyor (son alınan: "+ALK[k0].f(qx.v)+", "+fdt(qx.at)+"). Alarm için canlı veri gerekir." : (Date.now()-bootAt<8000?"Fiyat yükleniyor…":"Bu fiyat şu an mevcut değil."));
     if(Date.now()-alT>2000) renderAl();
   }
   function renderAl(){
