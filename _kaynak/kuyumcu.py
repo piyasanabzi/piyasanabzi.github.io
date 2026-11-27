@@ -17,6 +17,9 @@ _ALTIN = [("gram", "Gram altın"), ("ceyrek", "Çeyrek altın"), ("yarim", "Yar�
 E = _h.escape
 
 
+_BUGUN = _dt.datetime.now(_dt.timezone(_dt.timedelta(hours=3))).date()  # İstanbul
+
+
 class KPHata(Exception):
     pass
 
@@ -75,7 +78,13 @@ def _dogrula(b, slugs):
             if not (isinstance(x.get("alis"), (int, float)) and isinstance(x.get("satis"), (int, float)) and 0 < x["alis"] <= x["satis"]): hata(f"{k} fiyatı geçersiz (alış ≤ satış, pozitif)")
         if not any(fy.get(k) for k, _ in _ALTIN): hata("fiyat izni var ama fiyat yok")
         fiyat = fy
-    out = dict(b); out["_fiyat"] = fiyat; out["_paket"] = p
+    kamp = []
+    for k in b.get("kampanyalar") or []:
+        try: k1, k2 = _tarih(k["baslangic"]), _tarih(k["bitis"])
+        except Exception: hata("kampanya tarihi geçersiz")
+        if not (3 <= len(str(k.get("baslik", "")).strip()) <= 80 and 3 <= len(str(k.get("aciklama", "")).strip()) <= 500) or k2 < k1 or (k2 - k1).days > 60: hata("kampanya geçersiz")
+        if k2 >= _BUGUN: kamp.append(k)
+    out = dict(b); out["_fiyat"] = fiyat; out["_paket"] = p; out["_kampanya"] = kamp
     out["_il"] = _IL[b["il"]]["ad"]; out["_ilce"] = _ILCE[(b["il"], b["ilce"])]
     out["_url"] = f"/kuyumcu-pazari/{b['il']}/{b['slug']}.html"
     return out
@@ -121,6 +130,8 @@ KP_CSS = """<style>
 .kp-foto img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:12px;display:block}
 .kp-acik{font-weight:800}.kp-acik.evet{color:#16a34a}.kp-acik.hayir{color:#dc2626}
 .kp-fiyat.eski table{opacity:.55}
+.kp-kampanya{background:color-mix(in srgb,var(--gold) 10%,var(--card));border:1px solid color-mix(in srgb,var(--gold) 45%,var(--line));border-radius:14px;padding:12px 14px;margin:10px 0}
+.kp-kampanya p{margin:6px 0;line-height:1.45}
 .kp-uyari{background:color-mix(in srgb,#f59e0b 14%,var(--card));border:1px solid color-mix(in srgb,#f59e0b 45%,var(--line));border-radius:12px;padding:10px 12px;font-size:13.5px;margin:8px 0}
 .kp-form{display:grid;gap:12px;margin:12px 0}
 .kp-form .iki{display:grid;grid-template-columns:1fr 1fr;gap:10px}
@@ -209,7 +220,7 @@ def _profil(b):
     p = b["_paket"]
     rz = '<span class="kp-rozet ok">✓ Doğrulandı</span>' + (f'<span class="kp-rozet gold">{E(p["rozet"])}</span>' if p.get("rozet") else "")
     tel = b["telefon"]; wa = b.get("whatsapp")
-    btn = f'<a href="tel:{tel}">📞 Ara</a>' + (f'<a class="wa" href="https://wa.me/{wa[1:]}" rel="nofollow noopener" target="_blank">WhatsApp</a>' if wa else "")
+    btn = f'<a href="tel:{tel}" data-kp-say="ara">📞 Ara</a>' + (f'<a class="wa" href="https://wa.me/{wa[1:]}" rel="nofollow noopener" target="_blank" data-kp-say="whatsapp">WhatsApp</a>' if wa else "")
     harita = E("https://www.google.com/maps/search/?api=1&query=" + _qp(f'{b["ad"]} {b["adres"]} {b["_ilce"]} {b["_il"]}'))
     saat_rows = "".join(f'<tr><td>{g}</td><td>{"Kapalı" if b["saatler"][k] == "kapali" else E(b["saatler"][k].replace("-", " – "))}</td></tr>' for k, g in _GUN)
     foto = ""
@@ -218,13 +229,14 @@ def _profil(b):
     fiyat = ""
     if b["_fiyat"]:
         fy = b["_fiyat"]; g = _dt.datetime.fromisoformat(fy["guncelleme"])
-        rows = "".join(f'<tr><td>{ad}</td><td>₺{_tr(fy[k]["alis"]) if k=="gram" else _tr0(fy[k]["alis"])}</td><td>₺{_tr(fy[k]["satis"]) if k=="gram" else _tr0(fy[k]["satis"])}</td></tr>' for k, ad in _ALTIN if fy.get(k))
+        rows = "".join((f'<tr data-tur="{k}"><td>{ad}</td><td data-a>₺{_tr(fy[k]["alis"]) if k=="gram" else _tr0(fy[k]["alis"])}</td><td data-s>₺{_tr(fy[k]["satis"]) if k=="gram" else _tr0(fy[k]["satis"])}</td></tr>'
+                        if fy.get(k) else f'<tr data-tur="{k}" hidden><td>{ad}</td><td data-a></td><td data-s></td></tr>') for k, ad in _ALTIN)
         ay = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
         gyaz = f"{g.day} {ay[g.month-1]} {g.year}, {g:%H:%M}"
         fiyat = (f'<h2>İşletmenin altın fiyatları</h2><div class="kp-fiyat" id="kpFiyatBlok" data-guncelleme="{E(fy["guncelleme"])}">'
                  f'<div class="kp-uyari" id="kpEski" hidden></div>'
                  f'<table><tr><th>Ürün</th><th>Alış</th><th>Satış</th></tr>{rows}</table>'
-                 f'<p class="note">Fiyatları işletme girmiştir · Son güncelleme: <b>{gyaz}</b>. Fiyatlar anlık değildir; alım satımdan önce işletmeyle teyit et. '
+                 f'<p class="note">Fiyatları işletme girmiştir · Son güncelleme: <b id="kpFiyatZaman">{gyaz}</b>. Fiyatlar anlık değildir; alım satımdan önce işletmeyle teyit et. '
                  f'Karşılaştırma için <a href="/">canlı Kapalıçarşı fiyatlarına</a> bakabilirsin.</p></div>')
     else:
         fiyat = '<h2>Altın fiyatları</h2><p class="note">Bu işletme Kuyumcu Pazarı üzerinden fiyat paylaşmıyor. Güncel fiyat için işletmeyi arayabilir ya da <a href="/">canlı Kapalıçarşı fiyatlarına</a> bakabilirsin.</p>'
@@ -237,11 +249,14 @@ def _profil(b):
     if b.get("fotograflar"): ld["image"] = [SITE + "/" + f["dosya"] for f in b["fotograflar"]]
     head = KP_CSS + '<script type="application/ld+json">' + _json.dumps(ld, ensure_ascii=False).replace("</", "<\\/") + "</script>"
     saatjs = _json.dumps(b["saatler"])
-    body = f"""<div class="kp-lead">{E(b["_ilce"])}, {E(b["_il"])}<br>{rz}</div>
+    kamp = "".join(f'<div class="kp-kampanya" data-bitis="{E(k["bitis"])}"><b>🎁 {E(k["baslik"])}</b><p>{E(k["aciklama"])}</p><small class="note">Son gün: {E(_tarihtr(k["bitis"]))} · Kampanya koşullarını işletmeyle teyit et.</small></div>' for k in b.get("_kampanya", []))
+    body = f"""<div class="kp-lead" data-kp-id="{E(b["id"])}">{E(b["_ilce"])}, {E(b["_il"])}<br>{rz}</div>
 <div class="kp-btns">{btn}</div>
+{kamp}
 <p><span class="kp-acik" id="kpAcik"></span></p>
+{('<p>' + E(b["aciklama"]) + '</p>') if b.get("aciklama") else ""}
 {foto}
-<h2>Adres</h2><p>{E(b["adres"])}<br>{E(b["_ilce"])} / {E(b["_il"])}<br><a href="{harita}" rel="nofollow noopener" target="_blank">Haritada aç →</a></p>
+<h2>Adres</h2><p>{E(b["adres"])}<br>{E(b["_ilce"])} / {E(b["_il"])}<br><a href="{harita}" rel="nofollow noopener" target="_blank" data-kp-say="yol_tarifi">Haritada aç →</a></p>
 <h2>Çalışma saatleri</h2><table>{saat_rows}</table>
 {fiyat}
 <h2>Doğrulama</h2><p class="note">Bu işletme {E(b["dogrulama"]["tarih"])} tarihinde doğrulandı ({E(yontem)}). <a href="/kuyumcu-pazari/kurallar.html">Doğrulama kurallarımız</a></p>
@@ -262,9 +277,17 @@ def _profil(b):
   if(fb){{ var t=Date.parse(fb.dataset.guncelleme), y=(Date.now()-t)/36e5, u=document.getElementById("kpEski");
     if(y>24*7){{ fb.querySelector("table").remove(); u.hidden=false; u.textContent="Bu işletmenin fiyatları 7 günden eski olduğu için gösterilmiyor. Güncel fiyat için işletmeyi ara."; }}
     else if(y>24){{ fb.classList.add("eski"); u.hidden=false; u.textContent="Dikkat: bu fiyatlar "+Math.floor(y/24)+" gün önce güncellendi; şu anki fiyat farklı olabilir."; }} }}
+  try{{ var bg=new Intl.DateTimeFormat("en-CA",{{timeZone:"Europe/Istanbul"}}).format(new Date());
+    Array.prototype.forEach.call(document.querySelectorAll(".kp-kampanya"),function(k){{ if(k.getAttribute("data-bitis")<bg) k.remove(); }}); }}catch(x){{}}
 }})();
 </script>"""
+    head += '<script src="/kuyumcu-pazari/ayar.js" defer></script><script src="/kuyumcu-pazari/sayac.js" defer></script>'
     return head, body
+
+
+def _tarihtr(s):
+    d = _tarih(s); ay = ["Ocak","Şubat","Mart","Nisan","Mayıs","Haziran","Temmuz","Ağustos","Eylül","Ekim","Kasım","Aralık"]
+    return f"{d.day} {ay[d.month-1]} {d.year}"
 
 
 def _kurallar():
@@ -399,5 +422,96 @@ for _b in _YAY:
               _bd, crumb=_crumb + f' › {E(_b["_il"])}', article=False, head=_hd, h1=_b["ad"])
     urls.append(_u); _var.add(_os.path.join(ROOT, _b["_url"].lstrip("/")))
 for _p in glob.glob(_os.path.join(ROOT, "kuyumcu-pazari", "*", "*.html")):
-    if _p not in _var: _os.remove(_p)
+    if _p not in _var and _os.path.basename(_os.path.dirname(_p)) in _IL: _os.remove(_p)
 print("kuyumcu pazarı:", len(_YAY), "yayında işletme")
+
+
+# ───────────── Kuyumcu Yönetim Sistemi: panel sayfaları (reklamsız, dizine kapalı, CSP'li) ─────────────
+PANEL_CSS = """<style>
+.kp-kutu{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin:12px 0}
+.kp-kutu h2{margin:0 0 8px;font-size:19px}.kp-kutu h3{margin:14px 0 6px;font-size:16px}
+.kp-ust{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:6px 0 10px}
+.kp-sekmeler{display:flex;gap:6px;overflow-x:auto;padding:4px 0 8px;scrollbar-width:none}
+.kp-sekmeler button,.kp-filtreler button{flex:none;font:700 13.5px/1 Inter,system-ui,sans-serif;color:var(--muted);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:9px 13px;cursor:pointer}
+.kp-sekmeler button[aria-selected=true],.kp-filtreler button.secili{color:#1a1200;background:var(--gold);border-color:var(--gold)}
+.kp-filtreler{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 10px}
+.kp-durum{border-radius:16px;padding:12px 14px;margin:8px 0 12px;border:1px solid var(--line);background:var(--card)}
+.kp-durum p{margin:6px 0;line-height:1.45}.kp-durum.d-onayli{border-color:#16a34a}.kp-durum.d-reddedildi,.kp-durum.d-askida{border-color:#dc2626}
+.kp-durum.d-eksik_bilgi{border-color:#f59e0b}.kp-not{background:var(--bg);border-radius:10px;padding:8px 10px}
+.kp-form button.ikincil,button.ikincil{background:var(--card);color:var(--ink);border:1px solid var(--line)}
+button.ikincil,button.tehlike,button.kucuk,.kp-dugmeler button,.kp-kutu>button{font:inherit;font-weight:800;border-radius:12px;padding:10px 14px;cursor:pointer;border:1px solid var(--line)}
+.kp-dugmeler button:not(.ikincil):not(.tehlike),.kp-kutu>button:not(.ikincil):not(.tehlike){background:var(--gold);color:#1a1200;border-color:var(--gold)}
+button.tehlike{background:#dc2626;color:#fff;border-color:#dc2626}
+button.kucuk{padding:7px 10px;font-size:13px}
+button:disabled{opacity:.6;cursor:wait}
+.kp-dugmeler{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0}
+.kp-satir{display:flex;gap:8px;align-items:center}.kp-satir select{flex:1}
+.kp-kutu select,.kp-kutu input:not([type=checkbox]),.kp-kutu textarea{width:100%;font:inherit;font-size:15px;color:var(--ink);background:var(--bg);border:1px solid var(--line);border-radius:12px;padding:10px 12px;margin:4px 0}
+.kp-saatler{display:grid;gap:6px}
+.kp-saat{display:grid;grid-template-columns:92px 1fr auto 1fr auto;gap:6px;align-items:center;font-size:14px}
+.kp-saat input[type=time]{padding:8px}
+.kp-saat label{display:flex;gap:4px;align-items:center;font-weight:600;color:var(--muted);margin:0}
+.kp-fiyat-gir{display:grid;gap:8px}
+.kp-fiyat-satir{display:grid;grid-template-columns:110px 1fr 1fr;gap:8px;align-items:center}
+.kp-foto-liste{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;margin:10px 0}
+.kp-foto-liste figure{margin:0;background:var(--card);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.kp-foto-liste img,.kp-onizle{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;border-radius:10px}
+.kp-foto-liste figcaption{padding:8px;font-size:13px}
+.kp-dogrulama{display:grid;grid-template-columns:1fr;gap:4px;border-top:1px solid var(--line);padding:8px 0}
+.kp-dogrulama.ok b{color:#16a34a}
+.kp-etiket{font-size:12px;font-weight:800;border-radius:999px;padding:2px 8px;border:1px solid var(--line)}
+.kp-kart-bas{all:unset;cursor:pointer;display:block;width:100%;line-height:1.5}
+.kp-sapma td{background:color-mix(in srgb,#f59e0b 14%,var(--card))}
+.kp-qr{background:#fff;padding:8px;border-radius:12px;display:block;margin:8px 0}
+.kp-anahtar{word-break:break-all;font-size:14px}
+.kp-paket{display:grid;gap:6px}.kp-paket-alan{display:grid;grid-template-columns:150px 1fr;align-items:center;gap:8px;font-size:14px}
+.kp-paket-alan input[type=checkbox]{width:20px;height:20px}
+#kpBildirim{position:fixed;left:12px;right:12px;bottom:14px;z-index:50;display:grid;gap:8px;max-width:520px;margin:0 auto}
+.kp-bil{padding:12px 14px;border-radius:14px;font-weight:700;font-size:14px;box-shadow:0 6px 20px rgba(0,0,0,.25);background:#16a34a;color:#fff}
+.kp-bil.hata{background:#dc2626}
+@media (max-width:520px){.kp-saat{grid-template-columns:1fr 1fr auto;}.kp-saat b{grid-column:1/-1}.kp-saat span{display:none}.kp-fiyat-satir{grid-template-columns:1fr 1fr}.kp-fiyat-satir b{grid-column:1/-1}.kp-paket-alan{grid-template-columns:1fr}}
+</style>"""
+_CSP = ('<meta http-equiv="Content-Security-Policy" content="default-src \'self\'; script-src \'self\'; style-src \'self\' \'unsafe-inline\'; '
+        'img-src \'self\' data: blob: https://*.supabase.co; connect-src \'self\' https://*.supabase.co; object-src \'none\'; base-uri \'none\'; form-action \'self\'">'
+        '<meta name="referrer" content="no-referrer"><meta name="robots" content="noindex,nofollow">')
+_PJS = '<script src="/kuyumcu-pazari/ayar.js" defer></script><script src="/kuyumcu-pazari/panel/pn-supa.js" defer></script><script src="/kuyumcu-pazari/panel/ortak.js" defer></script>'
+_PBODY = '<div id="kpPanel"><noscript><p class="kp-uyari">Panel için tarayıcınızda JavaScript açık olmalı.</p></noscript><p class="note">Yükleniyor…</p></div>'
+page("kuyumcu-pazari/panel/index.html", "Kuyumcu paneli", "Kuyumcu Pazarı işletme paneli: giriş, işletme bilgileri, fiyat, fotoğraf ve kampanya yönetimi.",
+     _PBODY, crumb=_crumb, article=False, h1="Kuyumcu paneli", reklam=False,
+     head=_CSP + KP_CSS + PANEL_CSS + _PJS + '<script src="/kuyumcu-pazari/panel/kuyumcu.js" defer></script>')
+page("kuyumcu-pazari/yonetim/index.html", "Yönetim paneli", "Kuyumcu Pazarı yönetim paneli.",
+     _PBODY, crumb=_crumb, article=False, h1="Yönetim paneli", reklam=False,
+     head=_CSP + KP_CSS + PANEL_CSS + _PJS + '<script src="/kuyumcu-pazari/yonetim/yonetim.js" defer></script>')
+
+_TASLAK = '<div class="kp-uyari"><b>Taslak metin.</b> Bu metin yayın öncesi hukuki incelemeden geçirilecektir.</div>'
+page("kuyumcu-pazari/panel-aydinlatma.html", "Kuyumcu paneli aydınlatma metni",
+     "Kuyumcu Pazarı işletme paneli üyeliğinde işlenen kişisel veriler hakkında KVKK aydınlatma metni.", _TASLAK + """
+<p class="note">Sürüm: kp-panel-aydinlatma-2026-11-27</p>
+<p>Bu metin, 6698 sayılı Kişisel Verilerin Korunması Kanunu'nun (KVKK) 10. maddesi uyarınca Kuyumcu Pazarı işletme paneli üyeliği sırasında işlenen kişisel veriler hakkında bilgi vermek için hazırlanmıştır.</p>
+<h2>Veri sorumlusu</h2><p>Piyasa Nabzı (piyasanabzi.site) işletmecisi. İletişim: <a href="mailto:piyasanabzi.iletisim@gmail.com">piyasanabzi.iletisim@gmail.com</a></p>
+<h2>İşlenen veriler</h2><ul>
+<li><b>Hesap:</b> e-posta adresi, giriş zamanları, oturum bilgileri</li>
+<li><b>Kimlik:</b> işletme yetkilisinin adı ve soyadı (yayınlanmaz)</li>
+<li><b>İletişim:</b> işletme telefonu, WhatsApp numarası, isteğe bağlı iletişim e-postası</li>
+<li><b>İşletme bilgileri:</b> işletme adı, adresi, il/ilçe, çalışma saatleri, açıklama, fotoğraflar, kampanyalar ve fiyatlar</li>
+<li><b>İşlem kayıtları:</b> başvuru, onay, izin ve değişiklik kayıtları (kim, ne zaman)</li></ul>
+<p>T.C. kimlik numarası, vergi numarası veya belge kopyası istenmez ve saklanmaz. Fotoğraflar yüklenmeden önce tarayıcınızda küçültülür ve içindeki konum bilgisi silinir.</p>
+<h2>Amaçlar ve hukuki sebepler</h2><ul>
+<li>Hesabın açılması, başvurunun değerlendirilmesi, işletmenin doğrulanması ve yayınlanması: sözleşmenin kurulması ve ifası (KVKK m.5/2-c)</li>
+<li>İşletme bilgilerinin, fotoğrafların ve izin verilmişse fiyatların herkese açık yayınlanması: sözleşmenin ifası (m.5/2-c), işletme tarafından alenileştirilmesi (m.5/2-d)</li>
+<li>Güvenlik ve kötüye kullanımın önlenmesi için işlem kayıtları: meşru menfaat (m.5/2-f) ve hukuki yükümlülük (m.5/2-ç)</li></ul>
+<h2>Aktarım</h2><p>Veriler; veritabanı, kimlik doğrulama ve dosya depolama hizmeti için Supabase'e, giriş e-postalarının gönderimi için e-posta hizmet sağlayıcısına aktarılır. Bu hizmetlerin sunucuları yurt dışında bulunabilir; aktarım KVKK m.9'daki usullere (standart sözleşme ve Kurul'a bildirim) uygun yapılır. Veriler satılmaz ve reklam amacıyla paylaşılmaz.</p>
+<h2>Saklama süresi</h2><p>Reddedilen başvurular 6 ay, yayından kalkan veya silme talebinde bulunulan hesaplar en geç 30 gün içinde silinir; güvenlik amaçlı işlem kayıtları en fazla 2 yıl saklanır.</p>
+<h2>Haklarınız</h2><p>KVKK m.11 uyarınca verilerinize erişme, düzeltilmesini veya silinmesini isteme ve itiraz etme haklarına sahipsiniz. Silme talebini panelin "Hesap" bölümünden ya da <a href="mailto:piyasanabzi.iletisim@gmail.com">e-postayla</a> iletebilirsiniz.</p>""",
+     crumb=_crumb, article=False, head=KP_CSS + _NOINDEX, h1="Kuyumcu paneli aydınlatma metni (KVKK)")
+page("kuyumcu-pazari/fiyat-izni.html", "Kuyumcu Pazarı fiyat yayınlama izni",
+     "Kuyumcu Pazarı'nda işletme fiyatlarının yayınlanmasına ilişkin izin metni.", _TASLAK + """
+<p class="note">Sürüm: kp-fiyat-izni-2026-11-27</p>
+<p>Bu izinle, işletme yetkilisi olarak panelden girdiğiniz altın alış ve satış fiyatlarının Kuyumcu Pazarı'ndaki işletme sayfanızda yayınlanmasına izin verirsiniz.</p>
+<ul>
+<li>Fiyatları yalnızca siz girersiniz; Piyasa Nabzı fiyat üretmez, değiştirmez ve garanti etmez.</li>
+<li>Her fiyat, girildiği tarih ve saatle birlikte gösterilir. 24 saati geçen fiyat "eski" olarak işaretlenir, 7 günü geçen fiyat gösterilmez.</li>
+<li>Girilen fiyatların gerçeği yansıtmasından siz sorumlusunuz. Yanıltıcı olduğu düşünülen fiyatları yönetici gizleyebilir.</li>
+<li>Bu izni panelden istediğiniz an geri alabilirsiniz; geri aldığınızda fiyatlarınız yayından kalkar.</li>
+<li>İzin verme ve geri alma işlemleri tarih ve saatiyle kaydedilir.</li></ul>""",
+     crumb=_crumb, article=False, head=KP_CSS + _NOINDEX, h1="Fiyat yayınlama izni")

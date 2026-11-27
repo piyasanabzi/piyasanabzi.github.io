@@ -1,0 +1,41 @@
+name: Kuyumcu Pazari senkron
+
+# Supabase'teki onaylı işletmeleri statik sayfalara dönüştürür.
+# kuyumcu-pazari/ayar.js boşken hiçbir şey yapmaz. Yalnızca publishable (herkese açık) anahtar kullanır.
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: kuyumcu-senkron
+  cancel-in-progress: false
+
+jobs:
+  senkron:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - name: Veritabanindan oku
+        id: oku
+        run: python3 _kaynak/kuyumcu_senkron.py
+      - name: Sayfalari uret
+        run: |
+          cd _kaynak && python3 content.py >/dev/null && python3 nav.py >/dev/null
+      - name: Degisiklik varsa yayinla
+        run: |
+          git config user.name "piyasanabzi-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A kuyumcu-pazari _kaynak/kuyumcu sitemap.xml
+          if git diff --cached --quiet; then echo "degisiklik yok"; exit 0; fi
+          # yalnızca Kuyumcu Pazarı dosyaları değişmiş olmalı
+          if git diff --cached --name-only | grep -v -E '^(kuyumcu-pazari/|_kaynak/kuyumcu/|sitemap\.xml$)'; then echo "beklenmeyen dosya degisti"; exit 1; fi
+          git commit -q -m "Kuyumcu Pazari senkron $(date -u +%Y-%m-%dT%H:%MZ)"
+          git pull -q --rebase origin main
+          git push -q origin HEAD:main
