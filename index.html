@@ -426,6 +426,9 @@
   function stTxt(q){ const sr=SRC[q.s]||{}; if(q.st==="canli") return "Canlı"; if(q.st==="eski") return "Son doğrulanmış"; if(sr.daily) return "Günlük kur"; if(sr.hourly) return "Saatlik"; return "Gecikmeli"; }
   function resolve(c){
     let q=null; try{ q=QF[c.k]?QF[c.k]():null; }catch(e){ q=null; }
+    // açılışın ilk saniyelerinde ana kaynak (Harem) beklenir: yedek kaynağın farklı piyasa fiyatı bir anlığına gösterilmez
+    const erken = Date.now()-bootAt<5000 && !S.hrOK && hFail===0 && !S.offline;
+    if(q && erken && SRC[q.s] && SRC[q.s].fb) q=null;
     if(q&&q.v>0&&isFinite(q.v)&&q.s&&SRC[q.s]){
       q.st=stOf(q); q.cached=false;
       const ok = (q.s!=="harem"&&q.s!=="hons") || S.hrOK;
