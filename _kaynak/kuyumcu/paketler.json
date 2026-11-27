@@ -1,0 +1,8 @@
+{
+  "aciklama": "Üyelik paketleri altyapısı. 'satista': false olan paket satın alınamaz ve hiçbir işletmeye atanamaz. Ücret ve içerik kararları henüz verilmedi; değerler taslaktır.",
+  "paketler": {
+    "ucretsiz":    {"ad": "Ücretsiz",    "satista": true,  "foto_limit": 3,  "fiyat_yayini": true, "one_cikan": false, "rozet": null,          "istatistik": false},
+    "profesyonel": {"ad": "Profesyonel", "satista": false, "foto_limit": 10, "fiyat_yayini": true, "one_cikan": false, "rozet": "Profesyonel", "istatistik": true},
+    "premium":     {"ad": "Premium",     "satista": false, "foto_limit": 20, "fiyat_yayini": true, "one_cikan": true,  "rozet": "Premium",     "istatistik": true}
+  }
+}
