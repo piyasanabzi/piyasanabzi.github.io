@@ -95,7 +95,7 @@
       ilAlan.appendChild(alan("İl", s.il)); ilAlan.appendChild(alan("İlçe", s.ilce));
       form._il = s.il; form._ilce = s.ilce;
     });
-    form.append(
+    KP.ekle(form, [
       h("h2", { text: x.id ? "İşletme bilgileri" : "İşletmenizi ekleyin" }),
       x.id ? null : h("p", { class: "note", text: "Bu bilgiler doğrulama için kullanılır ve yalnızca onaydan sonra yayınlanır. T.C. kimlik numarası, vergi numarası ya da belge yüklemeniz istenmez." }),
       kilitli ? h("p", { class: "kp-uyari", text: "Başvurunuz incelenirken işletme bilgileri değiştirilemez; çalışma saatlerini değiştirebilirsiniz." }) : null,
@@ -108,7 +108,7 @@
       alan("İletişim e-postası (isteğe bağlı, yayınlanmaz)", ep),
       alan("Kısa açıklama (isteğe bağlı)", ac),
       h("div", null, h("label", { text: "Çalışma saatleri" }), saat.el),
-      kaydet);
+      kaydet]);
     [ad, yetkili, adres, tel, wa, ep, ac].forEach(function (i) { i.disabled = kilitli; });
     form.addEventListener("submit", KP.islem(kaydet, async function () {
       var v = { ad: ad.value.trim(), yetkili_ad: yetkili.value.trim(), adres: adres.value.trim(), telefon: KP.tel(tel.value),

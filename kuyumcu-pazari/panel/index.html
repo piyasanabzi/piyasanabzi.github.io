@@ -85,8 +85,8 @@ footer a{color:var(--muted);margin-right:14px;display:inline-block;margin-bottom
 .kp-durum p{margin:6px 0;line-height:1.45}.kp-durum.d-onayli{border-color:#16a34a}.kp-durum.d-reddedildi,.kp-durum.d-askida{border-color:#dc2626}
 .kp-durum.d-eksik_bilgi{border-color:#f59e0b}.kp-not{background:var(--bg);border-radius:10px;padding:8px 10px}
 .kp-form button.ikincil,button.ikincil{background:var(--card);color:var(--ink);border:1px solid var(--line)}
-button.ikincil,button.tehlike,button.kucuk,.kp-dugmeler button,.kp-kutu>button{font:inherit;font-weight:800;border-radius:12px;padding:10px 14px;cursor:pointer;border:1px solid var(--line)}
-.kp-dugmeler button:not(.ikincil):not(.tehlike),.kp-kutu>button:not(.ikincil):not(.tehlike){background:var(--gold);color:#1a1200;border-color:var(--gold)}
+button.ikincil,button.tehlike,button.kucuk,.kp-dugmeler button,.kp-kutu>button:not(.kp-kart-bas){font:inherit;font-weight:800;border-radius:12px;padding:10px 14px;cursor:pointer;border:1px solid var(--line)}
+.kp-dugmeler button:not(.ikincil):not(.tehlike),.kp-kutu>button:not(.ikincil):not(.tehlike):not(.kp-kart-bas){background:var(--gold);color:#1a1200;border-color:var(--gold)}
 button.tehlike{background:#dc2626;color:#fff;border-color:#dc2626}
 button.kucuk{padding:7px 10px;font-size:13px}
 button:disabled{opacity:.6;cursor:wait}
@@ -106,7 +106,8 @@ button:disabled{opacity:.6;cursor:wait}
 .kp-dogrulama{display:grid;grid-template-columns:1fr;gap:4px;border-top:1px solid var(--line);padding:8px 0}
 .kp-dogrulama.ok b{color:#16a34a}
 .kp-etiket{font-size:12px;font-weight:800;border-radius:999px;padding:2px 8px;border:1px solid var(--line)}
-.kp-kart-bas{all:unset;cursor:pointer;display:block;width:100%;line-height:1.5}
+.kp-kart-bas{all:unset;cursor:pointer;display:block;width:100%;line-height:1.5;box-sizing:border-box}
+.kp-alan table th{white-space:nowrap;width:1%;vertical-align:top}.kp-alan table td{overflow-wrap:anywhere}
 .kp-sapma td{background:color-mix(in srgb,#f59e0b 14%,var(--card))}
 .kp-qr{background:#fff;padding:8px;border-radius:12px;display:block;margin:8px 0}
 .kp-anahtar{word-break:break-all;font-size:14px}
